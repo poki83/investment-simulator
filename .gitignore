@@ -1,6 +1,9 @@
-.DS_Store
-*.log
 node_modules/
-*.local
-.idea/
-.vscode/
+www/
+android/
+dist/
+*.keystore
+*.jks
+*.p12
+keystore.properties
+.DS_Store

@@ -1,0 +1,29 @@
+{
+  "name": "investment-simulator",
+  "version": "1.0.0",
+  "description": "InvestSim – Deutschsprachiger Investment-Simulator (Aktien, ETFs, Krypto, Immobilien, Luxus)",
+  "main": "sw.js",
+  "scripts": {
+    "build:www": "node scripts/build-www.mjs",
+    "cap:add": "npm run build:www && npx cap add android",
+    "cap:sync": "npx cap sync android",
+    "android:build": "npm run build:www && npx cap sync android && cd android && ./gradlew assembleDebug"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/poki83/investment-simulator.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "UNLICENSED",
+  "type": "module",
+  "bugs": {
+    "url": "https://github.com/poki83/investment-simulator/issues"
+  },
+  "homepage": "https://github.com/poki83/investment-simulator#readme",
+  "dependencies": {
+    "@capacitor/android": "^8.5.1",
+    "@capacitor/cli": "^8.5.1",
+    "@capacitor/core": "^8.5.1"
+  }
+}

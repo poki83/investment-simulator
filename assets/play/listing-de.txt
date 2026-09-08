@@ -1,0 +1,65 @@
+=========================================================
+InvestSim – Google-Play-Eintrag (Copy-Paste-Vorlage)
+=========================================================
+
+App-Name (max. 30 Zeichen):
+  InvestSim
+
+Kurzfassung / Kurzbeschreibung (max. 80 Zeichen):
+  Investment-Simulator: Aktien, ETF, Krypto & Immobilien live erleben.
+
+=========================================================
+Volltext (Listenbeschreibung, max. 4000 Zeichen):
+=========================================================
+InvestSim ist ein deutschsprachiger Investment-Simulator in Echtzeit. Starte mit 10.000 € Startguthaben und baue dein Vermögen an den fiktiven Märkten auf:
+
+📈 AKTIEN & ETFs
+- Aktien großer Konzerne mit Charts, Technik-Kennzahlen und Dividenden
+- ETFs zur breiten Streuung
+
+₿ KRYPTO
+- Beliebte Kryptowährungen rund um die Uhr handeln
+
+🏠 IMMOBILIEN
+- Häuser und Wohnungen in deutschen Bundesländern kaufen
+- Mieteinnahmen, Grundsteuer, Renovierung und Wertsteigerung
+
+💼 UNTERNEHMEN
+- Junge Firmen gründen oder kaufen, Markt-Risiken meistern
+
+💎 LUXUS
+- Uhren, Yachten und Kunstwerke als Wertanlage
+
+🎰 CASINO & EVENT-KALENDER
+- Roulette, Slots und Spiele um Echtzeit-Währung
+- Dynamische Nachrichten und Markt-Events
+
+Realistisches Steuersystem:
+- Abgeltungssteuer (26,375 %) wird beim Verkauf automatisch einbehalten
+- Mieteinnahmen werden automatisch versteuert
+- Grundsteuer, Grunderwerbsteuer und Fälligkeiten pro Bundesland
+
+Features:
+- Spielstand wird automatisch lokal auf dem Gerät gespeichert
+- Offline-Fortschritt, Leaderboard, Speedsteuerung (1x–100x)
+- Vollständig auf Deutsch, optimiert für Smartphone und Tablet
+
+Achtung: InvestSim ist ein fiktives Spiel mit erfundenen Kursen – kein echtes Geld, keine echte Börse. Ohne In-App-Käufe, ohne Werbung.
+
+=========================================================
+Weitere Angaben für die Play Console:
+=========================================================
+Kategorie:            Finance
+Content-Rating:       Über den Fragebogen angeben – keine gewalttätigen/persönlichen Inhalte;
+                      Hinweis: Glücksspiel-Simulation nur mit fiktivem Geld, kein Echtgeld-Einsatz.
+Altersfreigabe:       Alle / für alle freigegeben (Jugendfreigabe) angeben lassen.
+Data Safety:          Es werden keine Nutzerdaten erhoben oder weitergegeben.
+Target audience:      Alle Altersgruppen (vollständig fiktiv, keine Echtgeld-Transaktionen).
+Privacy Policy URL:   https://poki83.github.io/investment-simulator/privacy.html
+App Icon (512x512):   assets/play/icon-512.png
+Feature Graphic:      assets/play/feature-graphic.png
+Screenshots (Telefon): assets/play/screenshot-1.png / -2.png / -3.png
+Nachricht an Reviewer: Fiktives Börsenspiel mit erfundenen Kursen; Einstieg mit virtuellen 10.000 €.
+
+Versionshinweise (was ist neu, v1.0.0):
+  Erste Veröffentlichung.
