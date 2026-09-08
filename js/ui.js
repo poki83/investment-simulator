@@ -676,6 +676,7 @@ const UI = {
 
         if (this.tradeAction === 'buy') {
             const result = ctx.market.buy(ctx.symbol, amount, Infinity);
+            document.getElementById('asset-trade-amount').removeAttribute('max');
             document.getElementById('asset-trade-cost-label').textContent = 'Gesamtkosten:';
             document.getElementById('asset-trade-fee-label').textContent = 'Gebühr (' + (ctx.t === 'crypto' ? '0,5%' : '0,1%') + '):';
             note.innerHTML = '';
@@ -759,7 +760,7 @@ const UI = {
             GameState.removeCash(result.total);
 
             if (!holding) {
-                GameState.portfolio[ctx.portKey][symbol] = { shares: 0, invested: 0, avgPrice: 0, profit: 0 };
+                GameState.portfolio[ctx.portKey][symbol] = { [ctx.holdingKey]: 0, invested: 0, avgPrice: 0, profit: 0 };
             }
             const h = GameState.portfolio[ctx.portKey][symbol];
             h[ctx.holdingKey] += amount;

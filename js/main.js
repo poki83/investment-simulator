@@ -160,12 +160,6 @@ const Game = {
             }
         }
 
-        const grundsteuer = Taxes.calculateGrundsteuer();
-        const monthlyGrundsteuer = grundsteuer / 12;
-        if (monthlyGrundsteuer > 0) {
-            Taxes.addTaxDebt(monthlyGrundsteuer);
-        }
-
         for (const prop of RealEstate.properties) {
             if (!prop.owned) continue;
             const growth = 0.001 + (Math.random() - 0.5) * 0.002;
