@@ -92,47 +92,18 @@ const Taxes = {
         return payment;
     },
 
+    withholdRent(monthlyRent) {
+        if (monthlyRent <= 0) return 0;
+        const annualRent = monthlyRent * 12;
+        const yearTax = this.calculateRentalIncomeTax(annualRent);
+        const monthTax = Math.round(yearTax / 12 * 100) / 100;
+        if (monthTax > 0) {
+            GameState.taxes.rentalTax += monthTax;
+        }
+        return monthTax;
+    },
+
     processWeeklyTaxes() {
-        for (const [symbol, holding] of Object.entries(GameState.portfolio.stocks)) {
-            if (holding.profit > 0 && holding.taxed) {
-                const tax = this.calculateCapitalGainsTax(holding.profit);
-                if (!holding.taxApplied) {
-                    this.addTaxDebt(tax.total);
-                    GameState.taxes.capitalTax += tax.capitalTax;
-                    GameState.taxes.soli += tax.soli;
-                    holding.taxApplied = true;
-                }
-            }
-        }
-
-        for (const [symbol, holding] of Object.entries(GameState.portfolio.etfs)) {
-            if (holding.profit > 0 && holding.taxed && !holding.taxApplied) {
-                const tax = this.calculateCapitalGainsTax(holding.profit);
-                this.addTaxDebt(tax.total);
-                GameState.taxes.capitalTax += tax.capitalTax;
-                GameState.taxes.soli += tax.soli;
-                holding.taxApplied = true;
-            }
-        }
-
-        for (const [symbol, holding] of Object.entries(GameState.portfolio.crypto)) {
-            if (holding.profit > 0 && holding.taxed && !holding.taxApplied) {
-                const tax = this.calculateCapitalGainsTax(holding.profit);
-                this.addTaxDebt(tax.total);
-                GameState.taxes.capitalTax += tax.capitalTax;
-                GameState.taxes.soli += tax.soli;
-                holding.taxApplied = true;
-            }
-        }
-
-        const annualRent = GameState.getMonthlyRent() * 12;
-        const rentalTax = this.calculateRentalIncomeTax(annualRent);
-        const weeklyRentalTax = rentalTax / 52;
-        if (weeklyRentalTax > 0) {
-            this.addTaxDebt(weeklyRentalTax);
-            GameState.taxes.rentalTax += weeklyRentalTax;
-        }
-
         const grundsteuer = this.calculateGrundsteuer();
         const weeklyGrundsteuer = grundsteuer / 52;
         if (weeklyGrundsteuer > 0) {

@@ -969,3 +969,93 @@ body {
 .sidebar .nav-btn {
     max-width: 68px;
 }
+/* =========================================================
+   Asset-Übersichtsseite (Aktien / ETFs / Krypto)
+   ========================================================= */
+.asset-detail-title {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+}
+.asset-detail-sub {
+    display: flex;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 8px;
+    color: var(--text-secondary);
+    font-size: 0.85rem;
+    margin-top: 3px;
+}
+.asset-overview-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 16px;
+    margin-bottom: 16px;
+}
+.asset-price-card .big-number {
+    font-size: 2.2rem;
+}
+.asset-price-card .detail-stats {
+    margin: 12px 0 0;
+}
+.asset-position-card .empty-state {
+    padding: 18px;
+}
+.position-grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 10px;
+}
+.asset-chart-card canvas {
+    width: 100%;
+    height: 260px;
+    display: block;
+}
+.asset-trade-card .trade-section {
+    margin-top: 0;
+    background: none;
+    padding: 0;
+}
+.trade-quick-row {
+    display: flex;
+    gap: 6px;
+    margin: 8px 0;
+    flex-wrap: wrap;
+}
+.trade-quick-row .btn {
+    flex: 1;
+    min-width: 56px;
+}
+.trade-tax-note {
+    font-size: 0.78rem;
+    color: var(--text-secondary);
+    background: var(--bg-tertiary);
+    border-radius: var(--radius-sm);
+    padding: 8px 10px;
+    margin: 10px 0;
+    line-height: 1.4;
+}
+.tax-note {
+    font-size: 0.8rem;
+    color: var(--text-secondary);
+    margin-top: 10px;
+    line-height: 1.5;
+}
+
+@media (max-width: 768px) {
+    .asset-overview-grid {
+        grid-template-columns: 1fr;
+    }
+    .position-grid {
+        grid-template-columns: repeat(2, 1fr);
+    }
+    .asset-detail-title h2 {
+        font-size: 1.1rem;
+    }
+    .asset-price-card .big-number {
+        font-size: 1.8rem;
+    }
+    .asset-chart-card canvas {
+        height: 210px;
+    }
+}

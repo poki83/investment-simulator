@@ -14,7 +14,7 @@ const UI = {
         { title: 'Unternehmen', text: 'Im Bereich <strong>Unternehmen</strong> kannst du deine eigene Firma gründen - Bank, Bekleidungsmarke, Tech-Startup, Restaurantkette und mehr!<br><br>Unternehmen generieren monatliche Gewinne, wenn sie profitabel laufen. Du kannst sie später auch wieder verkaufen.' },
         { title: 'Shops & Garage', text: 'In den <strong>Shops</strong> kannst du in verschiedenen Läden kaufen: Auto-Haus, Yacht-Club, Jet-Port und Uhren-Boutique.<br><br>In deiner <strong>Garage</strong> siehst du alle gekauften Güter. Du kannst sie dort jederzeit verkaufen - allerdings nur zum <strong>Gebrauchtpreis</strong> (ca. 60% des Werts).<br><br>⚠️ Autos, Yachten und Flugzeuge verlieren an Wert! Uhren können im Wert steigen.' },
         { title: 'Reichtumsliste', text: 'Die <strong>Reichtumsliste</strong> zeigt die reichsten Menschen in Deutschland. Versuche, es in die Top 3 zu schaffen!<br><br>Dein Rang wird automatisch aus deinem gesamten Vermögen berechnet.' },
-        { title: 'Steuern', text: 'In Deutschland musst du <strong>Steuern</strong> zahlen:<br><br>• Kapitalertragsteuer: 25% + Soli<br>• Grunderwerbsteuer beim Immobilienkauf<br>• Grundsteuer jährlich<br>• Mieteinnahmen werden versteuert<br><br>⚠️ Bezahle deine Steuern fristgerecht! Verspätungszuschlag: 1% pro Monat.' },
+        { title: 'Steuern', text: 'In Deutschland musst du <strong>Steuern</strong> zahlen:<br><br>• Abgeltungssteuer (26,375%) wird automatisch bei Verkaufsgewinnen einbehalten<br>• Mieteinnahmen werden monatlich automatisch versteuert<br>• Grunderwerbsteuer beim Immobilienkauf<br>• Grundsteuer läuft als offene Steuerschuld<br><br>⚠️ Bezahle deine offene Steuerschuld fristgerecht! Verspätungszuschlag: 1% pro Monat.' },
         { title: 'Echtzeit', text: 'Das Spiel läuft <strong>in Echtzeit</strong>: Jede Echtzeit-Sekunde = 1 Spieltag, Kurse und Vermögen aktualisieren sich live. Ein Punkt grün = <strong>LIVE</strong>.<br><br>Mit der <strong>Pause-Taste</strong> kannst du bei Bedarf anhalten (z. B. zum Investieren), mit <strong>Play</strong> läuft alles wieder in Echtzeit weiter. Speichern mit 💾-Button.' },
         { title: 'Nachrichten', text: '<strong>Nachrichten</strong> beeinflussen die Kurse! Halte Augen und Ohren offen für Marktereignisse, Zinsänderungen und Unternehmensmeldungen.<br><br>Viel Erfolg beim Investieren! 📈' }
     ],
@@ -26,7 +26,7 @@ const UI = {
         this.bindCheatCode();
         this.bindSaveButton();
         this.bindDetailPanels();
-        this.bindTradeButtons();
+        this.bindAssetPage();
         this.bindTaxPage();
         this.bindTutorial();
         this.bindSellModal();
@@ -147,9 +147,6 @@ const UI = {
     },
 
     bindDetailPanels() {
-        document.getElementById('stock-detail-close').addEventListener('click', () => this.closeDetailPanels());
-        document.getElementById('etf-detail-close').addEventListener('click', () => this.closeDetailPanels());
-        document.getElementById('crypto-detail-close').addEventListener('click', () => this.closeDetailPanels());
         document.getElementById('re-detail-close').addEventListener('click', () => this.closeDetailPanels());
         document.getElementById('cd-detail-close').addEventListener('click', () => this.closeDetailPanels());
     },
@@ -159,45 +156,27 @@ const UI = {
         this.detailOpen = null;
     },
 
-    bindTradeButtons() {
-        // Stock trade tabs
-        document.querySelectorAll('#stock-detail .trade-tab').forEach(tab => {
+    bindAssetPage() {
+        document.getElementById('asset-detail-back').addEventListener('click', () => {
+            const back = this.assetBack || 'dashboard';
+            this.closeDetailPanels();
+            this.navigateTo(back);
+        });
+
+        document.querySelectorAll('#page-asset-detail .trade-tab').forEach(tab => {
             tab.addEventListener('click', () => {
-                document.querySelectorAll('#stock-detail .trade-tab').forEach(t => t.classList.remove('active'));
+                document.querySelectorAll('#page-asset-detail .trade-tab').forEach(t => t.classList.remove('active'));
                 tab.classList.add('active');
                 this.tradeAction = tab.dataset.action;
-                this.updateStockTradeForm();
+                this.updateAssetTradeForm();
             });
         });
 
-        document.getElementById('stock-trade-amount').addEventListener('input', () => this.updateStockTradeForm());
-        document.getElementById('stock-trade-btn').addEventListener('click', () => this.executeStockTrade());
-
-        // ETF trade tabs
-        document.querySelectorAll('#etf-detail .trade-tab').forEach(tab => {
-            tab.addEventListener('click', () => {
-                document.querySelectorAll('#etf-detail .trade-tab').forEach(t => t.classList.remove('active'));
-                tab.classList.add('active');
-                this.tradeAction = tab.dataset.action;
-                this.updateETFTradeForm();
-            });
+        document.getElementById('asset-trade-amount').addEventListener('input', () => this.updateAssetTradeForm());
+        document.querySelectorAll('#page-asset-detail .trade-quick').forEach(btn => {
+            btn.addEventListener('click', () => this.applyQuickAmount(btn.dataset.pct));
         });
-
-        document.getElementById('etf-trade-amount').addEventListener('input', () => this.updateETFTradeForm());
-        document.getElementById('etf-trade-btn').addEventListener('click', () => this.executeETFTrade());
-
-        // Crypto trade tabs
-        document.querySelectorAll('#crypto-detail .trade-tab').forEach(tab => {
-            tab.addEventListener('click', () => {
-                document.querySelectorAll('#crypto-detail .trade-tab').forEach(t => t.classList.remove('active'));
-                tab.classList.add('active');
-                this.tradeAction = tab.dataset.action;
-                this.updateCryptoTradeForm();
-            });
-        });
-
-        document.getElementById('crypto-trade-amount').addEventListener('input', () => this.updateCryptoTradeForm());
-        document.getElementById('crypto-trade-btn').addEventListener('click', () => this.executeCryptoTrade());
+        document.getElementById('asset-trade-btn').addEventListener('click', () => this.executeAssetTrade());
     },
 
     bindTaxPage() {
@@ -287,6 +266,9 @@ const UI = {
         this.updateCasino();
         this.updateDate();
         this.updateSpeedDisplay();
+        if (this.detailOpen && ['stock', 'etf', 'crypto'].indexOf(this.detailOpen.type) !== -1) {
+            this.updateAssetOverview();
+        }
     },
 
     updatePage(page) {
@@ -558,121 +540,298 @@ const UI = {
     },
 
     openStockDetail(symbol) {
-        this.closeDetailPanels();
-        this.detailOpen = { type: 'stock', symbol };
-        this.tradeAction = 'buy';
-
-        const stock = StockMarket.data[symbol];
-        const holding = GameState.portfolio.stocks[symbol];
-
-        document.getElementById('stock-detail-name').textContent = stock.name;
-        document.getElementById('stock-detail-symbol').textContent = symbol;
-        document.getElementById('stock-detail-price').textContent = '€' + this.fmtPrice(stock.price);
-
-        const changeEl = document.getElementById('stock-detail-change');
-        changeEl.textContent = `${stock.weekChange >= 0 ? '+' : ''}${stock.weekChange.toFixed(2)}%`;
-        changeEl.className = 'change ' + (stock.weekChange >= 0 ? 'positive' : 'negative');
-
-        document.getElementById('stock-detail-open').textContent = '€' + this.fmtPrice(stock.openPrice);
-        document.getElementById('stock-detail-high').textContent = '€' + this.fmtPrice(stock.high);
-        document.getElementById('stock-detail-low').textContent = '€' + this.fmtPrice(stock.low);
-        document.getElementById('stock-detail-volume').textContent = this.fmt(stock.volume);
-        document.getElementById('stock-detail-52wh').textContent = '€' + this.fmtPrice(stock.allTimeHigh);
-        document.getElementById('stock-detail-52wl').textContent = '€' + this.fmtPrice(stock.allTimeLow);
-        document.getElementById('stock-detail-pe').textContent = stock.pe;
-        document.getElementById('stock-detail-dividend').textContent = stock.dividend;
-
-        Charts.drawLineChart(document.getElementById('stock-detail-chart'), StockMarket.history[symbol].slice(-52));
-
-        // Reset trade tabs
-        document.querySelectorAll('#stock-detail .trade-tab').forEach(t => t.classList.remove('active'));
-        document.querySelector('#stock-detail .trade-tab[data-action="buy"]').classList.add('active');
-        document.getElementById('stock-trade-amount').value = 1;
-
-        this.updateStockTradeForm();
-
-        document.getElementById('stock-detail').classList.remove('hidden');
+        this.assetBack = 'stocks';
+        this.openAssetOverview('stock', symbol);
     },
 
-    updateStockTradeForm() {
-        if (!this.detailOpen || this.detailOpen.type !== 'stock') return;
-        const stock = StockMarket.data[this.detailOpen.symbol];
-        const amount = parseInt(document.getElementById('stock-trade-amount').value) || 0;
-        const holding = GameState.portfolio.stocks[this.detailOpen.symbol];
+    openAssetOverview(type, symbol) {
+        this.closeDetailPanels();
+        this.detailOpen = { type, symbol };
+        this.tradeAction = 'buy';
+
+        document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+        document.getElementById('page-asset-detail').classList.add('active');
+        document.querySelectorAll('.nav-btn').forEach(b => b.classList.remove('active'));
+        const srcBtn = document.querySelector(`.nav-btn[data-page="${this.assetBack}"]`);
+        if (srcBtn) srcBtn.classList.add('active');
+        this.currentPage = 'asset-detail';
+
+        this.renderAssetOverview();
+    },
+
+    assetCtx() {
+        if (!this.detailOpen || ['stock', 'etf', 'crypto'].indexOf(this.detailOpen.type) === -1) return null;
+        const t = this.detailOpen.type;
+        const symbol = this.detailOpen.symbol;
+        return {
+            t,
+            symbol,
+            asset: t === 'stock' ? StockMarket.data[symbol] : t === 'etf' ? ETFMarket.data[symbol] : CryptoMarket.data[symbol],
+            history: t === 'stock' ? StockMarket.history[symbol] : t === 'etf' ? ETFMarket.history[symbol] : CryptoMarket.history[symbol],
+            portKey: t === 'stock' ? 'stocks' : t === 'etf' ? 'etfs' : 'crypto',
+            holdingKey: t === 'crypto' ? 'amount' : 'shares',
+            market: t === 'stock' ? StockMarket : t === 'etf' ? ETFMarket : CryptoMarket
+        };
+    },
+
+    renderAssetOverview() {
+        const ctx = this.assetCtx();
+        if (!ctx) return;
+        const { t, symbol, asset } = ctx;
+
+        document.getElementById('asset-detail-name').textContent = asset.name;
+        document.getElementById('asset-detail-symbol').textContent = symbol;
+        const icon = document.getElementById('asset-detail-icon');
+        icon.textContent = symbol.substring(0, 3);
+        icon.style.background = asset.color + '22';
+        icon.style.color = asset.color;
+        document.getElementById('asset-detail-subtext').textContent = asset.description || '';
+        document.getElementById('asset-position-type').textContent = t === 'stock' ? 'Aktie' : t === 'etf' ? 'ETF' : 'Krypto';
+
+        document.getElementById('asset-trade-label').textContent = t === 'stock' ? 'Anzahl:' : t === 'etf' ? 'Anteile:' : 'Betrag (in Coins):';
+        document.getElementById('asset-trade-fee-label').textContent = 'Gebühr (' + (t === 'crypto' ? '0,5%' : '0,1%') + '):';
+
+        const input = document.getElementById('asset-trade-amount');
+        if (t === 'stock') { input.min = 1; input.step = 1; input.value = 1; }
+        else if (t === 'crypto') { input.min = 0.0001; input.step = 0.0001; input.value = symbol === 'BTC' ? '0.01' : symbol === 'ETH' ? '0.1' : '1'; }
+        else { input.min = 0.01; input.step = 0.01; input.value = 1; }
+
+        this.tradeAction = 'buy';
+        document.querySelectorAll('#page-asset-detail .trade-tab').forEach(tb => {
+            tb.classList.toggle('active', tb.dataset.action === 'buy');
+        });
+
+        this.updateAssetOverview();
+    },
+
+    updateAssetOverview() {
+        const ctx = this.assetCtx();
+        if (!ctx) return;
+        const asset = ctx.asset;
+
+        document.getElementById('asset-detail-price').textContent = '€' + this.fmtPrice(asset.price);
+        const chEl = document.getElementById('asset-detail-change');
+        chEl.textContent = `${asset.weekChange >= 0 ? '+' : ''}${asset.weekChange.toFixed(2)}%`;
+        chEl.className = 'change ' + (asset.weekChange >= 0 ? 'positive' : 'negative');
+
+        let stats = '';
+        if (ctx.t === 'stock') {
+            stats = `<div class="stat"><span>Eröffnung</span><span>€${this.fmtPrice(asset.openPrice)}</span></div>
+                <div class="stat"><span>Hoch</span><span>€${this.fmtPrice(asset.high)}</span></div>
+                <div class="stat"><span>Tief</span><span>€${this.fmtPrice(asset.low)}</span></div>
+                <div class="stat"><span>Volumen</span><span>${this.fmt(asset.volume)}</span></div>
+                <div class="stat"><span>52W Hoch</span><span>€${this.fmtPrice(asset.allTimeHigh)}</span></div>
+                <div class="stat"><span>52W Tief</span><span>€${this.fmtPrice(asset.allTimeLow)}</span></div>
+                <div class="stat"><span>KGV</span><span>${asset.pe}</span></div>
+                <div class="stat"><span>Dividende</span><span>${asset.dividend}</span></div>`;
+        } else if (ctx.t === 'etf') {
+            stats = `<div class="stat"><span>TER</span><span>${asset.ter}</span></div>
+                <div class="stat"><span>Auflagevolumen</span><span>${asset.aum}</span></div>
+                <div class="stat"><span>Tracking Error</span><span>${asset.trackingError}</span></div>
+                <div class="stat"><span>Dividenden-Rendite</span><span>${asset.dividend}</span></div>`;
+        } else {
+            stats = `<div class="stat"><span>Marktkapitalisierung</span><span>${asset.marketCap}</span></div>
+                <div class="stat"><span>24h Volumen</span><span>${asset.volume}</span></div>
+                <div class="stat"><span>Circulating Supply</span><span>${asset.supply}</span></div>
+                <div class="stat"><span>ATH</span><span>${asset.ath}</span></div>`;
+        }
+        document.getElementById('asset-detail-stats').innerHTML = stats;
+
+        if (ctx.history && ctx.history.length >= 2) {
+            Charts.drawLineChart(document.getElementById('asset-detail-chart'), ctx.history.slice(-52));
+        }
+
+        this.updatePositionCard(ctx);
+        this.updateAssetTradeForm();
+    },
+
+    updatePositionCard(ctx) {
+        const holding = GameState.portfolio[ctx.portKey][ctx.symbol];
+        const el = document.getElementById('asset-position-content');
+        if (!holding || !(holding[ctx.holdingKey] > 0)) {
+            el.innerHTML = '<div class="empty-state"><div class="empty-state-text">Du hältst noch keine Position in diesem Asset.</div></div>';
+            return;
+        }
+        const units = holding[ctx.holdingKey];
+        const value = units * ctx.asset.price;
+        const unrealized = value - holding.invested;
+        const unrealizedPct = holding.invested > 0 ? (unrealized / holding.invested) * 100 : 0;
+        const sign = unrealized >= 0 ? '+' : '';
+        el.innerHTML = `<div class="position-grid">
+            <div class="mini-stat"><span class="mini-label">${ctx.t === 'crypto' ? 'Bestand' : 'Anteile'}</span><span class="mini-value">${ctx.t === 'crypto' ? units.toFixed(4) : units}</span></div>
+            <div class="mini-stat"><span class="mini-label">Ø-Einstand</span><span class="mini-value">€${this.fmtPrice(holding.avgPrice)}</span></div>
+            <div class="mini-stat"><span class="mini-label">Investiert</span><span class="mini-value">€${this.fmt(holding.invested)}</span></div>
+            <div class="mini-stat"><span class="mini-label">Aktueller Wert</span><span class="mini-value">€${this.fmt(value)}</span></div>
+            <div class="mini-stat"><span class="mini-label">Unrealisiert</span><span class="mini-value ${unrealized >= 0 ? 'text-green' : 'text-red'}">${sign}€${this.fmt(Math.abs(unrealized))} (${sign}${unrealizedPct.toFixed(2)}%)</span></div>
+            <div class="mini-stat"><span class="mini-label">Realisierter Gewinn</span><span class="mini-value ${holding.profit >= 0 ? 'text-green' : 'text-red'}">${holding.profit >= 0 ? '+' : ''}€${this.fmt(holding.profit)}</span></div>
+        </div>`;
+    },
+
+    updateAssetTradeForm() {
+        const ctx = this.assetCtx();
+        if (!ctx) return;
+        const amount = parseFloat(document.getElementById('asset-trade-amount').value) || 0;
+        const holding = GameState.portfolio[ctx.portKey][ctx.symbol];
+        const note = document.getElementById('asset-trade-tax-note');
 
         if (this.tradeAction === 'buy') {
-            const result = StockMarket.buy(this.detailOpen.symbol, amount, Infinity);
+            const result = ctx.market.buy(ctx.symbol, amount, Infinity);
+            document.getElementById('asset-trade-cost-label').textContent = 'Gesamtkosten:';
+            document.getElementById('asset-trade-fee-label').textContent = 'Gebühr (' + (ctx.t === 'crypto' ? '0,5%' : '0,1%') + '):';
+            note.innerHTML = '';
             if (result) {
-                document.getElementById('stock-trade-cost').textContent = '€' + this.fmt(result.total);
-                document.getElementById('stock-trade-fee').textContent = '€' + this.fmt(result.fee);
-                const btn = document.getElementById('stock-trade-btn');
-                btn.textContent = 'Kaufen';
-                btn.className = 'btn btn-success btn-block';
-                btn.disabled = result.total > GameState.cash;
+                document.getElementById('asset-trade-cost').textContent = '€' + this.fmt(result.total);
+                document.getElementById('asset-trade-fee').textContent = '€' + this.fmt(result.fee);
             }
+            const btn = document.getElementById('asset-trade-btn');
+            btn.textContent = 'Kaufen';
+            btn.className = 'btn btn-success btn-block';
+            btn.disabled = !result || result.total > GameState.cash;
         } else {
-            const maxShares = holding ? holding.shares : 0;
-            document.getElementById('stock-trade-amount').max = maxShares;
-            const result = StockMarket.sell(this.detailOpen.symbol, amount);
+            const maxHeld = holding ? holding[ctx.holdingKey] : 0;
+            document.getElementById('asset-trade-amount').max = maxHeld;
+            document.getElementById('asset-trade-cost-label').textContent = 'Netto-Auszahlung:';
+            document.getElementById('asset-trade-fee-label').textContent = 'Gebühr (' + (ctx.t === 'crypto' ? '0,5%' : '0,1%') + '):';
+            note.innerHTML = '⚠️ Bei Verkaufsgewinn werden 26,375% (KapESt + Soli) automatisch einbehalten.';
+            const result = ctx.market.sell(ctx.symbol, amount);
             if (result) {
-                document.getElementById('stock-trade-cost').textContent = '€' + this.fmt(result.net);
-                document.getElementById('stock-trade-fee').textContent = '€' + this.fmt(result.fee);
-                const btn = document.getElementById('stock-trade-btn');
-                btn.textContent = 'Verkaufen';
-                btn.className = 'btn btn-danger btn-block';
-                btn.disabled = amount > maxShares || amount <= 0;
+                const profit = this.realizedProfit(ctx, result, amount);
+                const tax = profit > 0 ? Taxes.calculateCapitalGainsTax(profit) : null;
+                document.getElementById('asset-trade-cost').textContent = '€' + this.fmt(result.net - (tax ? tax.total : 0));
+                document.getElementById('asset-trade-fee').textContent = '€' + this.fmt(result.fee);
             }
+            const btn = document.getElementById('asset-trade-btn');
+            btn.textContent = 'Verkaufen';
+            btn.className = 'btn btn-danger btn-block';
+            btn.disabled = amount <= 0 || amount > maxHeld;
         }
     },
 
-    executeStockTrade() {
-        const symbol = this.detailOpen.symbol;
-        const amount = parseInt(document.getElementById('stock-trade-amount').value) || 0;
+    realizedProfit(ctx, result, amount) {
+        const holding = GameState.portfolio[ctx.portKey][ctx.symbol];
+        if (!holding) return 0;
+        return (result.price - holding.avgPrice * amount) - result.fee;
+    },
+
+    projectedProfit(type, symbol, amount, result) {
+        const portKey = type === 'stock' ? 'stocks' : type === 'etf' ? 'etfs' : 'crypto';
+        const holding = GameState.portfolio[portKey][symbol];
+        if (!holding) return 0;
+        return (result.price - holding.avgPrice * amount) - result.fee;
+    },
+
+    applyQuickAmount(pct) {
+        const ctx = this.assetCtx();
+        if (!ctx) return;
+        const input = document.getElementById('asset-trade-amount');
+        if (this.tradeAction === 'buy') {
+            const feeRate = ctx.t === 'crypto' ? 0.005 : 0.001;
+            const afford = GameState.cash / (ctx.asset.price * (1 + feeRate));
+            const units = pct === 'max' ? afford : afford * (parseInt(pct, 10) / 100);
+            input.value = this.roundAmount(ctx, units);
+        } else {
+            const holding = GameState.portfolio[ctx.portKey][ctx.symbol];
+            const maxHeld = holding ? holding[ctx.holdingKey] : 0;
+            const units = pct === 'max' ? maxHeld : maxHeld * (parseInt(pct, 10) / 100);
+            input.value = this.roundAmount(ctx, units);
+        }
+        this.updateAssetTradeForm();
+    },
+
+    roundAmount(ctx, units) {
+        if (ctx.t === 'stock') return Math.max(1, Math.floor(units || 0));
+        if (ctx.t === 'crypto') return Math.max(0.0001, Math.round(units * 10000) / 10000);
+        return Math.max(0.01, Math.round(units * 100) / 100);
+    },
+
+    executeAssetTrade() {
+        const ctx = this.assetCtx();
+        if (!ctx) return;
+        const amount = parseFloat(document.getElementById('asset-trade-amount').value) || 0;
         if (amount <= 0) return;
 
+        const symbol = ctx.symbol;
+        const holding = GameState.portfolio[ctx.portKey][symbol];
+
         if (this.tradeAction === 'buy') {
-            const result = StockMarket.buy(symbol, amount, GameState.cash);
-            if (!result) {
-                this.showToast('Nicht genug Guthaben!', '⚠️');
-                return;
-            }
+            const result = ctx.market.buy(symbol, amount, GameState.cash);
+            if (!result) { this.showToast('Nicht genug Guthaben!', '⚠️'); return; }
             GameState.removeCash(result.total);
 
-            if (!GameState.portfolio.stocks[symbol]) {
-                GameState.portfolio.stocks[symbol] = { shares: 0, invested: 0, avgPrice: 0, profit: 0, taxed: false, taxApplied: false };
+            if (!holding) {
+                GameState.portfolio[ctx.portKey][symbol] = { shares: 0, invested: 0, avgPrice: 0, profit: 0 };
             }
-            const h = GameState.portfolio.stocks[symbol];
-            h.shares += amount;
+            const h = GameState.portfolio[ctx.portKey][symbol];
+            h[ctx.holdingKey] += amount;
             h.invested += result.total;
-            h.avgPrice = h.invested / h.shares;
+            h.avgPrice = h.invested / h[ctx.holdingKey];
 
-            GameState.addTransaction('buy', 'stock', StockMarket.data[symbol].name, symbol, amount, result.price, result.fee, result.total);
-            this.showToast(`${amount}x ${symbol} gekauft!`, '🟢');
+            GameState.addTransaction('buy', ctx.t, ctx.asset.name, symbol, amount, result.price, result.fee, result.total);
+            this.showToast(`${amount}${ctx.t === 'crypto' ? ' ' : 'x '}${symbol} gekauft!`, '🟢');
         } else {
-            const holding = GameState.portfolio.stocks[symbol];
-            if (!holding || holding.shares < amount) {
+            if (!holding || holding[ctx.holdingKey] < amount) {
                 this.showToast('Nicht genug Anteile!', '⚠️');
                 return;
             }
-            const result = StockMarket.sell(symbol, amount);
-            GameState.addCash(result.net);
+            const result = ctx.market.sell(symbol, amount);
+            const profit = this.realizedProfit(ctx, result, amount);
 
-            const profitPerShare = result.price - holding.avgPrice;
-            const realizedProfit = profitPerShare * amount - result.fee;
-            holding.profit += realizedProfit;
-            holding.shares -= amount;
+            let net = result.net;
+            let taxMsg = '';
+            if (profit > 0) {
+                const tax = Taxes.calculateCapitalGainsTax(profit);
+                GameState.taxes.capitalTax += tax.capitalTax;
+                GameState.taxes.soli += tax.soli;
+                net -= tax.total;
+                GameState.addTransaction('tax', ctx.t, 'Kapitalertragsteuer', symbol, 0, 0, 0, tax.total);
+                taxMsg = ` (Steuer €${this.fmt(tax.total)} einbehalten)`;
+            }
+            GameState.addCash(net);
 
-            if (holding.shares <= 0) {
-                holding.shares = 0;
-                holding.taxed = true;
+            holding.profit += profit;
+            holding[ctx.holdingKey] -= amount;
+            if (holding[ctx.holdingKey] <= 0 || (ctx.t === 'crypto' && holding[ctx.holdingKey] <= 0.00001)) {
+                holding[ctx.holdingKey] = 0;
             }
 
-            GameState.addTransaction('sell', 'stock', StockMarket.data[symbol].name, symbol, amount, result.price, result.fee, result.net);
-            this.showToast(`${amount}x ${symbol} verkauft!`, '🔴');
+            GameState.addTransaction('sell', ctx.t, ctx.asset.name, symbol, amount, result.price, result.fee, result.net);
+            this.showToast(`${amount}${ctx.t === 'crypto' ? ' ' : 'x '}${symbol} verkauft!${taxMsg}`, '🔴');
         }
 
-        this.openStockDetail(symbol);
+        this.renderAssetOverview();
         this.updateAll();
+    },
+
+    executeHoldingSale(type, symbol, amount) {
+        const market = type === 'stock' ? StockMarket : type === 'etf' ? ETFMarket : CryptoMarket;
+        const data = type === 'stock' ? StockMarket.data : type === 'etf' ? ETFMarket.data : CryptoMarket.data;
+        const portKey = type === 'stock' ? 'stocks' : type === 'etf' ? 'etfs' : 'crypto';
+        const holdingKey = type === 'crypto' ? 'amount' : 'shares';
+        const holding = GameState.portfolio[portKey][symbol];
+        if (!holding || holding[holdingKey] < amount) return null;
+
+        const result = market.sell(symbol, amount);
+        if (!result) return null;
+
+        const profit = (result.price - holding.avgPrice * amount) - result.fee;
+        let net = result.net;
+        if (profit > 0) {
+            const tax = Taxes.calculateCapitalGainsTax(profit);
+            GameState.taxes.capitalTax += tax.capitalTax;
+            GameState.taxes.soli += tax.soli;
+            net -= tax.total;
+            GameState.addTransaction('tax', type, 'Kapitalertragsteuer', symbol, 0, 0, 0, tax.total);
+        }
+
+        holding.profit += profit;
+        holding[holdingKey] -= amount;
+        if (holding[holdingKey] <= 0 || (type === 'crypto' && holding[holdingKey] <= 0.00001)) {
+            holding[holdingKey] = 0;
+        }
+        GameState.addCash(net);
+        GameState.addTransaction('sell', type, data[symbol].name, symbol, amount, result.price, result.fee, result.net);
+        this.showToast(`${data[symbol].name}: ${amount}${type === 'crypto' ? ' ' : 'x '}verkauft für €${this.fmt(net)}${profit > 0 ? ' (inkl. Steuer)' : ''}`, '💸');
+        return result;
     },
 
     updateETFsList() {
@@ -716,101 +875,13 @@ const UI = {
     },
 
     openETFDetail(symbol) {
-        this.closeDetailPanels();
-        this.detailOpen = { type: 'etf', symbol };
-        this.tradeAction = 'buy';
-
-        const etf = ETFMarket.data[symbol];
-        document.getElementById('etf-detail-name').textContent = etf.name;
-        document.getElementById('etf-detail-symbol').textContent = symbol;
-        document.getElementById('etf-detail-price').textContent = '€' + this.fmtPrice(etf.price);
-
-        const changeEl = document.getElementById('etf-detail-change');
-        changeEl.textContent = `${etf.weekChange >= 0 ? '+' : ''}${etf.weekChange.toFixed(2)}%`;
-        changeEl.className = 'change ' + (etf.weekChange >= 0 ? 'positive' : 'negative');
-
-        document.getElementById('etf-detail-ter').textContent = etf.ter;
-        document.getElementById('etf-detail-aum').textContent = etf.aum;
-        document.getElementById('etf-detail-te').textContent = etf.trackingError;
-        document.getElementById('etf-detail-div').textContent = etf.dividend;
-
-        Charts.drawLineChart(document.getElementById('etf-detail-chart'), ETFMarket.history[symbol].slice(-52));
-
-        document.querySelectorAll('#etf-detail .trade-tab').forEach(t => t.classList.remove('active'));
-        document.querySelector('#etf-detail .trade-tab[data-action="buy"]').classList.add('active');
-        document.getElementById('etf-trade-amount').value = 1;
-        this.updateETFTradeForm();
-
-        document.getElementById('etf-detail').classList.remove('hidden');
+        this.assetBack = 'etfs';
+        this.openAssetOverview('etf', symbol);
     },
 
-    updateETFTradeForm() {
-        if (!this.detailOpen || this.detailOpen.type !== 'etf') return;
-        const amount = parseFloat(document.getElementById('etf-trade-amount').value) || 0;
-        const holding = GameState.portfolio.etfs[this.detailOpen.symbol];
-
-        if (this.tradeAction === 'buy') {
-            const result = ETFMarket.buy(this.detailOpen.symbol, amount, Infinity);
-            if (result) {
-                document.getElementById('etf-trade-cost').textContent = '€' + this.fmt(result.total);
-                document.getElementById('etf-trade-fee').textContent = '€' + this.fmt(result.fee);
-                const btn = document.getElementById('etf-trade-btn');
-                btn.textContent = 'Kaufen';
-                btn.className = 'btn btn-success btn-block';
-                btn.disabled = result.total > GameState.cash;
-            }
-        } else {
-            const maxShares = holding ? holding.shares : 0;
-            document.getElementById('etf-trade-amount').max = maxShares;
-            const result = ETFMarket.sell(this.detailOpen.symbol, amount);
-            if (result) {
-                document.getElementById('etf-trade-cost').textContent = '€' + this.fmt(result.net);
-                document.getElementById('etf-trade-fee').textContent = '€' + this.fmt(result.fee);
-                const btn = document.getElementById('etf-trade-btn');
-                btn.textContent = 'Verkaufen';
-                btn.className = 'btn btn-danger btn-block';
-                btn.disabled = amount > maxShares || amount <= 0;
-            }
-        }
-    },
-
-    executeETFTrade() {
-        const symbol = this.detailOpen.symbol;
-        const amount = parseFloat(document.getElementById('etf-trade-amount').value) || 0;
-        if (amount <= 0) return;
-
-        if (this.tradeAction === 'buy') {
-            const result = ETFMarket.buy(symbol, amount, GameState.cash);
-            if (!result) { this.showToast('Nicht genug Guthaben!', '⚠️'); return; }
-            GameState.removeCash(result.total);
-
-            if (!GameState.portfolio.etfs[symbol]) {
-                GameState.portfolio.etfs[symbol] = { shares: 0, invested: 0, avgPrice: 0, profit: 0, taxed: false, taxApplied: false };
-            }
-            const h = GameState.portfolio.etfs[symbol];
-            h.shares += amount;
-            h.invested += result.total;
-            h.avgPrice = h.invested / h.shares;
-
-            GameState.addTransaction('buy', 'etf', ETFMarket.data[symbol].name, symbol, amount, result.price, result.fee, result.total);
-            this.showToast(`${amount}x ${symbol} gekauft!`, '🟢');
-        } else {
-            const holding = GameState.portfolio.etfs[symbol];
-            if (!holding || holding.shares < amount) { this.showToast('Nicht genug Anteile!', '⚠️'); return; }
-            const result = ETFMarket.sell(symbol, amount);
-            GameState.addCash(result.net);
-
-            const profitPerShare = result.price - holding.avgPrice;
-            holding.profit += profitPerShare * amount - result.fee;
-            holding.shares -= amount;
-            if (holding.shares <= 0) { holding.shares = 0; holding.taxed = true; }
-
-            GameState.addTransaction('sell', 'etf', ETFMarket.data[symbol].name, symbol, amount, result.price, result.fee, result.net);
-            this.showToast(`${amount}x ${symbol} verkauft!`, '🔴');
-        }
-
-        this.openETFDetail(symbol);
-        this.updateAll();
+    openCryptoDetail(symbol) {
+        this.assetBack = 'crypto';
+        this.openAssetOverview('crypto', symbol);
     },
 
     updateCryptoList() {
@@ -851,104 +922,6 @@ const UI = {
             }
         });
         document.getElementById('crypto-search').oninput = () => this.updateCryptoList();
-    },
-
-    openCryptoDetail(symbol) {
-        this.closeDetailPanels();
-        this.detailOpen = { type: 'crypto', symbol };
-        this.tradeAction = 'buy';
-
-        const coin = CryptoMarket.data[symbol];
-        document.getElementById('crypto-detail-name').textContent = coin.name;
-        document.getElementById('crypto-detail-symbol').textContent = symbol;
-        document.getElementById('crypto-detail-price').textContent = '€' + this.fmtPrice(coin.price);
-
-        const changeEl = document.getElementById('crypto-detail-change');
-        changeEl.textContent = `${coin.weekChange >= 0 ? '+' : ''}${coin.weekChange.toFixed(2)}%`;
-        changeEl.className = 'change ' + (coin.weekChange >= 0 ? 'positive' : 'negative');
-
-        document.getElementById('crypto-detail-mcap').textContent = coin.marketCap;
-        document.getElementById('crypto-detail-vol').textContent = coin.volume;
-        document.getElementById('crypto-detail-supply').textContent = coin.supply;
-        document.getElementById('crypto-detail-ath').textContent = coin.ath;
-
-        Charts.drawLineChart(document.getElementById('crypto-detail-chart'), CryptoMarket.history[symbol].slice(-52));
-
-        document.querySelectorAll('#crypto-detail .trade-tab').forEach(t => t.classList.remove('active'));
-        document.querySelector('#crypto-detail .trade-tab[data-action="buy"]').classList.add('active');
-        document.getElementById('crypto-trade-amount').value = symbol === 'BTC' ? '0.01' : symbol === 'ETH' ? '0.1' : '1';
-        this.updateCryptoTradeForm();
-
-        document.getElementById('crypto-detail').classList.remove('hidden');
-    },
-
-    updateCryptoTradeForm() {
-        if (!this.detailOpen || this.detailOpen.type !== 'crypto') return;
-        const amount = parseFloat(document.getElementById('crypto-trade-amount').value) || 0;
-        const holding = GameState.portfolio.crypto[this.detailOpen.symbol];
-
-        if (this.tradeAction === 'buy') {
-            const result = CryptoMarket.buy(this.detailOpen.symbol, amount, Infinity);
-            if (result) {
-                document.getElementById('crypto-trade-cost').textContent = '€' + this.fmt(result.total);
-                document.getElementById('crypto-trade-fee').textContent = '€' + this.fmt(result.fee);
-                const btn = document.getElementById('crypto-trade-btn');
-                btn.textContent = 'Kaufen';
-                btn.className = 'btn btn-success btn-block';
-                btn.disabled = result.total > GameState.cash;
-            }
-        } else {
-            const maxAmount = holding ? holding.amount : 0;
-            document.getElementById('crypto-trade-amount').max = maxAmount;
-            const result = CryptoMarket.sell(this.detailOpen.symbol, amount);
-            if (result) {
-                document.getElementById('crypto-trade-cost').textContent = '€' + this.fmt(result.net);
-                document.getElementById('crypto-trade-fee').textContent = '€' + this.fmt(result.fee);
-                const btn = document.getElementById('crypto-trade-btn');
-                btn.textContent = 'Verkaufen';
-                btn.className = 'btn btn-danger btn-block';
-                btn.disabled = amount > maxAmount || amount <= 0;
-            }
-        }
-    },
-
-    executeCryptoTrade() {
-        const symbol = this.detailOpen.symbol;
-        const amount = parseFloat(document.getElementById('crypto-trade-amount').value) || 0;
-        if (amount <= 0) return;
-
-        if (this.tradeAction === 'buy') {
-            const result = CryptoMarket.buy(symbol, amount, GameState.cash);
-            if (!result) { this.showToast('Nicht genug Guthaben!', '⚠️'); return; }
-            GameState.removeCash(result.total);
-
-            if (!GameState.portfolio.crypto[symbol]) {
-                GameState.portfolio.crypto[symbol] = { amount: 0, invested: 0, avgPrice: 0, profit: 0, taxed: false, taxApplied: false };
-            }
-            const h = GameState.portfolio.crypto[symbol];
-            h.amount += amount;
-            h.invested += result.total;
-            h.avgPrice = h.invested / h.amount;
-
-            GameState.addTransaction('buy', 'crypto', CryptoMarket.data[symbol].name, symbol, amount, result.price, result.fee, result.total);
-            this.showToast(`${amount} ${symbol} gekauft!`, '🟢');
-        } else {
-            const holding = GameState.portfolio.crypto[symbol];
-            if (!holding || holding.amount < amount) { this.showToast('Nicht genug Coins!', '⚠️'); return; }
-            const result = CryptoMarket.sell(symbol, amount);
-            GameState.addCash(result.net);
-
-            const profitPerCoin = result.price - holding.avgPrice;
-            holding.profit += profitPerCoin * amount - result.fee;
-            holding.amount -= amount;
-            if (holding.amount <= 0.00001) { holding.amount = 0; holding.taxed = true; }
-
-            GameState.addTransaction('sell', 'crypto', CryptoMarket.data[symbol].name, symbol, amount, result.price, result.fee, result.net);
-            this.showToast(`${amount} ${symbol} verkauft!`, '🔴');
-        }
-
-        this.openCryptoDetail(symbol);
-        this.updateAll();
     },
 
     updateRealEstate() {
@@ -1733,9 +1706,9 @@ const UI = {
         const amount = parseFloat(document.getElementById('sell-modal-amount').value) || 0;
         const totalEl = document.getElementById('sell-modal-total');
         let total = 0;
-        if (ctx.type === 'stock') { const r = StockMarket.sell(ctx.id, amount); total = r ? r.net : 0; }
-        else if (ctx.type === 'etf') { const r = ETFMarket.sell(ctx.id, amount); total = r ? r.net : 0; }
-        else if (ctx.type === 'crypto') { const r = CryptoMarket.sell(ctx.id, amount); total = r ? r.net : 0; }
+        if (ctx.type === 'stock') { const r = StockMarket.sell(ctx.id, amount); if (r) { const p = this.projectedProfit('stock', ctx.id, amount, r); total = r.net - (p > 0 ? Taxes.calculateCapitalGainsTax(p).total : 0); } }
+        else if (ctx.type === 'etf') { const r = ETFMarket.sell(ctx.id, amount); if (r) { const p = this.projectedProfit('etf', ctx.id, amount, r); total = r.net - (p > 0 ? Taxes.calculateCapitalGainsTax(p).total : 0); } }
+        else if (ctx.type === 'crypto') { const r = CryptoMarket.sell(ctx.id, amount); if (r) { const p = this.projectedProfit('crypto', ctx.id, amount, r); total = r.net - (p > 0 ? Taxes.calculateCapitalGainsTax(p).total : 0); } }
         else if (ctx.type === 'realestate') {
             const p = RealEstate.properties.find(x => x.id === ctx.id);
             total = p ? p.currentValue - Taxes.calculateCapitalGainsTax(Math.max(0, p.currentValue - p.currentPrice)) : 0;
@@ -1752,44 +1725,11 @@ const UI = {
         let result = null;
 
         if (ctx.type === 'stock') {
-            const holding = GameState.portfolio.stocks[ctx.id];
-            if (!holding || holding.shares < amount) { this.showToast('Nicht genug Anteile!', '⚠️'); return; }
-            result = StockMarket.sell(ctx.id, amount);
-            if (result) {
-                GameState.addCash(result.net);
-                const profitPerShare = result.price - holding.avgPrice;
-                holding.profit += profitPerShare * amount - result.fee;
-                holding.shares -= amount;
-                if (holding.shares <= 0.0001) { holding.shares = 0; holding.taxed = true; }
-                GameState.addTransaction('sell', 'stock', StockMarket.data[ctx.id].name, ctx.id, amount, result.price, result.fee, result.net);
-                this.showToast(`${StockMarket.data[ctx.id].name}: ${amount}x verkauft für €${this.fmt(result.net)}`, '💸');
-            }
+            result = this.executeHoldingSale('stock', ctx.id, amount);
         } else if (ctx.type === 'etf') {
-            const holding = GameState.portfolio.etfs[ctx.id];
-            if (!holding || holding.shares < amount) { this.showToast('Nicht genug Anteile!', '⚠️'); return; }
-            result = ETFMarket.sell(ctx.id, amount);
-            if (result) {
-                GameState.addCash(result.net);
-                const profitPerShare = result.price - holding.avgPrice;
-                holding.profit += profitPerShare * amount - result.fee;
-                holding.shares -= amount;
-                if (holding.shares <= 0.0001) { holding.shares = 0; holding.taxed = true; }
-                GameState.addTransaction('sell', 'etf', ETFMarket.data[ctx.id].name, ctx.id, amount, result.price, result.fee, result.net);
-                this.showToast(`${ETFMarket.data[ctx.id].name}: ${amount}x verkauft für €${this.fmt(result.net)}`, '💸');
-            }
+            result = this.executeHoldingSale('etf', ctx.id, amount);
         } else if (ctx.type === 'crypto') {
-            const holding = GameState.portfolio.crypto[ctx.id];
-            if (!holding || holding.amount < amount) { this.showToast('Nicht genug Coins!', '⚠️'); return; }
-            result = CryptoMarket.sell(ctx.id, amount);
-            if (result) {
-                GameState.addCash(result.net);
-                const profitPerCoin = result.price - holding.avgPrice;
-                holding.profit += profitPerCoin * amount - result.fee;
-                holding.amount -= amount;
-                if (holding.amount <= 0.000001) { holding.amount = 0; holding.taxed = true; }
-                GameState.addTransaction('sell', 'crypto', CryptoMarket.data[ctx.id].name, ctx.id, amount, result.price, result.fee, result.net);
-                this.showToast(`${CryptoMarket.data[ctx.id].name}: ${amount.toFixed(4)} verkauft für €${this.fmt(result.net)}`, '💸');
-            }
+            result = this.executeHoldingSale('crypto', ctx.id, amount);
         } else if (ctx.type === 'realestate') {
             result = RealEstate.sellProperty(ctx.id);
             if (result) {

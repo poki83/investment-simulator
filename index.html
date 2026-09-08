@@ -237,50 +237,6 @@
                     </div>
                 </div>
                 <div id="stocks-list" class="asset-list"></div>
-                <!-- Detail Modal -->
-                <div id="stock-detail" class="detail-panel hidden">
-                    <div class="detail-header">
-                        <button id="stock-detail-close" class="btn-icon">✕</button>
-                        <h3 id="stock-detail-name"></h3>
-                        <span id="stock-detail-symbol" class="symbol-badge"></span>
-                    </div>
-                    <div class="detail-body">
-                        <div class="detail-price">
-                            <span class="big-number" id="stock-detail-price">€0,00</span>
-                            <span class="change" id="stock-detail-change">+0,00%</span>
-                        </div>
-                        <canvas id="stock-detail-chart" width="600" height="200"></canvas>
-                        <div class="detail-stats">
-                            <div class="stat"><span>Eröffnung</span><span id="stock-detail-open">-</span></div>
-                            <div class="stat"><span>Hoch</span><span id="stock-detail-high">-</span></div>
-                            <div class="stat"><span>Tief</span><span id="stock-detail-low">-</span></div>
-                            <div class="stat"><span>Volumen</span><span id="stock-detail-volume">-</span></div>
-                            <div class="stat"><span>52W Hoch</span><span id="stock-detail-52wh">-</span></div>
-                            <div class="stat"><span>52W Tief</span><span id="stock-detail-52wl">-</span></div>
-                            <div class="stat"><span>KGV</span><span id="stock-detail-pe">-</span></div>
-                            <div class="stat"><span>Dividende</span><span id="stock-detail-dividend">-</span></div>
-                        </div>
-                        <div class="trade-section">
-                            <div class="trade-tabs">
-                                <button class="trade-tab active" data-action="buy">Kaufen</button>
-                                <button class="trade-tab" data-action="sell">Verkaufen</button>
-                            </div>
-                            <div class="trade-form">
-                                <label>Anzahl:</label>
-                                <input type="number" id="stock-trade-amount" min="1" value="1" class="trade-input">
-                                <div class="trade-summary">
-                                    <span>Gesamtkosten:</span>
-                                    <span id="stock-trade-cost">€0,00</span>
-                                </div>
-                                <div class="trade-fee">
-                                    <span>Gebühr (0,1%):</span>
-                                    <span id="stock-trade-fee">€0,00</span>
-                                </div>
-                                <button id="stock-trade-btn" class="btn btn-primary btn-block">Kaufen</button>
-                            </div>
-                        </div>
-                    </div>
-                </div>
             </div>
 
             <!-- ETFs Seite -->
@@ -292,45 +248,6 @@
                     </div>
                 </div>
                 <div id="etfs-list" class="asset-list"></div>
-                <div id="etf-detail" class="detail-panel hidden">
-                    <div class="detail-header">
-                        <button id="etf-detail-close" class="btn-icon">✕</button>
-                        <h3 id="etf-detail-name"></h3>
-                        <span id="etf-detail-symbol" class="symbol-badge"></span>
-                    </div>
-                    <div class="detail-body">
-                        <div class="detail-price">
-                            <span class="big-number" id="etf-detail-price">€0,00</span>
-                            <span class="change" id="etf-detail-change">+0,00%</span>
-                        </div>
-                        <canvas id="etf-detail-chart" width="600" height="200"></canvas>
-                        <div class="detail-stats">
-                            <div class="stat"><span>TER</span><span id="etf-detail-ter">-</span></div>
-                            <div class="stat"><span>Auflagevolumen</span><span id="etf-detail-aum">-</span></div>
-                            <div class="stat"><span>Tracking Error</span><span id="etf-detail-te">-</span></div>
-                            <div class="stat"><span>Dividenden-Rendite</span><span id="etf-detail-div">-</span></div>
-                        </div>
-                        <div class="trade-section">
-                            <div class="trade-tabs">
-                                <button class="trade-tab active" data-action="buy">Kaufen</button>
-                                <button class="trade-tab" data-action="sell">Verkaufen</button>
-                            </div>
-                            <div class="trade-form">
-                                <label>Anteile:</label>
-                                <input type="number" id="etf-trade-amount" min="0.01" step="0.01" value="1" class="trade-input">
-                                <div class="trade-summary">
-                                    <span>Gesamtkosten:</span>
-                                    <span id="etf-trade-cost">€0,00</span>
-                                </div>
-                                <div class="trade-fee">
-                                    <span>Gebühr (0,1%):</span>
-                                    <span id="etf-trade-fee">€0,00</span>
-                                </div>
-                                <button id="etf-trade-btn" class="btn btn-primary btn-block">Kaufen</button>
-                            </div>
-                        </div>
-                    </div>
-                </div>
             </div>
 
             <!-- Krypto Seite -->
@@ -342,42 +259,69 @@
                     </div>
                 </div>
                 <div id="crypto-list" class="asset-list"></div>
-                <div id="crypto-detail" class="detail-panel hidden">
-                    <div class="detail-header">
-                        <button id="crypto-detail-close" class="btn-icon">✕</button>
-                        <h3 id="crypto-detail-name"></h3>
-                        <span id="crypto-detail-symbol" class="symbol-badge"></span>
+            </div>
+
+            <!-- Asset-Übersicht (Aktien / ETFs / Krypto) -->
+            <div id="page-asset-detail" class="page">
+                <div class="page-header">
+                    <button id="asset-detail-back" class="btn btn-secondary">← Zurück</button>
+                    <div class="asset-detail-title">
+                        <div class="asset-icon" id="asset-detail-icon">ABC</div>
+                        <div>
+                            <h2 id="asset-detail-name">—</h2>
+                            <div class="asset-detail-sub">
+                                <span id="asset-detail-symbol" class="symbol-badge">—</span>
+                                <span id="asset-detail-subtext"></span>
+                            </div>
+                        </div>
                     </div>
-                    <div class="detail-body">
+                </div>
+
+                <div class="asset-overview-grid">
+                    <div class="card asset-price-card">
                         <div class="detail-price">
-                            <span class="big-number" id="crypto-detail-price">€0,00</span>
-                            <span class="change" id="crypto-detail-change">+0,00%</span>
+                            <span class="big-number" id="asset-detail-price">€0,00</span>
+                            <span class="change" id="asset-detail-change">+0,00%</span>
                         </div>
-                        <canvas id="crypto-detail-chart" width="600" height="200"></canvas>
-                        <div class="detail-stats">
-                            <div class="stat"><span>Marktkapitalisierung</span><span id="crypto-detail-mcap">-</span></div>
-                            <div class="stat"><span>24h Volumen</span><span id="crypto-detail-vol">-</span></div>
-                            <div class="stat"><span>Circulating Supply</span><span id="crypto-detail-supply">-</span></div>
-                            <div class="stat"><span>ATH</span><span id="crypto-detail-ath">-</span></div>
+                        <div class="detail-stats" id="asset-detail-stats"></div>
+                    </div>
+
+                    <div class="card asset-position-card">
+                        <h3>Position <span id="asset-position-type" class="page-subnote">Aktie</span></h3>
+                        <div id="asset-position-content"></div>
+                    </div>
+                </div>
+
+                <div class="card asset-chart-card">
+                    <canvas id="asset-detail-chart" width="800" height="300"></canvas>
+                </div>
+
+                <div class="card asset-trade-card">
+                    <h3>Handel</h3>
+                    <div class="trade-section">
+                        <div class="trade-tabs">
+                            <button class="trade-tab active" data-action="buy">Kaufen</button>
+                            <button class="trade-tab" data-action="sell">Verkaufen</button>
                         </div>
-                        <div class="trade-section">
-                            <div class="trade-tabs">
-                                <button class="trade-tab active" data-action="buy">Kaufen</button>
-                                <button class="trade-tab" data-action="sell">Verkaufen</button>
+                        <div class="trade-form">
+                            <label id="asset-trade-label">Anzahl:</label>
+                            <div class="trade-quick-row">
+                                <button class="btn btn-sm trade-quick" data-pct="25">25%</button>
+                                <button class="btn btn-sm trade-quick" data-pct="50">50%</button>
+                                <button class="btn btn-sm trade-quick" data-pct="100">100%</button>
+                                <button class="btn btn-sm trade-quick" data-pct="max">Max ✓</button>
                             </div>
-                            <div class="trade-form">
-                                <label>Betrag (in Coins):</label>
-                                <input type="number" id="crypto-trade-amount" min="0.001" step="0.001" value="0.1" class="trade-input">
-                                <div class="trade-summary">
-                                    <span>Gesamtkosten:</span>
-                                    <span id="crypto-trade-cost">€0,00</span>
-                                </div>
-                                <div class="trade-fee">
-                                    <span>Gebühr (0,5%):</span>
-                                    <span id="crypto-trade-fee">€0,00</span>
-                                </div>
-                                <button id="crypto-trade-btn" class="btn btn-primary btn-block">Kaufen</button>
+                            <input type="number" id="asset-trade-amount" min="0.01" step="0.01" value="1" class="trade-input">
+                            <div class="trade-summary">
+                                <span id="asset-trade-cost-label">Gesamtkosten:</span>
+                                <span id="asset-trade-cost">€0,00</span>
                             </div>
+                            <div class="trade-fee">
+                                <span id="asset-trade-fee-label">Gebühr:</span>
+                                <span id="asset-trade-fee">€0,00</span>
+                            </div>
+                            <div class="trade-tax-note" id="asset-trade-tax-note"></div>
+                            <button id="asset-trade-btn" class="btn btn-primary btn-block">Kaufen</button>
                         </div>
                     </div>
                 </div>
@@ -466,24 +410,24 @@
                         <h3>Steuerübersicht</h3>
                         <div class="tax-grid">
                             <div class="tax-item">
-                                <span class="tax-label">Kapitalertragsteuer (25%)</span>
+                                <span class="tax-label">Kapitalertragsteuer (einbehalten)</span>
                                 <span class="tax-value" id="tax-capital">€0,00</span>
                             </div>
                             <div class="tax-item">
-                                <span class="tax-label">Solidaritätszuschlag (5,5%)</span>
+                                <span class="tax-label">Solidaritätszuschlag (einbehalten)</span>
                                 <span class="tax-value" id="tax-soli">€0,00</span>
                             </div>
                             <div class="tax-item">
-                                <span class="tax-label">Grunderwerbsteuer (pending)</span>
+                                <span class="tax-label">Mieteinnahmen-Steuer (einbehalten)</span>
+                                <span class="tax-value" id="tax-rental">€0,00</span>
+                            </div>
+                            <div class="tax-item">
+                                <span class="tax-label">Grunderwerbsteuer (nach Kauf)</span>
                                 <span class="tax-value" id="tax-realestate">€0,00</span>
                             </div>
                             <div class="tax-item">
-                                <span class="tax-label">Grundsteuer (jährlich)</span>
+                                <span class="tax-label">Grundsteuer (offene Schuld)</span>
                                 <span class="tax-value" id="tax-property">€0,00</span>
-                            </div>
-                            <div class="tax-item">
-                                <span class="tax-label">Mieteinnahmen-Steuer</span>
-                                <span class="tax-value" id="tax-rental">€0,00</span>
                             </div>
                             <div class="tax-item">
                                 <span class="tax-label">Verspätungszuschlag</span>
@@ -507,6 +451,7 @@
                             <button id="tax-pay-btn" class="btn btn-primary btn-block">Steuern zahlen</button>
                             <button id="tax-pay-all-btn" class="btn btn-secondary btn-block">Alles zahlen</button>
                         </div>
+                        <p class="tax-note">💡 <strong>Einbehalten</strong> = automatisch beim Verkauf/Miete abgezogen (Abgeltungssteuer). Als <strong>Schuld</strong> offen: Grundsteuer &amp; Verspätungszuschlag.</p>
                         <div class="tax-history">
                             <h4>Zahlungshistorie</h4>
                             <div id="tax-history-list"></div>
@@ -516,11 +461,11 @@
                 <div class="card tax-info-card">
                     <h3>Steuerinformationen (Deutschland)</h3>
                     <div class="tax-info-content">
-                        <p><strong>Kapitalertragsteuer:</strong> 25% auf Gewinne aus Aktien, ETFs und Kryptowährungen. Zusätzlich fällt der Solidaritätszuschlag von 5,5% auf die Steuer an.</p>
+                        <p><strong>Kapitalertragsteuer:</strong> 25% + Solidaritätszuschlag (5,5% davon) = 26,375% auf realisierte Gewinne aus Aktien, ETFs und Kryptowährungen. Wird <strong>automatisch beim Verkauf einbehalten</strong> — wie bei einem echten Broker-Depot.</p>
+                        <p><strong>Mieteinnahmen:</strong> werden monatlich automatisch mit progressivem Steuersatz von der Miete abgezogen (bis 45%).</p>
+                        <p><strong>Grundsteuer:</strong> Läuft kontinuierlich als offene Steuerschuld für Immobilienbesitz (ca. 0,3-1% des Immobilienwerts pro Jahr) und ist im Steuerbüro zu zahlen.</p>
                         <p><strong>Grunderwerbsteuer:</strong> 3,5% - 6,5% beim Kauf von Immobilien, je nach Bundesland.</p>
-                        <p><strong>Grundsteuer:</strong> Jährliche Steuer auf Immobilienbesitz, ca. 0,3-1% des Immobilienwerts.</p>
-                        <p><strong>Mieteinnahmen:</strong> Werden als Einkommen versteuert (progressiver Steuersatz bis 45%).</p>
-                        <p><strong>⚠️ Verspätungszuschlag:</strong> Bei nicht fristgerechter Zahlung: 1% pro Monat (min. €25), maximal 10% der Steuerschuld.</p>
+                        <p><strong>⚠️ Verspätungszuschlag:</strong> Bei nicht fristgerechter Zahlung der Steuerschuld: 1% pro Monat (min. €25), maximal 10% der Steuerschuld.</p>
                     </div>
                 </div>
             </div>

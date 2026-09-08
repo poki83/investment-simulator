@@ -153,6 +153,11 @@ const Game = {
         if (monthlyRent > 0) {
             GameState.addCash(monthlyRent);
             GameState.addTransaction('rent', 'realestate', 'Mieteinnahmen', 'RENT', 1, monthlyRent, 0, monthlyRent);
+            const rentTax = Taxes.withholdRent(monthlyRent);
+            if (rentTax > 0) {
+                GameState.addCash(-rentTax);
+                GameState.addTransaction('tax', 'realestate', 'Steuer auf Mieteinnahmen', 'TAX', 0, 0, 0, rentTax);
+            }
         }
 
         const grundsteuer = Taxes.calculateGrundsteuer();
