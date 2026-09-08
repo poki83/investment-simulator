@@ -1,0 +1,642 @@
+/* =========================================================
+   InvestSim – realistischer Fintech-Relaunch (nur Design)
+   Override-Theme: feinere Typografie, Banken-Farbwelt,
+   echte Oberflächen-Hierarchie, matte Materialien, Charts
+   ========================================================= */
+
+@import url("https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap");
+
+:root {
+    --bg-primary: #eef1f6;
+    --bg-secondary: #ffffff;
+    --bg-tertiary: #f3f5f9;
+    --bg-hover: #f0f3f8;
+    --border: #e5e9f0;
+    --text-primary: #0d1424;
+    --text-secondary: #5a6375;
+    --text-muted: #98a1b1;
+    --green: #0b9e4f;
+    --green-bg: rgba(11, 158, 79, 0.09);
+    --red: #e02e3a;
+    --red-bg: rgba(224, 46, 58, 0.08);
+    --blue: #155df0;
+    --blue-bg: rgba(21, 93, 240, 0.08);
+    --yellow: #b45309;
+    --yellow-bg: rgba(180, 83, 9, 0.10);
+    --purple: #7c3aed;
+    --purple-bg: rgba(124, 58, 237, 0.08);
+    --orange: #ea580c;
+    --radius: 16px;
+    --radius-sm: 10px;
+    --shadow: 0 1px 2px rgba(16, 24, 40, 0.05), 0 10px 28px rgba(16, 24, 40, 0.06);
+    --shadow-lg: 0 20px 55px rgba(8, 14, 32, 0.35);
+    --transition: all 0.18s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+html, body {
+    font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+    letter-spacing: -0.01em;
+}
+
+::selection {
+    background: rgba(21, 93, 240, 0.16);
+}
+
+:focus-visible {
+    outline: 2px solid var(--blue);
+    outline-offset: 2px;
+}
+
+/* Scrollbar – zart, unsichtbare Bahn */
+::-webkit-scrollbar {
+    width: 9px;
+    height: 9px;
+}
+::-webkit-scrollbar-track {
+    background: transparent;
+}
+::-webkit-scrollbar-thumb {
+    background: #c6cedb;
+    border-radius: 9px;
+    border: 3px solid transparent;
+    background-clip: padding-box;
+}
+::-webkit-scrollbar-thumb:hover {
+    background: #a8b2c2;
+    border: 3px solid transparent;
+    background-clip: padding-box;
+}
+
+/* --- Header: mattes Glas, echte App-Leiste -------------- */
+.header {
+    background: rgba(255, 255, 255, 0.82);
+    -webkit-backdrop-filter: blur(14px) saturate(1.5);
+    backdrop-filter: blur(14px) saturate(1.5);
+    border-bottom: 1px solid rgba(229, 233, 240, 0.9);
+    box-shadow: 0 1px 0 rgba(255, 255, 255, 0.6) inset, 0 1px 4px rgba(16, 24, 40, 0.05);
+}
+
+.logo {
+    font-weight: 800;
+    font-size: 1.18rem;
+    letter-spacing: -0.02em;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+.logo::after {
+    content: "";
+    width: 7px;
+    height: 7px;
+    border-radius: 50%;
+    background: var(--green);
+    box-shadow: 0 0 0 3px var(--green-bg);
+}
+
+.game-date {
+    color: var(--text-secondary);
+    letter-spacing: 0.02em;
+    font-variant-numeric: tabular-nums;
+}
+
+.game-speed {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    background: var(--blue-bg);
+    border: 1px solid rgba(21, 93, 240, 0.18);
+    letter-spacing: 0.02em;
+}
+
+/* Tempo-Buttons als Segment-Steuerung */
+.btn-speed {
+    border-radius: var(--radius-sm);
+    font-weight: 600;
+    letter-spacing: 0.01em;
+}
+.btn-speed.active {
+    background: linear-gradient(180deg, #2f74ff, #155df0);
+    color: #fff;
+    border-color: transparent;
+    box-shadow: 0 3px 10px rgba(21, 93, 240, 0.35);
+}
+.btn-speed.active:hover {
+    background: linear-gradient(180deg, #2f74ff, #155df0);
+    color: #fff;
+}
+
+.btn-icon {
+    border-radius: 10px;
+    font-size: 1.05rem;
+}
+.btn-icon:hover {
+    background: var(--bg-tertiary);
+    transform: translateY(-0.5px);
+}
+
+/* --- Seitenleiste: echte Navigation mit Funktionstiefe -- */
+.sidebar {
+    background: var(--bg-secondary);
+    border-right: 1px solid var(--border);
+    box-shadow: 0 0 1px rgba(16, 24, 40, 0.06);
+}
+
+.nav-btn {
+    border-radius: 12px;
+    margin: 2px 5px;
+    width: 62px;
+    padding: 9px 4px;
+}
+.nav-btn:hover {
+    background: var(--bg-tertiary);
+}
+.nav-btn.active {
+    background: linear-gradient(180deg, #2f74ff, #0e4ddd);
+    color: #fff;
+    box-shadow: 0 6px 14px rgba(21, 93, 240, 0.38), inset 0 1px 0 rgba(255, 255, 255, 0.25);
+}
+.nav-icon {
+    font-size: 1.25rem;
+    line-height: 1;
+}
+.nav-label {
+    font-weight: 600;
+    font-size: 0.6rem;
+    letter-spacing: 0.02em;
+}
+
+/* --- Karten: ruhige Materialflächen mit echtem Schatten -- */
+.card {
+    border-radius: var(--radius);
+    border: 1px solid var(--border);
+    box-shadow: var(--shadow);
+    background: var(--bg-secondary);
+}
+.card h3 {
+    color: var(--text-muted);
+    font-weight: 600;
+    letter-spacing: 0.08em;
+    font-size: 0.74rem;
+}
+
+/* --- Buttons: echter Fintech-Auftritt ------------------- */
+.btn {
+    border-radius: 10px;
+    box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.22);
+    letter-spacing: 0.01em;
+}
+.btn:active:not(:disabled) {
+    transform: translateY(1px);
+}
+.btn-primary {
+    background: linear-gradient(180deg, #2f74ff, #155df0);
+}
+.btn-primary:hover:not(:disabled) {
+    background: linear-gradient(180deg, #1f68f8, #0e4ddd);
+    box-shadow: 0 8px 18px rgba(21, 93, 240, 0.35), inset 0 1px 0 rgba(255, 255, 255, 0.25);
+    transform: translateY(-1px);
+}
+.btn-primary:disabled {
+    background: #b9c2d1;
+    color: #ffffff;
+    box-shadow: none;
+}
+.btn-success {
+    background: linear-gradient(180deg, #12b06a, #0b8f4c);
+}
+.btn-success:hover {
+    background: linear-gradient(180deg, #0fa55f, #0a7e43);
+    box-shadow: 0 8px 18px rgba(11, 158, 79, 0.35), inset 0 1px 0 rgba(255, 255, 255, 0.25);
+    transform: translateY(-1px);
+}
+.btn-danger {
+    background: linear-gradient(180deg, #f04855, #d62430);
+}
+.btn-danger:hover {
+    background: linear-gradient(180deg, #e53c48, #c91c28);
+    box-shadow: 0 8px 18px rgba(224, 46, 58, 0.35), inset 0 1px 0 rgba(255, 255, 255, 0.25);
+    transform: translateY(-1px);
+}
+.btn-secondary {
+    background: var(--bg-secondary);
+    border: 1px solid var(--border);
+    color: var(--text-secondary);
+    box-shadow: none;
+}
+.btn-secondary:hover {
+    background: var(--bg-tertiary);
+    border-color: #d3dae4;
+    color: var(--text-primary);
+}
+
+/* --- Zahlen & Kurse: präzise, seriös -------------------- */
+.big-number, .mini-value, .hero-amount, .hero-stat-value {
+    letter-spacing: -0.025em;
+    font-feature-settings: "tnum", "lnum";
+}
+.hero-amount {
+    background: linear-gradient(135deg, #155df0 10%, #4f46e5 60%, #7c3aed 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+}
+.change.positive, .holding-pnl.positive {
+    color: var(--green);
+}
+.change.negative, .holding-pnl.negative {
+    color: var(--red);
+}
+
+/* --- Suche & Filter: Eingabefelder wie eine Bank --------- */
+.search-input {
+    background-color: var(--bg-secondary);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding-left: 40px;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' fill='none' stroke='%2398a1b1' stroke-width='1.7' stroke-linecap='round'%3E%3Ccircle cx='7' cy='7' r='5'/%3E%3Cpath d='m11 11 3.6 3.6'/%3E%3C/svg%3E");
+    background-repeat: no-repeat;
+    background-position: 13px center;
+    background-size: 16px;
+    box-shadow: 0 1px 2px rgba(16, 24, 40, 0.03) inset;
+}
+.search-input:hover {
+    border-color: #cdd5e0;
+}
+.search-input:focus {
+    border-color: var(--blue);
+    box-shadow: 0 0 0 4px rgba(21, 93, 240, 0.12);
+}
+
+.filter-select {
+    appearance: none;
+    -webkit-appearance: none;
+    background-color: var(--bg-secondary);
+    border-color: var(--border);
+    border-radius: 10px;
+    padding-right: 32px;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='14' height='14' fill='none' stroke='%235a6375' stroke-width='1.9' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='m3 5.5 4 4 4-4'/%3E%3C/svg%3E");
+    background-repeat: no-repeat;
+    background-position: right 10px center;
+    background-size: 14px;
+}
+.filter-select:hover {
+    border-color: #cdd5e0;
+}
+.filter-select:focus {
+    border-color: var(--blue);
+    box-shadow: 0 0 0 4px rgba(21, 93, 240, 0.12);
+}
+
+.trade-input {
+    background-color: var(--bg-secondary);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    box-shadow: 0 1px 2px rgba(16, 24, 40, 0.03) inset;
+}
+.trade-input:hover {
+    border-color: #cdd5e0;
+}
+.trade-input:focus {
+    border-color: var(--blue);
+    box-shadow: 0 0 0 4px rgba(21, 93, 240, 0.12);
+}
+
+input[type="number"]::-webkit-outer-spin-button,
+input[type="number"]::-webkit-inner-spin-button {
+    opacity: 1;
+    margin-left: 2px;
+}
+
+/* --- Seitenkopf ------------------------------------------ */
+.page-header h2 {
+    font-weight: 800;
+    letter-spacing: -0.02em;
+}
+
+/* --- Statistik-Zeilen ------------------------------------ */
+.stat {
+    border-bottom-color: var(--border);
+}
+.stat span:first-child {
+    color: var(--text-muted);
+}
+.stat span:last-child {
+    font-weight: 600;
+}
+
+/* --- Asset-/Halten-Liste: aufgeräumte Zeilen ------------- */
+.asset-item {
+    border-radius: 12px;
+}
+.asset-item:hover {
+    transform: translateY(-1px);
+    box-shadow: 0 6px 16px rgba(16, 24, 40, 0.10);
+    background: var(--bg-secondary);
+    border-color: var(--blue);
+}
+.asset-name {
+    font-weight: 700;
+}
+.asset-symbol {
+    color: var(--text-muted);
+    font-weight: 500;
+}
+
+/* Icon-Kugeln: Glanz + Innenring wie echte Broker-Kacheln */
+.asset-icon, .p-icon, .holding-icon, .company-icon,
+.leaderboard-avatar, .garage-icon {
+    background-image: linear-gradient(180deg, rgba(255, 255, 255, 0.28), rgba(255, 255, 255, 0) 55%);
+    box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.30), inset 0 -8px 14px rgba(0, 0, 0, 0.10);
+}
+.asset-icon, .holding-icon {
+    border-radius: 50%;
+}
+.p-icon {
+    border-radius: 12px;
+}
+.company-icon, .garage-icon {
+    border-radius: 14px;
+}
+
+/* --- Portfolio-Zeilen ------------------------------------ */
+.p-row.clickable:hover {
+    background: var(--bg-tertiary);
+}
+.p-value {
+    letter-spacing: -0.01em;
+}
+.p-name {
+    font-weight: 700;
+}
+
+/* --- Dashboard-Hero: wertevolle Karte mit Tiefe ---------- */
+.dashboard-hero {
+    background: linear-gradient(135deg, #ffffff 0%, #f3f7ff 55%, #eaf1fd 100%);
+    border: 1px solid #e3e9f6;
+    border-radius: 18px;
+    box-shadow: var(--shadow);
+    position: relative;
+    overflow: hidden;
+}
+.dashboard-hero::before {
+    content: "";
+    position: absolute;
+    top: -70px;
+    right: -40px;
+    width: 260px;
+    height: 260px;
+    border-radius: 50%;
+    background: radial-gradient(circle, rgba(21, 93, 240, 0.10), transparent 65%);
+    pointer-events: none;
+}
+.hero-label {
+    letter-spacing: 0.12em;
+    color: var(--text-muted);
+}
+.hero-stat-value {
+    letter-spacing: -0.02em;
+}
+
+/* --- Mini-Statistiken ------------------------------------ */
+.mini-stat {
+    border-radius: var(--radius-sm);
+}
+.mini-label {
+    letter-spacing: 0.09em;
+    color: var(--text-muted);
+}
+.mini-value {
+    letter-spacing: -0.02em;
+}
+
+/* --- Chart-Flächen: dezentes Raster + Rahmen ------------- */
+.chart-card, .asset-chart-card, .detail-chart {
+    border-radius: var(--radius-sm);
+    overflow: hidden;
+}
+.chart-card canvas, .asset-chart-card canvas, .detail-chart canvas {
+    background-image: linear-gradient(to bottom, rgba(16, 24, 40, 0.045) 1px, transparent 1px);
+    background-size: 100% 42px;
+    background-position: 0 100%;
+}
+.chart-card {
+    padding-top: 8px;
+}
+
+/* --- Trade-Bereich: echte Broker-Handelsoberfläche ------- */
+.trade-section {
+    background: var(--bg-tertiary);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    padding: 18px;
+}
+.trade-tabs {
+    background: #e7ebf2;
+    border-radius: 11px;
+    padding: 4px;
+    box-shadow: inset 0 1px 3px rgba(16, 24, 40, 0.06);
+}
+.trade-tab {
+    border-radius: 8px;
+}
+.trade-tab.active[data-action="buy"] {
+    background: linear-gradient(180deg, #12b06a, #0b8f4c);
+    box-shadow: 0 4px 10px rgba(11, 158, 79, 0.40), inset 0 1px 0 rgba(255, 255, 255, 0.25);
+}
+.trade-tab.active[data-action="sell"] {
+    background: linear-gradient(180deg, #f04855, #d62430);
+    box-shadow: 0 4px 10px rgba(224, 46, 58, 0.40), inset 0 1px 0 rgba(255, 255, 255, 0.25);
+}
+.trade-quick-row .btn {
+    background: var(--bg-secondary);
+    border: 1px solid var(--border);
+    color: var(--text-secondary);
+    box-shadow: none;
+    font-weight: 600;
+    padding: 8px 6px;
+}
+.trade-quick-row .btn:hover {
+    border-color: var(--blue);
+    color: var(--blue);
+    background: var(--bg-secondary);
+    transform: translateY(-1px);
+}
+.trade-quick-row .btn:active {
+    transform: scale(0.95);
+}
+.trade-summary, .trade-fee {
+    color: var(--text-muted);
+}
+.trade-summary span:last-child {
+    color: var(--text-primary);
+    font-weight: 700;
+}
+.trade-tax-note {
+    background: var(--yellow-bg);
+    border: 1px solid rgba(180, 83, 9, 0.22);
+    color: #7c4a04;
+    font-weight: 500;
+}
+.tax-note {
+    color: var(--text-muted);
+}
+
+/* --- Real Estate: Immobilienkarte mit Szenerie ----------- */
+.re-card-image::after {
+    content: "";
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(180deg, transparent 50%, rgba(10, 18, 36, 0.22));
+    pointer-events: none;
+}
+.re-card-image {
+    border-bottom: 1px solid var(--border);
+}
+.re-card-price-value {
+    letter-spacing: -0.02em;
+}
+
+/* --- News ------------------------------------------------- */
+.news-item {
+    border-radius: 12px;
+}
+.news-item:hover {
+    background: var(--bg-secondary);
+    box-shadow: 0 4px 14px rgba(16, 24, 40, 0.08);
+}
+.news-item-title {
+    font-weight: 700;
+}
+.news-item-body {
+    color: var(--text-secondary);
+}
+
+/* --- Steuer-Seite ---------------------------------------- */
+.tax-item {
+    border-bottom-color: var(--border);
+}
+.tax-total {
+    border-top: 2px solid var(--border);
+}
+
+/* --- Toast & Benachrichtigung ---------------------------- */
+.news-toast {
+    background: var(--bg-secondary);
+    border: 1px solid var(--border);
+    border-radius: 16px;
+    box-shadow: 0 16px 40px rgba(8, 14, 32, 0.20);
+}
+.news-toast-icon {
+    width: 38px;
+    height: 38px;
+    border-radius: 50%;
+    background: var(--blue-bg);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.05rem;
+}
+.news-toast-text strong {
+    font-weight: 700;
+}
+
+.notification {
+    background: var(--bg-secondary);
+    border: 1px solid rgba(180, 83, 9, 0.30);
+    border-radius: 14px;
+    box-shadow: 0 16px 40px rgba(8, 14, 32, 0.22);
+    padding: 14px 18px;
+}
+.notification-icon {
+    width: 34px;
+    height: 34px;
+    border-radius: 50%;
+    background: var(--yellow-bg);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+}
+
+/* --- Modals: echte Fokus-Ebene --------------------------- */
+.modal {
+    background: rgba(9, 15, 28, 0.55);
+    -webkit-backdrop-filter: blur(6px);
+    backdrop-filter: blur(6px);
+}
+.modal-content {
+    border: none;
+    border-radius: 20px;
+    box-shadow: var(--shadow-lg);
+}
+.modal-header {
+    border-bottom: 1px solid var(--border);
+}
+.modal-header h3 {
+    font-weight: 700;
+}
+
+/* --- Luxury / Garage -------------------------------------- */
+.luxury-card, .company-card, .realestate-card, .garage-card, .leaderboard-entry {
+    border-radius: 12px;
+}
+.luxury-card:hover, .company-card:hover, .realestate-card:hover, .garage-card:hover, .leaderboard-entry:hover {
+    box-shadow: 0 6px 16px rgba(16, 24, 40, 0.08);
+}
+.luxury-card-name, .company-name, .realestate-card .re-card-title, .garage-name {
+    font-weight: 700;
+}
+.luxury-card.owned, .luxury-card.owned:hover {
+    background: linear-gradient(180deg, rgba(11, 158, 79, 0.06), rgba(11, 158, 79, 0.12));
+    border-color: rgba(11, 158, 79, 0.45);
+}
+
+/* --- Tutorial --------------------------------------------- */
+.tutorial-overlay {
+    background: rgba(9, 15, 28, 0.72);
+    -webkit-backdrop-filter: blur(8px);
+    backdrop-filter: blur(8px);
+}
+.tutorial-box {
+    border: none;
+    border-radius: 20px;
+    box-shadow: var(--shadow-lg);
+}
+.tutorial-box h2 {
+    font-weight: 800;
+    letter-spacing: -0.02em;
+}
+.tutorial-progress {
+    background: #e7ebf2;
+}
+
+/* --- Empty State ------------------------------------------- */
+.empty-state {
+    color: var(--text-muted);
+}
+.empty-state-icon {
+    opacity: 0.7;
+}
+
+/* --- Fenstergröße: kompakter Abstand, mehr Inhalt --------- */
+.main-content {
+    padding: 22px;
+}
+.card {
+    padding: 18px 20px;
+}
+
+/* --- Mobil: alles bleibt touch-, nur Details werden zarter */
+@media (max-width: 768px) {
+    .modal-content {
+        border-radius: 18px;
+    }
+    .card {
+        padding: 16px;
+    }
+    .trade-section .trade-summary, .trade-section .trade-fee {
+        overflow-wrap: anywhere;
+    }
+}
