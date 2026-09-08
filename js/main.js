@@ -6,6 +6,7 @@ const Game = {
     dividentWeek: 26,
     lastProcessedMonth: 1,
     lastMarketMinute: 0,
+    taxWarningShown: false,
 
     init() {
         const loaded = GameState.init();
@@ -202,10 +203,20 @@ const Game = {
 
     checkTaxNotification() {
         const summary = Taxes.getSummary();
-        if (summary.total > 50 && summary.weeksOverdue > 0) {
-            document.getElementById('tax-notification').classList.remove('hidden');
+        const el = document.getElementById('tax-notification');
+        const overdue = summary.total > 50 && summary.weeksOverdue > 0;
+
+        if (overdue && !this.taxWarningShown) {
+            this.taxWarningShown = true;
             document.getElementById('tax-notification-text').textContent =
                 `⚠️ Steuerschuld: €${UI.fmt(summary.total)}! ${summary.lateFees > 0 ? `Verspätungszuschlag: €${UI.fmt(summary.lateFees)}` : 'Zahle jetzt, um Zuschläge zu vermeiden!'}`;
+            el.classList.remove('hidden');
+        } else if (!overdue) {
+            el.classList.add('hidden');
+        }
+
+        if (summary.total <= 0) {
+            this.taxWarningShown = false;
         }
     }
 };

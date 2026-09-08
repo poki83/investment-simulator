@@ -1143,14 +1143,6 @@ const UI = {
         }
         if (!histHtml) histHtml = '<div class="empty-state" style="padding:10px"><div class="empty-state-text">Noch keine Zahlungen</div></div>';
         histContainer.innerHTML = histHtml;
-
-        if (summary.total > 100 && summary.weeksOverdue > 0) {
-            const notif = document.getElementById('tax-notification');
-            document.getElementById('tax-notification-text').textContent = `⚠️ Steuerschuld: €${this.fmt(summary.total)}! ${summary.lateFees > 0 ? `Verspätungszuschlag: €${this.fmt(summary.lateFees)}` : ''}`;
-            notif.classList.remove('hidden');
-        } else {
-            document.getElementById('tax-notification').classList.add('hidden');
-        }
     },
 
     updateNewsList() {
