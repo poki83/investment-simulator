@@ -1,5 +1,5 @@
 /* InvestSim – Service Worker: App-Cache & Offline */
-const VERSION = 'investsim-v1';
+const VERSION = 'investsim-v2';
 
 const CORE = [
   './',
@@ -29,6 +29,7 @@ const CORE = [
   './icons/icon-192.png',
   './icons/icon-512.png',
   './icons/icon-180.png',
+  './icons/icon-maskable-192.png',
   './icons/icon-maskable-512.png'
 ];
 

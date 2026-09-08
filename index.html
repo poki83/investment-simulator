@@ -72,6 +72,7 @@
                 <button id="btn-speed-normal" class="btn-speed" title="Abspielen (1x)">▶</button>
                 <button id="btn-save" class="btn-icon" title="Speichern">💾</button>
                 <button id="btn-settings" class="btn-icon" title="Einstellungen">⚙️</button>
+                <button id="app-install-btn" class="btn btn-primary btn-sm hidden" title="InvestSim als App installieren">⬇️ Installieren</button>
             </div>
         </header>
 
@@ -754,6 +755,24 @@
         if ('serviceWorker' in navigator) {
             navigator.serviceWorker.register('./sw.js').catch(function () {});
         }
+
+        let deferredPrompt = null;
+        window.addEventListener('beforeinstallprompt', function (e) {
+            e.preventDefault();
+            deferredPrompt = e;
+            var btn = document.getElementById('app-install-btn');
+            if (btn) btn.classList.remove('hidden');
+        });
+        document.addEventListener('click', function (e) {
+            if (e.target && e.target.closest && e.target.closest('#app-install-btn') && deferredPrompt) {
+                deferredPrompt.prompt();
+            }
+        });
+        window.addEventListener('appinstalled', function () {
+            var btn = document.getElementById('app-install-btn');
+            if (btn) btn.classList.add('hidden');
+            deferredPrompt = null;
+        });
     </script>
 </body>
 </html>

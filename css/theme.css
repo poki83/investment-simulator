@@ -645,4 +645,9 @@ input[type="number"]::-webkit-inner-spin-button {
     .sidebar {
         padding-bottom: env(safe-area-inset-bottom);
     }
+    #app-install-btn {
+        padding: 4px 10px;
+        font-size: 0.74rem;
+        white-space: nowrap;
+    }
 }
