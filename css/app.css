@@ -819,3 +819,113 @@ body {
         display: none;
     }
 }
+
+/* =========================================================
+   Mobile-Polish: Touch, iOS, schmale Screens, Safe-Area
+   ========================================================= */
+
+/* Mobile-URL-Leisten: dvh statt vh */
+@supports (height: 100dvh) {
+    .app { height: 100dvh; }
+}
+
+html {
+    -webkit-text-size-adjust: 100%;
+}
+body {
+    -webkit-tap-highlight-color: transparent;
+    overflow-x: hidden;
+}
+
+/* iOS: kein Auto-Zoom beim Eingeben (Eingabefelder ≥ 16px) */
+@media (max-width: 768px) {
+    input, select, textarea {
+        font-size: 16px;
+    }
+    .detail-panel {
+        -webkit-overflow-scrolling: touch;
+    }
+    .detail-body {
+        padding: 16px;
+    }
+    /* Touch-Targets */
+    .chip, .casino-bet-btn, .coin-btn, .trade-tab,
+    .filter-select, .casino-tab, .btn-icon {
+        min-height: 44px;
+    }
+    /* Tipp-Feedback */
+    .btn:active, .chip:active, .casino-bet-btn:active,
+    .coin-btn:active, .p-row:active, .btn-icon:active {
+        transform: scale(0.96);
+    }
+    .casino-tab, .coin-btn, .trade-tab {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+    }
+    .nav-btn {
+        min-height: 52px;
+    }
+}
+
+/* Header: kompakt, kein Überlauf */
+@media (max-width: 900px) {
+    .game-clock { display: none; }
+}
+@media (max-width: 600px) {
+    .game-date { display: none; }
+}
+@media (max-width: 480px) {
+    .header {
+        padding: 0 10px;
+        gap: 6px;
+    }
+    .header-center {
+        gap: 6px;
+    }
+    .btn-speed, .header-right .btn-icon {
+        min-width: 40px;
+        min-height: 40px;
+        padding: 0;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+    }
+}
+
+/* Modals: begrenzt + scrollbar */
+.modal-content {
+    max-height: 88vh;
+    overflow-y: auto;
+    -webkit-overflow-scrolling: touch;
+    margin-bottom: env(safe-area-inset-bottom);
+}
+
+/* Geldzahlen nie aus dem Rahmen drücken */
+.mini-value, .hero-amount, .p-value, .portfolio-group-value,
+.asset-price-value, .holding-value, .overview-stats strong {
+    max-width: 100%;
+    overflow-wrap: anywhere;
+}
+
+/* Sehr schmale Screens (< 380px) straffen */
+@media (max-width: 380px) {
+    .roulette-grid { gap: 2px; }
+    .roulette-num { padding: 7px 0; font-size: 0.72rem; }
+    .coin-show { font-size: 3rem; }
+    .slot-reel { width: 62px; height: 88px; font-size: 1.9rem; }
+    .hero-amount { font-size: 1.6rem; }
+    .portfolio-group-value { font-size: 0.8rem; }
+    .logo { font-size: 0.9rem; }
+}
+
+/* Bottom-Navigation: sauberes Scrollen ohne Scrollbar */
+.sidebar {
+    scrollbar-width: none;
+}
+.sidebar::-webkit-scrollbar {
+    display: none;
+}
+.sidebar .nav-btn {
+    max-width: 68px;
+}
