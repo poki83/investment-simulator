@@ -1,0 +1,801 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+    <meta name="theme-color" content="#f4f6f9">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <title>InvestSim - Investment Simulator</title>
+    <link rel="stylesheet" href="css/style.css">
+    <link rel="stylesheet" href="css/dashboard.css">
+    <link rel="stylesheet" href="css/components.css">
+    <link rel="stylesheet" href="css/app.css">
+</head>
+<body>
+    <!-- Tutorial Overlay -->
+    <div id="tutorial-overlay" class="tutorial-overlay">
+        <div class="tutorial-box">
+            <h2 id="tutorial-title">Willkommen bei InvestSim!</h2>
+            <p id="tutorial-text"></p>
+            <div class="tutorial-progress">
+                <div id="tutorial-progress-bar" class="tutorial-progress-bar"></div>
+            </div>
+            <div class="tutorial-buttons">
+                <button id="tutorial-skip" class="btn btn-secondary">Tutorial überspringen</button>
+                <button id="tutorial-next" class="btn btn-primary">Weiter</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Steuern Benachrichtigung -->
+    <div id="tax-notification" class="notification hidden">
+        <div class="notification-content">
+            <span class="notification-icon">⚠️</span>
+            <span id="tax-notification-text"></span>
+            <button id="tax-notification-close" class="btn-icon">✕</button>
+        </div>
+    </div>
+
+    <!-- Nachrichten Panel -->
+    <div id="news-toast" class="news-toast hidden">
+        <div class="news-toast-content">
+            <span class="news-toast-icon">📰</span>
+            <div class="news-toast-text">
+                <strong id="news-toast-title"></strong>
+                <p id="news-toast-body"></p>
+            </div>
+        </div>
+    </div>
+
+    <!-- Hauptanwendung -->
+    <div id="app" class="app">
+        <!-- Header -->
+        <header class="header">
+            <div class="header-left">
+                <h1 class="logo">📈 InvestSim</h1>
+            </div>
+            <div class="header-center">
+                <span id="game-speed" class="game-speed">● LIVE</span>
+                <span id="game-date" class="game-date"></span>
+                <span id="game-clock" class="game-clock"></span>
+            </div>
+            <div class="header-right">
+                <button id="btn-speed-pause" class="btn-speed active" title="Pause">⏸</button>
+                <button id="btn-speed-normal" class="btn-speed" title="Abspielen (1x)">▶</button>
+                <button id="btn-save" class="btn-icon" title="Speichern">💾</button>
+                <button id="btn-settings" class="btn-icon" title="Einstellungen">⚙️</button>
+            </div>
+        </header>
+
+        <!-- Sidebar Navigation -->
+        <nav class="sidebar">
+            <button class="nav-btn active" data-page="dashboard">
+                <span class="nav-icon">🏠</span>
+                <span class="nav-label">Dashboard</span>
+            </button>
+            <button class="nav-btn" data-page="portfolio">
+                <span class="nav-icon">💼</span>
+                <span class="nav-label">Portfolio</span>
+            </button>
+            <button class="nav-btn" data-page="stocks">
+                <span class="nav-icon">📈</span>
+                <span class="nav-label">Aktien</span>
+            </button>
+            <button class="nav-btn" data-page="etfs">
+                <span class="nav-icon">📊</span>
+                <span class="nav-label">ETFs</span>
+            </button>
+            <button class="nav-btn" data-page="crypto">
+                <span class="nav-icon">🪙</span>
+                <span class="nav-label">Krypto</span>
+            </button>
+            <button class="nav-btn" data-page="realestate">
+                <span class="nav-icon">🏠</span>
+                <span class="nav-label">Immobilien</span>
+            </button>
+            <button class="nav-btn" data-page="companies">
+                <span class="nav-icon">🏢</span>
+                <span class="nav-label">Unternehmen</span>
+            </button>
+            <button class="nav-btn" data-page="luxury">
+                <span class="nav-icon">🛍️</span>
+                <span class="nav-label">Shops</span>
+            </button>
+            <button class="nav-btn" data-page="garage">
+                <span class="nav-icon">🚗</span>
+                <span class="nav-label">Garage</span>
+            </button>
+            <button class="nav-btn" data-page="casino">
+                <span class="nav-icon">🎰</span>
+                <span class="nav-label">Casino</span>
+            </button>
+            <button class="nav-btn" data-page="leaderboard">
+                <span class="nav-icon">🏆</span>
+                <span class="nav-label">Reichtum</span>
+            </button>
+            <button class="nav-btn" data-page="taxes">
+                <span class="nav-icon">📋</span>
+                <span class="nav-label">Steuern</span>
+            </button>
+            <button class="nav-btn" data-page="news">
+                <span class="nav-icon">📰</span>
+                <span class="nav-label">Nachrichten</span>
+            </button>
+        </nav>
+
+        <!-- Hauptinhalt -->
+        <main class="main-content">
+            <!-- Dashboard Seite -->
+            <div id="page-dashboard" class="page active">
+                <div class="dashboard-hero card">
+                    <div class="hero-main">
+                        <div class="hero-label">Gesamtvermögen</div>
+                        <div class="hero-amount" id="total-portfolio">€0,00</div>
+                        <div class="hero-change" id="portfolio-change">+€0,00 (0,00%)</div>
+                    </div>
+                    <div class="hero-right">
+                        <div class="hero-stat">
+                            <span class="mini-label">Guthaben</span>
+                            <span class="hero-stat-value" id="cash-balance">€10.000,00</span>
+                        </div>
+                        <div class="hero-stat">
+                            <span class="mini-label">Gewinn/Verlust</span>
+                            <span class="hero-stat-value" id="total-profit">€0,00</span>
+                        </div>
+                    </div>
+                </div>
+                <div class="dashboard-stats">
+                    <div class="card mini-stat">
+                        <span class="mini-label">Aktien</span>
+                        <span class="mini-value" id="stat-stocks">€0</span>
+                    </div>
+                    <div class="card mini-stat">
+                        <span class="mini-label">ETFs</span>
+                        <span class="mini-value" id="stat-etfs">€0</span>
+                    </div>
+                    <div class="card mini-stat">
+                        <span class="mini-label">Krypto</span>
+                        <span class="mini-value" id="stat-crypto">€0</span>
+                    </div>
+                    <div class="card mini-stat">
+                        <span class="mini-label">Immobilien</span>
+                        <span class="mini-value" id="stat-realestate">€0</span>
+                    </div>
+                    <div class="card mini-stat">
+                        <span class="mini-label">Unternehmen</span>
+                        <span class="mini-value" id="stat-companies">€0</span>
+                    </div>
+                    <div class="card mini-stat">
+                        <span class="mini-label">Luxusgüter</span>
+                        <span class="mini-value" id="stat-luxury">€0</span>
+                    </div>
+                </div>
+                <div class="dashboard-charts">
+                    <div class="card chart-card wide">
+                        <h3>Portfolio-Entwicklung</h3>
+                        <canvas id="portfolio-chart" width="800" height="300"></canvas>
+                    </div>
+                </div>
+                <div class="dashboard-bottom">
+                    <div class="card holdings-card">
+                        <h3>Meine Bestände</h3>
+                        <div id="holdings-list" class="holdings-list"></div>
+                    </div>
+                    <div class="card recent-card">
+                        <h3>Letzte Transaktionen</h3>
+                        <div id="transactions-list" class="transactions-list"></div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Portfolio Seite -->
+            <div id="page-portfolio" class="page">
+                <div class="page-header">
+                    <h2>💼 Mein Portfolio</h2>
+                    <div class="portfolio-filter-bar port-filters" id="portfolio-filters">
+                        <button class="chip active" data-filter="all">Alle</button>
+                        <button class="chip" data-filter="stocks">📈 Aktien</button>
+                        <button class="chip" data-filter="etfs">📊 ETFs</button>
+                        <button class="chip" data-filter="crypto">🪙 Krypto</button>
+                        <button class="chip" data-filter="realestate">🏠 Immobilien</button>
+                        <button class="chip" data-filter="companies">🏢 Unternehmen</button>
+                        <button class="chip" data-filter="luxury">💎 Luxus</button>
+                    </div>
+                </div>
+                <div class="dashboard-stats">
+                    <div class="card mini-stat">
+                        <span class="mini-label">Gesamtwert</span>
+                        <span class="mini-value" id="portfolio-total">€0</span>
+                    </div>
+                    <div class="card mini-stat">
+                        <span class="mini-label">Guthaben</span>
+                        <span class="mini-value" id="portfolio-cash">€0</span>
+                    </div>
+                    <div class="card mini-stat">
+                        <span class="mini-label">Investiert</span>
+                        <span class="mini-value" id="portfolio-invested">€0</span>
+                    </div>
+                    <div class="card mini-stat">
+                        <span class="mini-label">Gewinn/Verlust</span>
+                        <span class="mini-value" id="portfolio-pnl">€0</span>
+                    </div>
+                </div>
+                <div class="card portfolio-overview-card" id="portfolio-overview">
+                    <canvas id="portfolio-allocation" width="180" height="180"></canvas>
+                    <div id="portfolio-allocation-legend" class="allocation-legend"></div>
+                    <div id="portfolio-overview-stats" class="overview-stats"></div>
+                </div>
+                <div id="portfolio-groups" class="portfolio-groups"></div>
+            </div>
+
+            <!-- Aktien Seite -->
+            <div id="page-stocks" class="page">
+                <div class="page-header">
+                    <h2>Aktienmarkt <span class="page-subnote">⏱️ Kurse aktualisieren jede Minute</span></h2>
+                    <div class="search-bar">
+                        <input type="text" id="stock-search" placeholder="Aktie suchen..." class="search-input">
+                    </div>
+                </div>
+                <div id="stocks-list" class="asset-list"></div>
+                <!-- Detail Modal -->
+                <div id="stock-detail" class="detail-panel hidden">
+                    <div class="detail-header">
+                        <button id="stock-detail-close" class="btn-icon">✕</button>
+                        <h3 id="stock-detail-name"></h3>
+                        <span id="stock-detail-symbol" class="symbol-badge"></span>
+                    </div>
+                    <div class="detail-body">
+                        <div class="detail-price">
+                            <span class="big-number" id="stock-detail-price">€0,00</span>
+                            <span class="change" id="stock-detail-change">+0,00%</span>
+                        </div>
+                        <canvas id="stock-detail-chart" width="600" height="200"></canvas>
+                        <div class="detail-stats">
+                            <div class="stat"><span>Eröffnung</span><span id="stock-detail-open">-</span></div>
+                            <div class="stat"><span>Hoch</span><span id="stock-detail-high">-</span></div>
+                            <div class="stat"><span>Tief</span><span id="stock-detail-low">-</span></div>
+                            <div class="stat"><span>Volumen</span><span id="stock-detail-volume">-</span></div>
+                            <div class="stat"><span>52W Hoch</span><span id="stock-detail-52wh">-</span></div>
+                            <div class="stat"><span>52W Tief</span><span id="stock-detail-52wl">-</span></div>
+                            <div class="stat"><span>KGV</span><span id="stock-detail-pe">-</span></div>
+                            <div class="stat"><span>Dividende</span><span id="stock-detail-dividend">-</span></div>
+                        </div>
+                        <div class="trade-section">
+                            <div class="trade-tabs">
+                                <button class="trade-tab active" data-action="buy">Kaufen</button>
+                                <button class="trade-tab" data-action="sell">Verkaufen</button>
+                            </div>
+                            <div class="trade-form">
+                                <label>Anzahl:</label>
+                                <input type="number" id="stock-trade-amount" min="1" value="1" class="trade-input">
+                                <div class="trade-summary">
+                                    <span>Gesamtkosten:</span>
+                                    <span id="stock-trade-cost">€0,00</span>
+                                </div>
+                                <div class="trade-fee">
+                                    <span>Gebühr (0,1%):</span>
+                                    <span id="stock-trade-fee">€0,00</span>
+                                </div>
+                                <button id="stock-trade-btn" class="btn btn-primary btn-block">Kaufen</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- ETFs Seite -->
+            <div id="page-etfs" class="page">
+                <div class="page-header">
+                    <h2>ETF-Markt <span class="page-subnote">⏱️ Kurse aktualisieren jede Minute</span></h2>
+                    <div class="search-bar">
+                        <input type="text" id="etf-search" placeholder="ETF suchen..." class="search-input">
+                    </div>
+                </div>
+                <div id="etfs-list" class="asset-list"></div>
+                <div id="etf-detail" class="detail-panel hidden">
+                    <div class="detail-header">
+                        <button id="etf-detail-close" class="btn-icon">✕</button>
+                        <h3 id="etf-detail-name"></h3>
+                        <span id="etf-detail-symbol" class="symbol-badge"></span>
+                    </div>
+                    <div class="detail-body">
+                        <div class="detail-price">
+                            <span class="big-number" id="etf-detail-price">€0,00</span>
+                            <span class="change" id="etf-detail-change">+0,00%</span>
+                        </div>
+                        <canvas id="etf-detail-chart" width="600" height="200"></canvas>
+                        <div class="detail-stats">
+                            <div class="stat"><span>TER</span><span id="etf-detail-ter">-</span></div>
+                            <div class="stat"><span>Auflagevolumen</span><span id="etf-detail-aum">-</span></div>
+                            <div class="stat"><span>Tracking Error</span><span id="etf-detail-te">-</span></div>
+                            <div class="stat"><span>Dividenden-Rendite</span><span id="etf-detail-div">-</span></div>
+                        </div>
+                        <div class="trade-section">
+                            <div class="trade-tabs">
+                                <button class="trade-tab active" data-action="buy">Kaufen</button>
+                                <button class="trade-tab" data-action="sell">Verkaufen</button>
+                            </div>
+                            <div class="trade-form">
+                                <label>Anteile:</label>
+                                <input type="number" id="etf-trade-amount" min="0.01" step="0.01" value="1" class="trade-input">
+                                <div class="trade-summary">
+                                    <span>Gesamtkosten:</span>
+                                    <span id="etf-trade-cost">€0,00</span>
+                                </div>
+                                <div class="trade-fee">
+                                    <span>Gebühr (0,1%):</span>
+                                    <span id="etf-trade-fee">€0,00</span>
+                                </div>
+                                <button id="etf-trade-btn" class="btn btn-primary btn-block">Kaufen</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Krypto Seite -->
+            <div id="page-crypto" class="page">
+                <div class="page-header">
+                    <h2>Kryptowährungen <span class="page-subnote">⏱️ Kurse aktualisieren jede Minute</span></h2>
+                    <div class="search-bar">
+                        <input type="text" id="crypto-search" placeholder="Krypto suchen..." class="search-input">
+                    </div>
+                </div>
+                <div id="crypto-list" class="asset-list"></div>
+                <div id="crypto-detail" class="detail-panel hidden">
+                    <div class="detail-header">
+                        <button id="crypto-detail-close" class="btn-icon">✕</button>
+                        <h3 id="crypto-detail-name"></h3>
+                        <span id="crypto-detail-symbol" class="symbol-badge"></span>
+                    </div>
+                    <div class="detail-body">
+                        <div class="detail-price">
+                            <span class="big-number" id="crypto-detail-price">€0,00</span>
+                            <span class="change" id="crypto-detail-change">+0,00%</span>
+                        </div>
+                        <canvas id="crypto-detail-chart" width="600" height="200"></canvas>
+                        <div class="detail-stats">
+                            <div class="stat"><span>Marktkapitalisierung</span><span id="crypto-detail-mcap">-</span></div>
+                            <div class="stat"><span>24h Volumen</span><span id="crypto-detail-vol">-</span></div>
+                            <div class="stat"><span>Circulating Supply</span><span id="crypto-detail-supply">-</span></div>
+                            <div class="stat"><span>ATH</span><span id="crypto-detail-ath">-</span></div>
+                        </div>
+                        <div class="trade-section">
+                            <div class="trade-tabs">
+                                <button class="trade-tab active" data-action="buy">Kaufen</button>
+                                <button class="trade-tab" data-action="sell">Verkaufen</button>
+                            </div>
+                            <div class="trade-form">
+                                <label>Betrag (in Coins):</label>
+                                <input type="number" id="crypto-trade-amount" min="0.001" step="0.001" value="0.1" class="trade-input">
+                                <div class="trade-summary">
+                                    <span>Gesamtkosten:</span>
+                                    <span id="crypto-trade-cost">€0,00</span>
+                                </div>
+                                <div class="trade-fee">
+                                    <span>Gebühr (0,5%):</span>
+                                    <span id="crypto-trade-fee">€0,00</span>
+                                </div>
+                                <button id="crypto-trade-btn" class="btn btn-primary btn-block">Kaufen</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Immobilien Seite -->
+            <div id="page-realestate" class="page">
+                <div class="page-header">
+                    <h2>Immobilienmarkt</h2>
+                    <div class="filter-bar">
+                        <select id="re-filter-city" class="filter-select">
+                            <option value="all">Alle Städte</option>
+                        </select>
+                        <select id="re-filter-type" class="filter-select">
+                            <option value="all">Alle Typen</option>
+                            <option value="wohnung">Wohnung</option>
+                            <option value="haus">Haus</option>
+                            <option value="gewerbe">Gewerbe</option>
+                        </select>
+                    </div>
+                </div>
+                <div class="realestate-stats">
+                    <div class="card mini-stat">
+                        <span class="mini-label">Gehaltene Immobilien</span>
+                        <span class="mini-value" id="re-owned-count">0</span>
+                    </div>
+                    <div class="card mini-stat">
+                        <span class="mini-label">Monatliche Mieteinnahmen</span>
+                        <span class="mini-value" id="re-monthly-rent">€0</span>
+                    </div>
+                    <div class="card mini-stat">
+                        <span class="mini-label">Immobilienwert</span>
+                        <span class="mini-value" id="re-total-value">€0</span>
+                    </div>
+                </div>
+                <div id="realestate-list" class="realestate-list"></div>
+                <!-- Immobilien Detail Modal -->
+                <div id="realestate-detail" class="detail-panel hidden">
+                    <div class="detail-header">
+                        <button id="re-detail-close" class="btn-icon">✕</button>
+                        <h3 id="re-detail-name"></h3>
+                    </div>
+                    <div class="detail-body">
+                        <div class="re-detail-info">
+                            <div class="stat"><span>Standort</span><span id="re-detail-location">-</span></div>
+                            <div class="stat"><span>Typ</span><span id="re-detail-type">-</span></div>
+                            <div class="stat"><span>Fläche</span><span id="re-detail-area">-</span></div>
+                            <div class="stat"><span>Zimmer</span><span id="re-detail-rooms">-</span></div>
+                            <div class="stat"><span>Baujahr</span><span id="re-detail-year">-</span></div>
+                            <div class="stat"><span>Zustand</span><span id="re-detail-condition">-</span></div>
+                            <div class="stat"><span>Miete/Monat</span><span id="re-detail-rent">-</span></div>
+                            <div class="stat"><span>Grundsteuer/Jahr</span><span id="re-detail-tax">-</span></div>
+                        </div>
+                        <div class="re-detail-actions" id="re-detail-actions">
+                            <button id="re-buy-btn" class="btn btn-primary btn-block">Immobilie kaufen</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Unternehmens-Detail -->
+            <div id="company-detail" class="detail-panel hidden">
+                <div class="detail-header">
+                    <button id="cd-detail-close" class="btn-icon">✕</button>
+                    <div class="cd-icon" id="cd-icon">🏦</div>
+                    <div>
+                        <h3 id="cd-name">Bank</h3>
+                        <div class="symbol-badge" id="cd-profit">+€0/Mo</div>
+                    </div>
+                </div>
+                <div class="detail-body">
+                    <div class="cd-stats" id="cd-stats"></div>
+                    <div class="cd-upgrades-head">AUSBAUEN</div>
+                    <div class="cd-upgrades" id="cd-upgrades"></div>
+                    <button id="cd-sell-btn" class="btn btn-danger btn-block">Verkaufen</button>
+                </div>
+            </div>
+
+            <!-- Steuern Seite -->
+            <div id="page-taxes" class="page">
+                <div class="page-header">
+                    <h2>Steuerverwaltung</h2>
+                </div>
+                <div class="tax-overview">
+                    <div class="card tax-summary-card">
+                        <h3>Steuerübersicht</h3>
+                        <div class="tax-grid">
+                            <div class="tax-item">
+                                <span class="tax-label">Kapitalertragsteuer (25%)</span>
+                                <span class="tax-value" id="tax-capital">€0,00</span>
+                            </div>
+                            <div class="tax-item">
+                                <span class="tax-label">Solidaritätszuschlag (5,5%)</span>
+                                <span class="tax-value" id="tax-soli">€0,00</span>
+                            </div>
+                            <div class="tax-item">
+                                <span class="tax-label">Grunderwerbsteuer (pending)</span>
+                                <span class="tax-value" id="tax-realestate">€0,00</span>
+                            </div>
+                            <div class="tax-item">
+                                <span class="tax-label">Grundsteuer (jährlich)</span>
+                                <span class="tax-value" id="tax-property">€0,00</span>
+                            </div>
+                            <div class="tax-item">
+                                <span class="tax-label">Mieteinnahmen-Steuer</span>
+                                <span class="tax-value" id="tax-rental">€0,00</span>
+                            </div>
+                            <div class="tax-item">
+                                <span class="tax-label">Verspätungszuschlag</span>
+                                <span class="tax-value warning" id="tax-late-fee">€0,00</span>
+                            </div>
+                        </div>
+                        <div class="tax-total">
+                            <strong>Gesamtsteuerschuld:</strong>
+                            <span id="tax-total">€0,00</span>
+                        </div>
+                        <div class="tax-due">
+                            <span>Nächste Fälligkeit:</span>
+                            <span id="tax-next-due">-</span>
+                        </div>
+                    </div>
+                    <div class="card tax-actions-card">
+                        <h3>Steuerzahlung</h3>
+                        <div class="tax-payment-form">
+                            <label>Zahlungsbetrag:</label>
+                            <input type="number" id="tax-payment-amount" min="0" step="0.01" class="trade-input">
+                            <button id="tax-pay-btn" class="btn btn-primary btn-block">Steuern zahlen</button>
+                            <button id="tax-pay-all-btn" class="btn btn-secondary btn-block">Alles zahlen</button>
+                        </div>
+                        <div class="tax-history">
+                            <h4>Zahlungshistorie</h4>
+                            <div id="tax-history-list"></div>
+                        </div>
+                    </div>
+                </div>
+                <div class="card tax-info-card">
+                    <h3>Steuerinformationen (Deutschland)</h3>
+                    <div class="tax-info-content">
+                        <p><strong>Kapitalertragsteuer:</strong> 25% auf Gewinne aus Aktien, ETFs und Kryptowährungen. Zusätzlich fällt der Solidaritätszuschlag von 5,5% auf die Steuer an.</p>
+                        <p><strong>Grunderwerbsteuer:</strong> 3,5% - 6,5% beim Kauf von Immobilien, je nach Bundesland.</p>
+                        <p><strong>Grundsteuer:</strong> Jährliche Steuer auf Immobilienbesitz, ca. 0,3-1% des Immobilienwerts.</p>
+                        <p><strong>Mieteinnahmen:</strong> Werden als Einkommen versteuert (progressiver Steuersatz bis 45%).</p>
+                        <p><strong>⚠️ Verspätungszuschlag:</strong> Bei nicht fristgerechter Zahlung: 1% pro Monat (min. €25), maximal 10% der Steuerschuld.</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Unternehmen Seite -->
+            <div id="page-companies" class="page">
+                <div class="page-header">
+                    <h2>Unternehmen gründen</h2>
+                </div>
+                <div class="company-stats">
+                    <div class="card mini-stat">
+                        <span class="mini-label">Gegründete Unternehmen</span>
+                        <span class="mini-value" id="company-count">0</span>
+                    </div>
+                    <div class="card mini-stat">
+                        <span class="mini-label">Monatlicher Gewinn</span>
+                        <span class="mini-value" id="company-profit">€0</span>
+                    </div>
+                    <div class="card mini-stat">
+                        <span class="mini-label">Unternehmenswert</span>
+                        <span class="mini-value" id="company-value">€0</span>
+                    </div>
+                </div>
+                <div id="companies-available" class="company-list"></div>
+                <div id="companies-owned-section" class="company-owned-section">
+                    <h3 style="margin:20px 0 12px;color:var(--text-secondary);font-size:0.9rem;">MEINE UNTERNEHMEN</h3>
+                    <div id="companies-owned" class="company-list"></div>
+                </div>
+            </div>
+
+            <!-- Shops (Luxusgüter) Seite -->
+            <div id="page-luxury" class="page">
+                <div class="page-header">
+                    <h2>🛍️ Shops & Luxusgüter</h2>
+                    <div class="filter-bar">
+                        <select id="luxury-filter" class="filter-select">
+                            <option value="all">Alle Shops</option>
+                            <option value="cars">🚗 Auto-Haus</option>
+                            <option value="boats">🛥️ Yacht-Club</option>
+                            <option value="planes">✈️ Jet-Port</option>
+                            <option value="watches">⌚ Uhren-Boutique</option>
+                        </select>
+                    </div>
+                </div>
+                <div class="luxury-stats">
+                    <div class="card mini-stat">
+                        <span class="mini-label">Besessene Güter</span>
+                        <span class="mini-value" id="luxury-count">0</span>
+                    </div>
+                    <div class="card mini-stat">
+                        <span class="mini-label">Monatliche Kosten</span>
+                        <span class="mini-value text-red" id="luxury-costs">€0</span>
+                    </div>
+                    <div class="card mini-stat">
+                        <span class="mini-label">Gesamtwert</span>
+                        <span class="mini-value" id="luxury-value">€0</span>
+                    </div>
+                </div>
+                <div id="luxury-list" class="luxury-grid"></div>
+            </div>
+
+            <!-- Garage Seite -->
+            <div id="page-garage" class="page">
+                <div class="page-header">
+                    <h2>🚗 Meine Garage</h2>
+                </div>
+                <div class="garage-stats">
+                    <div class="card mini-stat">
+                        <span class="mini-label">Fahrzeuge & Güter</span>
+                        <span class="mini-value" id="garage-count">0</span>
+                    </div>
+                    <div class="card mini-stat">
+                        <span class="mini-label">Anschaffungswert</span>
+                        <span class="mini-value" id="garage-purchase-value">€0</span>
+                    </div>
+                    <div class="card mini-stat">
+                        <span class="mini-label">Verkaufswert</span>
+                        <span class="mini-value" id="garage-resale-value">€0</span>
+                    </div>
+                </div>
+                <div id="garage-list" class="garage-list"></div>
+            </div>
+
+            <!-- Casino Seite -->
+            <div id="page-casino" class="page">
+                <div class="page-header">
+                    <h2>🎰 Casino Royal</h2>
+                    <div class="filter-bar">
+                        <span class="casino-cash-box">Guthaben: <strong id="casino-cash">€10.000,00</strong></span>
+                    </div>
+                </div>
+                <div class="casino-stats">
+                    <div class="card mini-stat">
+                        <span class="mini-label">Gewinn/Verlust</span>
+                        <span class="mini-value" id="casino-net">€0</span>
+                    </div>
+                    <div class="card mini-stat">
+                        <span class="mini-label">Einsätze gesamt</span>
+                        <span class="mini-value" id="casino-wagered">€0</span>
+                    </div>
+                    <div class="card mini-stat">
+                        <span class="mini-label">Gewinntreffer</span>
+                        <span class="mini-value" id="casino-wins">0</span>
+                    </div>
+                </div>
+
+                <div id="casino-tabs" class="casino-tabs">
+                    <button class="casino-tab active" data-game="roulette" onclick="UI.switchCasinoGame('roulette')">🎡 Roulette</button>
+                    <button class="casino-tab" data-game="slot" onclick="UI.switchCasinoGame('slot')">🎰 Spielautomat</button>
+                    <button class="casino-tab" data-game="coin" onclick="UI.switchCasinoGame('coin')">🪙 Münzwurf</button>
+                </div>
+
+                <!-- Roulette -->
+                <div id="casino-roulette" class="casino-game">
+                    <div class="casino-game-grid">
+                        <div class="card casino-board-card">
+                            <h3>Roulette</h3>
+                            <div id="roulette-number-grid" class="roulette-grid"></div>
+                            <div id="roulette-result" class="casino-result"></div>
+                        </div>
+                        <div class="card casino-bet-card">
+                            <h3>Dein Einsatz</h3>
+                            <div class="casino-bet-options" id="roulette-bet-options">
+                                <button class="casino-bet-btn" data-bet="red">🔴 Rot (1:1)</button>
+                                <button class="casino-bet-btn" data-bet="black">⚫ Schwarz (1:1)</button>
+                                <button class="casino-bet-btn" data-bet="odd">Ungerade (1:1)</button>
+                                <button class="casino-bet-btn" data-bet="even">Gerade (1:1)</button>
+                            </div>
+                            <label>Einsatz (€):</label>
+                            <input type="number" id="roulette-bet-amount" class="trade-input" min="1" value="50" step="10">
+                            <button id="roulette-spin-btn" class="btn btn-primary btn-block">🎡 Drehen (Einsatz €50)</button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Spielautomat -->
+                <div id="casino-slot" class="casino-game hidden">
+                    <div class="card casino-slot-card">
+                        <h3>Spielautomat</h3>
+                        <div class="slot-ticket-box">🎟️ Ticket: <strong>€100</strong> · Jackpot bis <strong>€1.000.000</strong></div>
+                        <div id="slot-reels" class="slot-reels">
+                            <div class="slot-reel" id="slot-reel-0">🍒</div>
+                            <div class="slot-reel" id="slot-reel-1">🍒</div>
+                            <div class="slot-reel" id="slot-reel-2">🍒</div>
+                        </div>
+                        <div id="slot-result" class="casino-result"></div>
+                        <div id="slot-paytable" class="slot-paytable"></div>
+                        <button id="slot-spin-btn" class="btn btn-primary btn-block">🎰 Ticket kaufen & Drehen (€100)</button>
+                    </div>
+                </div>
+
+                <!-- Münzwurf -->
+                <div id="casino-coin" class="casino-game hidden">
+                    <div class="card casino-coin-card">
+                        <h3>Münzwurf</h3>
+                        <div class="coin-options">
+                            <button class="coin-btn selected" data-side="kopf">👑 Kopf</button>
+                            <button class="coin-btn" data-side="zahl">🪙 Zahl</button>
+                        </div>
+                        <div id="coin-show" class="coin-show">🪙</div>
+                        <div id="coin-result" class="casino-result"></div>
+                        <label>Einsatz (€):</label>
+                        <input type="number" id="coin-bet-amount" class="trade-input" min="1" value="25" step="5">
+                        <button id="coin-flip-btn" class="btn btn-primary btn-block">🪙 Werfen (Einsatz €25)</button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Reichsten Menschen -->
+            <div id="page-leaderboard" class="page">
+                <div class="page-header">
+                    <h2>🏆 Reichsten Menschen</h2>
+                </div>
+                <div class="leaderboard-list" id="leaderboard-list"></div>
+            </div>
+
+            <!-- Nachrichten Seite -->
+            <div id="page-news" class="page">
+                <div class="page-header">
+                    <h2>Marktnachrichten</h2>
+                </div>
+                <div id="news-list" class="news-list"></div>
+            </div>
+        </main>
+    </div>
+
+    <!-- Einstellungs-Modal -->
+    <div id="settings-modal" class="modal hidden">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3>Einstellungen</h3>
+                <button id="settings-close" class="btn-icon">✕</button>
+            </div>
+            <div class="modal-body">
+                <div class="setting-group">
+                    <label>Bundesland (Grunderwerbsteuer):</label>
+                    <select id="settings-bundesland" class="filter-select">
+                        <option value="Bayern">Bayern (3,5%)</option>
+                        <option value="Hamburg">Hamburg (5,5%)</option>
+                        <option value="Hessen">Hessen (6,0%)</option>
+                        <option value="Berlin">Berlin (6,0%)</option>
+                        <option value="NRW" selected>Nordrhein-Westfalen (6,5%)</option>
+                        <option value="BaWü">Baden-Württemberg (5,0%)</option>
+                        <option value="Niedersachsen">Niedersachsen (5,0%)</option>
+                        <option value="Sachsen">Sachsen (5,5%)</option>
+                        <option value="Thüringen">Thüringen (5,0%)</option>
+                        <option value="Brandenburg">Brandenburg (6,5%)</option>
+                    </select>
+                    <small style="color:var(--text-muted);font-size:0.75rem;margin-top:4px;display:block;">Nur 1x pro Woche änderbar</small>
+                </div>
+                <div class="setting-group">
+                    <label for="cheat-input">Cheatcode:</label>
+                    <input type="text" id="cheat-input" class="trade-input" placeholder="Cheatcode eingeben..." autocomplete="off">
+                    <small style="color:var(--text-muted);font-size:0.75rem;margin-top:4px;display:block;">Einmalig eingeben, um unbegrenztes Geld zu erhalten.</small>
+                </div>
+                <div class="setting-group">
+                    <button id="settings-reset" class="btn btn-danger btn-block">Spiel zurücksetzen</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Verkaufs-Modal -->
+    <div id="sell-modal" class="modal hidden">
+        <div class="modal-content modal-small">
+            <div class="modal-header">
+                <h3 id="sell-modal-title">Verkaufen</h3>
+                <button id="sell-modal-close" class="btn-icon">✕</button>
+            </div>
+            <div class="modal-body">
+                <div id="sell-modal-info" class="sell-modal-info"></div>
+                <div class="trade-form">
+                    <label id="sell-modal-label">Anzahl:</label>
+                    <input type="number" id="sell-modal-amount" min="0.0001" step="1" value="1" class="trade-input">
+                    <div class="trade-summary">
+                        <span>Verkaufserlös:</span>
+                        <span id="sell-modal-total">€0,00</span>
+                    </div>
+                    <button id="sell-modal-confirm" class="btn btn-danger btn-block">Verkaufen</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Bestätigungs-Modal -->
+    <div id="confirm-modal" class="modal hidden">
+        <div class="modal-content modal-small">
+            <div class="modal-header">
+                <h3 id="confirm-title">Bestätigung</h3>
+            </div>
+            <div class="modal-body">
+                <p id="confirm-text"></p>
+                <div class="modal-buttons">
+                    <button id="confirm-cancel" class="btn btn-secondary">Abbrechen</button>
+                    <button id="confirm-ok" class="btn btn-primary">Bestätigen</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Scripte laden -->
+    <script src="js/storage.js"></script>
+    <script src="js/gameState.js"></script>
+    <script src="js/stocks.js"></script>
+    <script src="js/etfs.js"></script>
+    <script src="js/crypto.js"></script>
+    <script src="js/realEstate.js"></script>
+    <script src="js/companies.js"></script>
+    <script src="js/luxury.js"></script>
+    <script src="js/leaderboard.js"></script>
+    <script src="js/casino.js"></script>
+    <script src="js/taxes.js"></script>
+    <script src="js/events.js"></script>
+    <script src="js/charts.js"></script>
+    <script src="js/ui.js"></script>
+    <script src="js/main.js"></script>
+</body>
+</html>

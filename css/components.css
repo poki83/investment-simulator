@@ -1,0 +1,1048 @@
+/* Asset List (Stocks, ETFs, Crypto) */
+.asset-list {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+}
+
+.asset-item {
+    display: grid;
+    grid-template-columns: 1fr auto auto auto;
+    align-items: center;
+    gap: 16px;
+    padding: 14px 16px;
+    background: var(--bg-secondary);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-sm);
+    cursor: pointer;
+    transition: var(--transition);
+}
+.asset-item:hover {
+    background: var(--bg-hover);
+    border-color: var(--blue);
+}
+
+.asset-item-left {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    min-width: 0;
+}
+
+.asset-icon {
+    width: 44px;
+    height: 44px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: 800;
+    font-size: 0.8rem;
+    flex-shrink: 0;
+    color: #fff;
+}
+
+.asset-name {
+    font-weight: 600;
+    font-size: 0.95rem;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+.asset-symbol {
+    font-size: 0.8rem;
+    color: var(--text-secondary);
+}
+.asset-sector {
+    font-size: 0.7rem;
+    color: var(--text-muted);
+}
+
+.asset-price {
+    text-align: right;
+    min-width: 100px;
+}
+.asset-price-value {
+    font-weight: 700;
+    font-size: 0.95rem;
+}
+.asset-price-change {
+    font-size: 0.8rem;
+    font-weight: 600;
+}
+
+.asset-chart-mini {
+    width: 100px;
+    height: 40px;
+}
+.asset-chart-mini canvas {
+    width: 100%;
+    height: 100%;
+}
+
+.asset-owned {
+    text-align: right;
+    min-width: 80px;
+}
+.asset-owned-amount {
+    font-size: 0.8rem;
+    color: var(--text-secondary);
+}
+.asset-owned-value {
+    font-size: 0.75rem;
+    color: var(--text-muted);
+}
+
+/* Detail Panel */
+.detail-panel {
+    position: fixed;
+    top: 56px;
+    right: 0;
+    width: 420px;
+    height: calc(100vh - 56px);
+    background: var(--bg-secondary);
+    border-left: 1px solid var(--border);
+    z-index: 200;
+    overflow-y: auto;
+    animation: slideIn 0.25s ease;
+    box-shadow: -4px 0 20px rgba(0,0,0,0.3);
+}
+
+@keyframes slideIn {
+    from { transform: translateX(100%); }
+    to { transform: translateX(0); }
+}
+
+.detail-header {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 16px 20px;
+    border-bottom: 1px solid var(--border);
+    position: sticky;
+    top: 0;
+    background: var(--bg-secondary);
+    z-index: 10;
+}
+
+.detail-header h3 {
+    flex: 1;
+    font-size: 1rem;
+    margin: 0;
+}
+
+.symbol-badge {
+    background: var(--bg-tertiary);
+    padding: 3px 8px;
+    border-radius: 6px;
+    font-size: 0.75rem;
+    color: var(--text-secondary);
+    font-weight: 600;
+}
+
+.detail-body {
+    padding: 20px;
+}
+
+.detail-price {
+    display: flex;
+    align-items: baseline;
+    gap: 12px;
+    margin-bottom: 16px;
+}
+
+.detail-price .big-number {
+    font-size: 2rem;
+}
+
+.detail-stats {
+    margin: 16px 0;
+}
+
+.detail-stats .stat {
+    padding: 10px 0;
+}
+
+.detail-chart {
+    margin: 16px 0;
+}
+
+/* Trade Section */
+.trade-section {
+    background: var(--bg-tertiary);
+    border-radius: var(--radius);
+    padding: 16px;
+    margin-top: 16px;
+}
+
+.trade-tabs {
+    display: flex;
+    gap: 0;
+    margin-bottom: 16px;
+    background: var(--bg-primary);
+    border-radius: var(--radius-sm);
+    padding: 3px;
+}
+
+.trade-tab {
+    flex: 1;
+    padding: 8px;
+    background: none;
+    border: none;
+    color: var(--text-secondary);
+    font-weight: 600;
+    font-size: 0.85rem;
+    cursor: pointer;
+    border-radius: 6px;
+    transition: var(--transition);
+}
+.trade-tab.active[data-action="buy"] {
+    background: var(--green);
+    color: #fff;
+}
+.trade-tab.active[data-action="sell"] {
+    background: var(--red);
+    color: #fff;
+}
+.trade-tab:hover:not(.active) {
+    color: var(--text-primary);
+}
+
+.trade-form {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+.trade-form label {
+    font-size: 0.85rem;
+    color: var(--text-secondary);
+}
+
+.trade-summary, .trade-fee {
+    display: flex;
+    justify-content: space-between;
+    font-size: 0.85rem;
+    color: var(--text-secondary);
+}
+.trade-summary span:last-child {
+    font-weight: 600;
+    color: var(--text-primary);
+}
+
+/* Real Estate */
+.realestate-stats {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 12px;
+    margin-bottom: 20px;
+}
+
+.mini-stat {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+    padding: 14px 16px;
+}
+.mini-label {
+    font-size: 0.75rem;
+    color: var(--text-secondary);
+    text-transform: uppercase;
+    letter-spacing: 0.3px;
+}
+.mini-value {
+    font-size: 1.3rem;
+    font-weight: 700;
+    color: var(--text-primary);
+}
+
+.realestate-list {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+    gap: 14px;
+}
+
+.realestate-card {
+    background: var(--bg-secondary);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    overflow: hidden;
+    cursor: pointer;
+    transition: var(--transition);
+}
+.realestate-card:hover {
+    border-color: var(--blue);
+    transform: translateY(-2px);
+    box-shadow: var(--shadow);
+}
+
+.re-card-image {
+    height: 180px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 3rem;
+    position: relative;
+    overflow: hidden;
+}
+
+.re-building-svg {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+}
+
+.re-card-badge {
+    position: absolute;
+    top: 8px;
+    right: 8px;
+    padding: 3px 10px;
+    border-radius: 12px;
+    font-size: 0.7rem;
+    font-weight: 600;
+    text-transform: uppercase;
+}
+.re-card-badge.available {
+    background: var(--green-bg);
+    color: var(--green);
+}
+.re-card-badge.owned {
+    background: var(--blue-bg);
+    color: var(--blue);
+}
+
+.re-card-body {
+    padding: 14px 16px;
+}
+
+.re-card-title {
+    font-weight: 600;
+    font-size: 0.95rem;
+    margin-bottom: 4px;
+}
+.re-card-location {
+    font-size: 0.8rem;
+    color: var(--text-secondary);
+    margin-bottom: 10px;
+}
+
+.re-card-details {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 6px;
+    margin-bottom: 12px;
+}
+.re-card-detail {
+    font-size: 0.78rem;
+    color: var(--text-muted);
+}
+.re-card-detail strong {
+    color: var(--text-secondary);
+}
+
+.re-card-price {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+.re-card-price-value {
+    font-size: 1.1rem;
+    font-weight: 700;
+}
+.re-card-rent {
+    font-size: 0.8rem;
+    color: var(--green);
+}
+
+/* Renovation */
+.renovation-options {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    margin-top: 12px;
+}
+.reno-option {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 10px 12px;
+    background: var(--bg-primary);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-sm);
+    cursor: pointer;
+    transition: var(--transition);
+}
+.reno-option:hover {
+    border-color: var(--blue);
+}
+.reno-option.selected {
+    border-color: var(--green);
+    background: var(--green-bg);
+}
+.reno-label {
+    font-size: 0.85rem;
+    font-weight: 500;
+}
+.reno-cost {
+    font-size: 0.85rem;
+    color: var(--text-secondary);
+}
+
+/* News */
+.news-list {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+
+.news-item {
+    background: var(--bg-secondary);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-sm);
+    padding: 14px 18px;
+    transition: var(--transition);
+}
+.news-item:hover {
+    background: var(--bg-hover);
+}
+
+.news-item-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 6px;
+}
+.news-item-category {
+    font-size: 0.7rem;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    padding: 2px 8px;
+    border-radius: 4px;
+}
+.news-category-markets { background: var(--blue-bg); color: var(--blue); }
+.news-category-economy { background: var(--green-bg); color: var(--green); }
+.news-category-crypto { background: var(--yellow-bg); color: var(--yellow); }
+.news-category-realestate { background: rgba(188,140,255,0.15); color: var(--purple); }
+.news-category-politics { background: var(--red-bg); color: var(--red); }
+
+.news-item-time {
+    font-size: 0.75rem;
+    color: var(--text-muted);
+}
+
+.news-item-title {
+    font-weight: 600;
+    font-size: 0.95rem;
+    margin-bottom: 4px;
+}
+.news-item-body {
+    font-size: 0.85rem;
+    color: var(--text-secondary);
+    line-height: 1.5;
+}
+
+.news-item-impact {
+    margin-top: 8px;
+    font-size: 0.8rem;
+    display: flex;
+    gap: 6px;
+    flex-wrap: wrap;
+}
+.news-impact-tag {
+    padding: 2px 8px;
+    border-radius: 4px;
+    font-weight: 500;
+}
+
+/* Tax Page */
+.tax-overview {
+    display: grid;
+    grid-template-columns: 2fr 1fr;
+    gap: 16px;
+    margin-bottom: 20px;
+}
+
+.tax-summary-card .tax-grid {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+}
+
+.tax-item {
+    display: flex;
+    justify-content: space-between;
+    padding: 10px 0;
+    border-bottom: 1px solid var(--border);
+    font-size: 0.9rem;
+}
+.tax-item:last-child { border-bottom: none; }
+.tax-label { color: var(--text-secondary); }
+.tax-value { font-weight: 600; }
+
+.tax-total {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 14px 0;
+    margin-top: 8px;
+    border-top: 2px solid var(--border);
+    font-size: 1.1rem;
+}
+.tax-total span:last-child {
+    color: var(--red);
+    font-weight: 700;
+}
+
+.tax-due {
+    display: flex;
+    justify-content: space-between;
+    padding: 10px 0;
+    font-size: 0.85rem;
+    color: var(--text-secondary);
+}
+
+.tax-actions-card .tax-payment-form {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    margin-bottom: 20px;
+}
+.tax-payment-form label {
+    font-size: 0.85rem;
+    color: var(--text-secondary);
+}
+
+.tax-history {
+    max-height: 200px;
+    overflow-y: auto;
+}
+.tax-history h4 {
+    font-size: 0.85rem;
+    color: var(--text-secondary);
+    margin-bottom: 8px;
+}
+.tax-history-item {
+    display: flex;
+    justify-content: space-between;
+    padding: 6px 0;
+    border-bottom: 1px solid var(--border);
+    font-size: 0.8rem;
+}
+.tax-history-item:last-child { border-bottom: none; }
+
+.tax-info-card {
+    margin-top: 20px;
+}
+.tax-info-content {
+    font-size: 0.88rem;
+    color: var(--text-secondary);
+    line-height: 1.7;
+}
+.tax-info-content p {
+    margin-bottom: 10px;
+}
+
+/* News Toast */
+.news-toast {
+    position: fixed;
+    top: 70px;
+    right: 20px;
+    width: 350px;
+    background: var(--bg-secondary);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    padding: 14px 18px;
+    z-index: 500;
+    box-shadow: 0 4px 20px rgba(0,0,0,0.4);
+    animation: slideInToast 0.3s ease;
+}
+@keyframes slideInToast {
+    from { transform: translateX(110%); opacity: 0; }
+    to { transform: translateX(0); opacity: 1; }
+}
+
+.news-toast-content {
+    display: flex;
+    gap: 12px;
+    align-items: flex-start;
+}
+.news-toast-icon { font-size: 1.3rem; }
+.news-toast-text strong {
+    display: block;
+    font-size: 0.85rem;
+    margin-bottom: 2px;
+}
+.news-toast-text p {
+    font-size: 0.8rem;
+    color: var(--text-secondary);
+    margin: 0;
+}
+
+/* Notification */
+.notification {
+    position: fixed;
+    bottom: 20px;
+    left: 50%;
+    transform: translateX(-50%);
+    background: var(--bg-secondary);
+    border: 1px solid var(--yellow);
+    border-radius: var(--radius);
+    padding: 12px 20px;
+    z-index: 600;
+    box-shadow: 0 4px 20px rgba(0,0,0,0.4);
+    animation: slideInToast 0.3s ease;
+}
+.notification-content {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+/* Tutorial */
+.tutorial-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0,0,0,0.8);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 9999;
+}
+.tutorial-box {
+    background: var(--bg-secondary);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    padding: 32px 40px;
+    max-width: 520px;
+    width: 90%;
+    text-align: center;
+}
+.tutorial-box h2 {
+    font-size: 1.4rem;
+    margin-bottom: 16px;
+}
+.tutorial-box p {
+    color: var(--text-secondary);
+    font-size: 0.95rem;
+    line-height: 1.7;
+    margin-bottom: 20px;
+    text-align: left;
+}
+.tutorial-progress {
+    height: 4px;
+    background: var(--bg-tertiary);
+    border-radius: 2px;
+    margin-bottom: 20px;
+    overflow: hidden;
+}
+.tutorial-progress-bar {
+    height: 100%;
+    background: var(--blue);
+    border-radius: 2px;
+    transition: width 0.3s ease;
+}
+.tutorial-buttons {
+    display: flex;
+    justify-content: space-between;
+    gap: 10px;
+}
+
+/* Filter bar */
+.filter-bar {
+    display: flex;
+    gap: 8px;
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+    .app {
+        grid-template-columns: 1fr;
+        grid-template-areas:
+            "header"
+            "main";
+    }
+    .sidebar {
+        position: fixed;
+        bottom: 0;
+        left: 0;
+        right: 0;
+        flex-direction: row;
+        height: 60px;
+        border-right: none;
+        border-top: 1px solid var(--border);
+        z-index: 100;
+        overflow-x: auto;
+        padding: 0 8px;
+    }
+    .nav-label { display: none; }
+    .detail-panel { width: 100%; }
+    .tax-overview { grid-template-columns: 1fr; }
+    .realestate-stats { grid-template-columns: 1fr; }
+}
+
+/* Companies */
+.company-stats {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 12px;
+    margin-bottom: 20px;
+}
+
+.company-list {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+    gap: 14px;
+}
+
+.company-card {
+    background: var(--bg-secondary);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    padding: 16px;
+    transition: var(--transition);
+}
+.company-card:hover {
+    border-color: var(--blue);
+}
+.company-card.owned {
+    border-color: var(--green);
+}
+
+.company-card-header {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    margin-bottom: 10px;
+}
+
+.company-icon {
+    width: 44px;
+    height: 44px;
+    border-radius: 12px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.4rem;
+    flex-shrink: 0;
+}
+
+.company-name {
+    font-weight: 600;
+    font-size: 0.95rem;
+}
+
+.company-risk {
+    font-size: 0.75rem;
+    color: var(--text-muted);
+    margin-top: 2px;
+}
+
+.company-desc {
+    font-size: 0.82rem;
+    color: var(--text-secondary);
+    line-height: 1.5;
+    margin-bottom: 12px;
+}
+
+.company-stats-row {
+    display: flex;
+    justify-content: space-between;
+    font-size: 0.8rem;
+    color: var(--text-secondary);
+    margin-bottom: 12px;
+}
+
+.company-stats-grid .stat {
+    padding: 6px 0;
+}
+
+.company-actions {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 8px;
+    margin-top: 12px;
+}
+
+.company-owned-badge {
+    text-align: center;
+    padding: 8px;
+    background: var(--green-bg);
+    color: var(--green);
+    border-radius: var(--radius-sm);
+    font-size: 0.85rem;
+    font-weight: 600;
+}
+
+.company-profit {
+    font-size: 0.8rem;
+    font-weight: 600;
+}
+
+/* Luxury */
+.luxury-stats, .garage-stats {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 12px;
+    margin-bottom: 20px;
+}
+
+.luxury-grid {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
+
+.luxury-category-header {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 12px 0 8px;
+    font-weight: 700;
+    font-size: 0.95rem;
+    color: var(--text-primary);
+    border-bottom: 1px solid var(--border);
+    margin-bottom: 4px;
+}
+
+.luxury-shop-desc {
+    font-size: 0.78rem;
+    font-weight: 400;
+    color: var(--text-muted);
+}
+
+.luxury-card {
+    display: grid;
+    grid-template-columns: 60px 1fr auto auto;
+    align-items: center;
+    gap: 14px;
+    padding: 12px 16px;
+    background: var(--bg-secondary);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-sm);
+    transition: var(--transition);
+}
+.luxury-card:hover {
+    border-color: var(--blue);
+}
+.luxury-card.owned {
+    border-color: var(--green);
+    background: var(--green-bg);
+}
+
+.luxury-card-icon {
+    font-size: 1.8rem;
+    text-align: center;
+}
+
+.luxury-card-info {
+    min-width: 0;
+}
+
+.luxury-card-name {
+    font-weight: 600;
+    font-size: 0.9rem;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.luxury-card-brand {
+    font-size: 0.75rem;
+    color: var(--text-muted);
+}
+
+.luxury-card-specs {
+    font-size: 0.75rem;
+    color: var(--text-secondary);
+    margin-top: 2px;
+}
+
+.luxury-card-price {
+    font-weight: 700;
+    font-size: 0.9rem;
+    text-align: right;
+    white-space: nowrap;
+}
+
+.luxury-card-cost {
+    font-size: 0.75rem;
+    color: var(--text-muted);
+    text-align: right;
+    white-space: nowrap;
+}
+
+/* Garage */
+.garage-list {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(340px, 1fr));
+    gap: 14px;
+}
+
+.garage-card {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    padding: 16px;
+    background: var(--bg-secondary);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    transition: var(--transition);
+}
+.garage-card:hover {
+    border-color: var(--blue);
+    box-shadow: var(--shadow);
+}
+
+.garage-icon {
+    width: 56px;
+    height: 56px;
+    border-radius: 14px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.8rem;
+    flex-shrink: 0;
+    background: var(--bg-tertiary);
+}
+
+.garage-info {
+    flex: 1;
+    min-width: 0;
+}
+
+.garage-name {
+    font-weight: 600;
+    font-size: 0.95rem;
+}
+
+.garage-brand {
+    font-size: 0.78rem;
+    color: var(--text-muted);
+    margin-top: 2px;
+}
+
+.garage-meta {
+    display: flex;
+    gap: 12px;
+    margin-top: 6px;
+    font-size: 0.75rem;
+    color: var(--text-secondary);
+}
+.garage-meta span strong {
+    color: var(--text-primary);
+}
+
+.garage-actions {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-end;
+    gap: 6px;
+}
+
+.garage-resale {
+    font-size: 0.78rem;
+    color: var(--text-muted);
+}
+.garage-resale strong {
+    color: var(--red);
+    display: block;
+    font-size: 0.95rem;
+}
+
+.garage-empty {
+    background: var(--bg-secondary);
+    border: 1px dashed var(--border);
+    border-radius: var(--radius);
+    padding: 60px 20px;
+    text-align: center;
+    color: var(--text-muted);
+}
+.garage-empty .garage-empty-icon {
+    font-size: 3rem;
+    margin-bottom: 12px;
+}
+
+/* Leaderboard */
+.leaderboard-list {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+    max-width: 800px;
+}
+
+.leaderboard-entry {
+    display: grid;
+    grid-template-columns: 70px 44px 1fr auto;
+    align-items: center;
+    gap: 14px;
+    padding: 10px 16px;
+    background: var(--bg-secondary);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-sm);
+    transition: var(--transition);
+}
+.leaderboard-entry:hover {
+    background: var(--bg-hover);
+}
+.leaderboard-entry.top3 {
+    border-color: var(--yellow);
+}
+.leaderboard-entry.player-entry {
+    border-color: var(--blue);
+    background: var(--blue-bg);
+    box-shadow: 0 0 0 1px var(--blue);
+}
+
+.leaderboard-rank {
+    font-weight: 700;
+    font-size: 0.95rem;
+    color: var(--text-secondary);
+    text-align: left;
+}
+.leaderboard-rank.top3 {
+    color: var(--yellow);
+}
+
+.leaderboard-avatar {
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.2rem;
+}
+
+.leaderboard-name {
+    font-weight: 600;
+    font-size: 0.95rem;
+}
+.leaderboard-entry.player-entry .leaderboard-name {
+    color: var(--blue);
+}
+
+.leaderboard-worth {
+    font-weight: 700;
+    font-size: 0.95rem;
+    text-align: right;
+}
+.leaderboard-entry.player-entry .leaderboard-worth {
+    color: var(--green);
+}
+
+@media (max-width: 768px) {
+    .company-stats, .luxury-stats, .garage-stats {
+        grid-template-columns: 1fr;
+    }
+    .luxury-card {
+        grid-template-columns: 50px 1fr auto;
+    }
+    .luxury-card-cost {
+        display: none;
+    }
+}
