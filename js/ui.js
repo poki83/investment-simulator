@@ -4,6 +4,8 @@ const UI = {
     tradeAction: 'buy',
     tutorialStep: 0,
     portfolioFilter: 'all',
+    prisonModalSeen: false,
+    undergroundView: 'all',
 
     tutorialSteps: [
         { title: 'Willkommen bei InvestSim!', text: 'Du startest mit <strong>€10.000</strong> Startguthaben. Dein Ziel ist es, Vermögen aufzubauen, indem du in verschiedene Anlageformen investierst.<br><br>Wie ein echter Investor musst du Entscheidungen treffen, Risiken abwägen und Steuern bezahlen.' },
@@ -32,6 +34,7 @@ const UI = {
         this.bindSellModal();
         this.bindPortfolio();
         this.bindCasino();
+        this.bindUnderground();
         this.updateAll();
     },
 
@@ -81,6 +84,201 @@ const UI = {
             el.classList.remove('paused');
         }
         this.updateLiveClock();
+    },
+
+    /* --- Haft / Aktionen sperren ------------------------------ */
+    canAct() {
+        if (GameState.isInPrison()) {
+            this.showToast('🔒 Du sitzt in Haft! Noch ' + GameState.prisonWeeksLeft() + ' Woche(n) Gefängnis.', '🔒');
+            this.openPrisonModal();
+            return false;
+        }
+        return true;
+    },
+
+    updatePrisonBanner() {
+        const el = document.getElementById('prison-banner');
+        if (!el) return;
+        const left = GameState.prisonWeeksLeft();
+        const p = GameState.prison;
+        if (GameState.isInPrison() && p) {
+            el.classList.remove('hidden');
+            el.querySelector('#prison-banner-text').innerHTML =
+                `${p.crimeIcon} <strong>HAFT:</strong> noch ${left} Woche(n) · Grund: ${p.crime}`;
+        } else {
+            el.classList.add('hidden');
+        }
+    },
+
+    checkPrisonModal() {
+        if (GameState.isInPrison() && !this.prisonModalSeen) {
+            this.openPrisonModal();
+        }
+    },
+
+    openPrisonModal() {
+        const p = GameState.prison;
+        if (!p || !p.active) return;
+        this.prisonModalSeen = true;
+        const el = document.getElementById('prison-modal');
+        document.getElementById('prison-crime').textContent = `${p.crimeIcon} ${p.crime}`;
+        document.getElementById('prison-sentence').textContent = p.weeks + ' Wochen';
+        document.getElementById('prison-left').textContent = Math.max(0, p.untilWeek - GameState.week) + ' Woche(n)';
+        document.getElementById('prison-fine').textContent = '€' + this.fmt(p.fine);
+        document.getElementById('prison-seized').textContent = '€' + this.fmt(p.seized);
+        el.classList.remove('hidden');
+    },
+
+    closePrisonModal() {
+        document.getElementById('prison-modal').classList.add('hidden');
+    },
+
+    /* --- Unterwelt Seite -------------------------------------- */
+    bindUnderground() {
+        const startBtn = document.getElementById('underground-start-btn');
+        if (startBtn) startBtn.addEventListener('click', () => {
+            const opId = document.getElementById('underground-op-select').value;
+            Underground.start(opId);
+            this.updateAll();
+        });
+        const washBtn = document.getElementById('underground-wash-btn');
+        if (washBtn) washBtn.addEventListener('click', () => this.washBlackMoney());
+        const amountInput = document.getElementById('underground-wash-amount');
+        if (amountInput) amountInput.addEventListener('input', () => this.updateWashPreview());
+        const chk = document.getElementById('prison-modal-close');
+        if (chk) chk.addEventListener('click', () => this.closePrisonModal());
+        const btnClean = document.getElementById('prison-ok-btn');
+        if (btnClean) btnClean.addEventListener('click', () => this.closePrisonModal());
+    },
+
+    updateWashPreview() {
+        const amount = Math.max(0, parseFloat(document.getElementById('underground-wash-amount').value) || 0);
+        const max = Math.floor(GameState.underground.blackMoney || 0);
+        const clamped = Math.min(amount, max);
+        const fee = Math.round(clamped * Underground.WASH_FEE);
+        const heat = Math.min(Underground.MAX_HEAT, (GameState.underground.heat || 0) + Math.max(1, Math.floor(clamped / Underground.HEAT_PER_EURO)));
+        const el = document.getElementById('underground-wash-preview');
+        if (el) {
+            el.innerHTML = clamped > 0
+                ? `→ Du erhältst <strong>€${this.fmt(clamped - fee)}</strong> · Waschgebühr €${this.fmt(fee)} · Fahndung steigt auf ${heat}/10`
+                : 'Gib einen Betrag ein.';
+        }
+    },
+
+    startOperation(opId) {
+        if (!this.canAct()) return;
+        const result = Underground.start(opId);
+        if (result.ok) {
+            this.showToast('Operation gestartet! 💸 Wöchentliches Schwarzgeld aktiv.', '💸');
+        } else if (result.error === 'aktiv') {
+            this.showToast('Diese Operation läuft bereits!', 'ℹ️');
+        } else if (result.error === 'guthaben') {
+            this.showToast('Nicht genug Guthaben!', '⚠️');
+        } else if (result.error === 'gefängnis') {
+            this.canAct();
+        }
+        this.updateAll();
+    },
+
+    stopOperation(opId) {
+        if (!this.canAct()) return;
+        const result = Underground.stop(opId);
+        if (result) {
+            this.showToast('Operation beendet. Restbestände: €' + this.fmt(result.resale) + ' Schwarzgeld.', '✂️');
+        }
+        this.updateAll();
+    },
+
+    washBlackMoney() {
+        if (!this.canAct()) return;
+        const amount = parseFloat(document.getElementById('underground-wash-amount').value) || 0;
+        const result = Underground.wash(amount);
+        if (result) {
+            this.showToast(`€${this.fmt(result.netto)} gewaschen (Gebühr €${this.fmt(result.fee)}). Fahndungslevel: ${result.heat}/10`, '🧼');
+            document.getElementById('underground-wash-amount').value = '';
+        } else {
+            this.showToast('Nichts zu waschen!', 'ℹ️');
+        }
+        this.updateAll();
+    },
+
+    updateUnderground() {
+        const safe = (el, val) => { const e = document.getElementById(el); if (e) e.textContent = val; };
+        const u = GameState.underground || { blackMoney: 0, heat: 0, operations: [], arrests: 0 };
+
+        safe('ug-black-money', '€' + this.fmt(u.blackMoney || 0));
+        safe('ug-heat', (u.heat || 0) + ' / 10');
+        safe('ug-ops', (u.operations || []).length);
+        safe('ug-arrests', u.arrests || 0);
+        safe('ug-washed', '€' + this.fmt(u.washedTotal || 0));
+
+        const heatEl = document.getElementById('ug-heat-bar');
+        if (heatEl) heatEl.style.width = Math.min(100, (u.heat || 0) * 10) + '%';
+        const heatWrap = document.getElementById('ug-heat-wrap');
+        if (heatWrap) heatWrap.className = 'heat-wrap' + ((u.heat || 0) >= 7 ? ' heat-danger' : (u.heat || 0) >= 4 ? ' heat-warn' : '');
+
+        if (GameState.isInPrison()) {
+            const b = document.getElementById('ug-prison-card');
+            if (b) { b.classList.remove('hidden'); }
+            const leftEl = document.getElementById('ug-prison-left');
+            if (leftEl) leftEl.textContent = GameState.prisonWeeksLeft();
+            const crimeEl = document.getElementById('ug-prison-crime');
+            if (crimeEl) crimeEl.textContent = GameState.prison.crime;
+            return;
+        }
+        const b2 = document.getElementById('ug-prison-card');
+        if (b2) b2.classList.add('hidden');
+
+        /* Operationen-Liste */
+        const cont = document.getElementById('underground-op-list');
+        if (!cont) return;
+        let html = '';
+        const active = u.operations || [];
+        for (const def of Underground.activities) {
+            const op = active.find(o => o.opId === def.id);
+            if (op) {
+                const weeks = Math.max(0, GameState.week - op.startWeek);
+                const risk = Underground.displayRisk(op);
+                html += `<div class="ug-card ug-active">
+                    <div class="ug-card-head">
+                        <span class="ug-icon" style="background:rgba(224,46,58,.12)">${def.icon}</span>
+                        <div>
+                            <div class="ug-name">${def.name}</div>
+                            <div class="ug-sub">${op.invested > 0 ? 'Investiert: €' + this.fmt(op.invested) : ''} · Woche ${weeks + 1} aktiv</div>
+                        </div>
+                        <button class="btn btn-secondary btn-sm" onclick="UI.stopOperation('${def.id}')">Auflösen</button>
+                    </div>
+                    <div class="ug-stats">
+                        <div class="stat"><span>Schwarzgeld gesamt</span><span class="ug-money">€${this.fmt(op.profit)}</span></div>
+                        <div class="stat"><span>Erwischt-Risiko/Woche</span><span class="text-red">${risk.toFixed(1)}%</span></div>
+                    </div>
+                </div>`;
+            }
+        }
+        for (const def of Underground.activities) {
+            if (active.find(o => o.opId === def.id)) continue;
+            const affordable = def.invest <= GameState.cash;
+            html += `<div class="ug-card">
+                <div class="ug-card-head">
+                    <span class="ug-icon" style="background:rgba(124,58,237,.12)">${def.icon}</span>
+                    <div>
+                        <div class="ug-name">${def.name}</div>
+                        <div class="ug-sub">${def.danger} Risiko · ${def.jail} Wo. Haft bei Erwischt</div>
+                    </div>
+                </div>
+                <p class="ug-desc">${def.desc}</p>
+                <div class="ug-stats">
+                    <div class="stat"><span>Einstieg</span><span>€${this.fmt(def.invest)}</span></div>
+                    <div class="stat"><span>Schwarzgeld/Woche</span><span>€${this.fmt(def.min)}–€${this.fmt(def.max)}</span></div>
+                    <div class="stat"><span>Basis-Risiko</span><span class="text-red">${(def.risk * 100).toFixed(1)}%</span></div>
+                    <div class="stat"><span>Haft</span><span class="text-red">${def.jail} Wo.</span></div>
+                </div>
+                <button class="btn ${affordable ? 'btn-danger' : 'btn-secondary'} btn-block" onclick="UI.startOperation('${def.id}')" ${affordable ? '' : 'disabled'}>
+                    ${affordable ? 'Operation starten (€' + this.fmt(def.invest) + ')' : 'Zu wenig Guthaben'}
+                </button>
+            </div>`;
+        }
+        cont.innerHTML = html;
     },
 
     updateLiveClock() {
@@ -264,6 +462,9 @@ const UI = {
         this.updateTaxes();
         this.updateNewsList();
         this.updateCasino();
+        this.updateUnderground();
+        this.updatePrisonBanner();
+        this.checkPrisonModal();
         this.updateDate();
         this.updateSpeedDisplay();
         if (this.detailOpen && ['stock', 'etf', 'crypto'].indexOf(this.detailOpen.type) !== -1) {
@@ -283,6 +484,7 @@ const UI = {
             case 'luxury': this.updateLuxury(); break;
             case 'garage': this.updateGarage(); break;
             case 'casino': this.updateCasino(); break;
+            case 'underground': this.updateUnderground(); break;
             case 'leaderboard': this.updateLeaderboard(); break;
             case 'taxes': this.updateTaxes(); break;
             case 'news': this.updateNewsList(); break;
@@ -693,12 +895,12 @@ const UI = {
             document.getElementById('asset-trade-amount').max = maxHeld;
             document.getElementById('asset-trade-cost-label').textContent = 'Netto-Auszahlung:';
             document.getElementById('asset-trade-fee-label').textContent = 'Gebühr (' + (ctx.t === 'crypto' ? '0,5%' : '0,1%') + '):';
-            note.innerHTML = '⚠️ Bei Verkaufsgewinn werden 26,375% (KapESt + Soli) automatisch einbehalten.';
+            note.innerHTML = '⚠️ Bei Verkaufsgewinn werden 26,375% (KapESt + Soli) automatisch einbehalten. 1.000 € Sparerpauschbetrag &amp; Verlustverrechnung werden berücksichtigt.';
             const result = ctx.market.sell(ctx.symbol, amount);
             if (result) {
                 const profit = this.realizedProfit(ctx, result, amount);
-                const tax = profit > 0 ? Taxes.calculateCapitalGainsTax(profit) : null;
-                document.getElementById('asset-trade-cost').textContent = '€' + this.fmt(result.net - (tax ? tax.total : 0));
+                const applied = Taxes.previewCapitalGain(profit);
+                document.getElementById('asset-trade-cost').textContent = '€' + this.fmt(result.net - applied.delta);
                 document.getElementById('asset-trade-fee').textContent = '€' + this.fmt(result.fee);
             }
             const btn = document.getElementById('asset-trade-btn');
@@ -746,6 +948,7 @@ const UI = {
     },
 
     executeAssetTrade() {
+        if (!this.canAct()) return;
         const ctx = this.assetCtx();
         if (!ctx) return;
         const amount = parseFloat(document.getElementById('asset-trade-amount').value) || 0;
@@ -779,13 +982,15 @@ const UI = {
 
             let net = result.net;
             let taxMsg = '';
-            if (profit > 0) {
-                const tax = Taxes.calculateCapitalGainsTax(profit);
-                GameState.taxes.capitalTax += tax.capitalTax;
-                GameState.taxes.soli += tax.soli;
-                net -= tax.total;
-                GameState.addTransaction('tax', ctx.t, 'Kapitalertragsteuer', symbol, 0, 0, 0, tax.total);
-                taxMsg = ` (Steuer €${this.fmt(tax.total)} einbehalten)`;
+            const applied = Taxes.applyCapitalGain(profit);
+            if (applied.delta > 0) {
+                net -= applied.delta;
+                GameState.addTransaction('tax', ctx.t, 'Kapitalertragsteuer', symbol, 0, 0, 0, applied.delta);
+                taxMsg = ` (Steuer €${this.fmt(applied.delta)} einbehalten)`;
+            } else if (applied.delta < 0) {
+                net += -applied.delta;
+                GameState.addTransaction('taxrefund', ctx.t, 'Steuererstattung (Freibetrag/Verluste)', symbol, 0, 0, 0, -applied.delta);
+                taxMsg = ` (Steuererstattung €${this.fmt(-applied.delta)})`;
             }
             GameState.addCash(net);
 
@@ -804,6 +1009,7 @@ const UI = {
     },
 
     executeHoldingSale(type, symbol, amount) {
+        if (!this.canAct()) return null;
         const market = type === 'stock' ? StockMarket : type === 'etf' ? ETFMarket : CryptoMarket;
         const data = type === 'stock' ? StockMarket.data : type === 'etf' ? ETFMarket.data : CryptoMarket.data;
         const portKey = type === 'stock' ? 'stocks' : type === 'etf' ? 'etfs' : 'crypto';
@@ -816,12 +1022,13 @@ const UI = {
 
         const profit = (result.price - holding.avgPrice * amount) - result.fee;
         let net = result.net;
-        if (profit > 0) {
-            const tax = Taxes.calculateCapitalGainsTax(profit);
-            GameState.taxes.capitalTax += tax.capitalTax;
-            GameState.taxes.soli += tax.soli;
-            net -= tax.total;
-            GameState.addTransaction('tax', type, 'Kapitalertragsteuer', symbol, 0, 0, 0, tax.total);
+        const applied = Taxes.applyCapitalGain(profit);
+        if (applied.delta > 0) {
+            net -= applied.delta;
+            GameState.addTransaction('tax', type, 'Kapitalertragsteuer', symbol, 0, 0, 0, applied.delta);
+        } else if (applied.delta < 0) {
+            net += -applied.delta;
+            GameState.addTransaction('taxrefund', type, 'Steuererstattung (Freibetrag/Verluste)', symbol, 0, 0, 0, -applied.delta);
         }
 
         holding.profit += profit;
@@ -831,7 +1038,7 @@ const UI = {
         }
         GameState.addCash(net);
         GameState.addTransaction('sell', type, data[symbol].name, symbol, amount, result.price, result.fee, result.net);
-        this.showToast(`${data[symbol].name}: ${amount}${type === 'crypto' ? ' ' : 'x '}verkauft für €${this.fmt(net)}${profit > 0 ? ' (inkl. Steuer)' : ''}`, '💸');
+        this.showToast(`${data[symbol].name}: ${amount}${type === 'crypto' ? ' ' : 'x '}verkauft für €${this.fmt(net)}${applied.delta !== 0 ? ' (inkl. Steuer)' : ''}`, '💸');
         return result;
     },
 
@@ -1046,6 +1253,7 @@ const UI = {
     },
 
     buyRealEstate(id) {
+        if (!this.canAct()) return;
         const result = RealEstate.buyProperty(id);
         if (!result) {
             this.showToast('Nicht genug Guthaben!', '⚠️');
@@ -1060,21 +1268,28 @@ const UI = {
     },
 
     sellRealEstate(id) {
+        if (!this.canAct()) return;
         const result = RealEstate.sellProperty(id);
         if (!result) return;
 
-        GameState.addCash(result.price);
-        if (result.capitalGain > 0) {
-            const tax = Taxes.calculateCapitalGainsTax(result.capitalGain);
-            Taxes.addTaxDebt(tax.total);
+        const applied = Taxes.applyCapitalGain(result.capitalGain);
+        let net = result.price;
+        if (applied.delta > 0) {
+            net -= applied.delta;
+            GameState.addTransaction('tax', 'realestate', 'Kapitalertragsteuer (Immobilie)', 'RE', 0, 0, 0, applied.delta);
+        } else if (applied.delta < 0) {
+            net += -applied.delta;
+            GameState.addTransaction('taxrefund', 'realestate', 'Steuererstattung (Immobilie)', 'RE', 0, 0, 0, -applied.delta);
         }
+        GameState.addCash(net);
         GameState.addTransaction('sell', 'realestate', RealEstate.properties[id].name, 'RE', 1, result.price, 0, result.price);
-        this.showToast(`Immobilie verkauft für €${this.fmt(result.price)}!`, '🏠');
+        this.showToast(`Immobilie verkauft für €${this.fmt(net)}${applied.delta !== 0 ? ' (inkl. Steuer)' : ''}!`, '🏠');
         this.closeDetailPanels();
         this.updateAll();
     },
 
     renovateProperty(id, level) {
+        if (!this.canAct()) return;
         const result = RealEstate.renovate(id, level);
         if (!result) {
             this.showToast('Nicht genug Guthaben!', '⚠️');
@@ -1096,6 +1311,19 @@ const UI = {
         document.getElementById('tax-late-fee').textContent = '€' + this.fmt(summary.lateFees);
         document.getElementById('tax-late-fee').className = summary.lateFees > 0 ? 'tax-value warning' : 'tax-value';
         document.getElementById('tax-total').textContent = '€' + this.fmt(summary.total);
+
+        const pauschEl = document.getElementById('tax-pausch');
+        if (pauschEl) pauschEl.textContent = `€${this.fmt(summary.freibetragUsed)} / €${this.fmt(summary.pauschbetrag)}`;
+        const netEl = document.getElementById('tax-capital-net');
+        if (netEl) {
+            const v = summary.capitalNet;
+            netEl.textContent = (v >= 0 ? '+' : '−') + '€' + this.fmt(Math.abs(v));
+            netEl.className = 'tax-value' + (v >= 0 ? '' : ' warning');
+        }
+        const rentEl = document.getElementById('tax-rent-net');
+        if (rentEl) rentEl.textContent = '€' + this.fmt(summary.rentNet);
+        const yearEl = document.getElementById('tax-year');
+        if (yearEl) yearEl.textContent = 'Wirtschaftsjahr ' + summary.taxYear;
 
         const weeksUntilDue = summary.nextDue - GameState.week;
         if (weeksUntilDue > 0) {
@@ -1205,6 +1433,7 @@ const UI = {
     },
 
     foundCompany(typeId) {
+        if (!this.canAct()) return;
         const result = Companies.buyCompany(typeId);
         if (result) {
             this.showToast(`${result.name} gegründet!`, '🏢');
@@ -1390,6 +1619,7 @@ const UI = {
     },
 
     buyLuxury(itemId) {
+        if (!this.canAct()) return;
         const result = Luxury.buyItem(itemId);
         if (result) {
             this.showToast(`${result.name} gekauft!`, '💎');
@@ -1707,12 +1937,12 @@ const UI = {
         const amount = parseFloat(document.getElementById('sell-modal-amount').value) || 0;
         const totalEl = document.getElementById('sell-modal-total');
         let total = 0;
-        if (ctx.type === 'stock') { const r = StockMarket.sell(ctx.id, amount); if (r) { const p = this.projectedProfit('stock', ctx.id, amount, r); total = r.net - (p > 0 ? Taxes.calculateCapitalGainsTax(p).total : 0); } }
-        else if (ctx.type === 'etf') { const r = ETFMarket.sell(ctx.id, amount); if (r) { const p = this.projectedProfit('etf', ctx.id, amount, r); total = r.net - (p > 0 ? Taxes.calculateCapitalGainsTax(p).total : 0); } }
-        else if (ctx.type === 'crypto') { const r = CryptoMarket.sell(ctx.id, amount); if (r) { const p = this.projectedProfit('crypto', ctx.id, amount, r); total = r.net - (p > 0 ? Taxes.calculateCapitalGainsTax(p).total : 0); } }
+        if (ctx.type === 'stock') { const r = StockMarket.sell(ctx.id, amount); if (r) { const p = this.projectedProfit('stock', ctx.id, amount, r); total = r.net - Taxes.previewCapitalGain(p).delta; } }
+        else if (ctx.type === 'etf') { const r = ETFMarket.sell(ctx.id, amount); if (r) { const p = this.projectedProfit('etf', ctx.id, amount, r); total = r.net - Taxes.previewCapitalGain(p).delta; } }
+        else if (ctx.type === 'crypto') { const r = CryptoMarket.sell(ctx.id, amount); if (r) { const p = this.projectedProfit('crypto', ctx.id, amount, r); total = r.net - Taxes.previewCapitalGain(p).delta; } }
         else if (ctx.type === 'realestate') {
             const p = RealEstate.properties.find(x => x.id === ctx.id);
-            total = p ? p.currentValue - Taxes.calculateCapitalGainsTax(Math.max(0, p.currentValue - p.currentPrice)) : 0;
+            total = p ? p.currentValue - Math.max(0, Taxes.previewCapitalGain(p.currentValue - p.currentPrice).delta) : 0;
         }
         else if (ctx.type === 'company') { const c = Companies.owned.find(x => x.id === ctx.id); total = c ? Math.round(c.value * 0.8) : 0; }
         else if (ctx.type === 'luxury') { const o = Luxury.owned.find(x => x.id === ctx.id); total = o ? Luxury.getResaleValue(o) : 0; }
@@ -1720,6 +1950,7 @@ const UI = {
     },
 
     confirmSell() {
+        if (!this.canAct()) return;
         const ctx = this.sellContext;
         if (!ctx) return;
         const amount = parseFloat(document.getElementById('sell-modal-amount').value) || 0;
@@ -1734,7 +1965,18 @@ const UI = {
         } else if (ctx.type === 'realestate') {
             result = RealEstate.sellProperty(ctx.id);
             if (result) {
-                this.showToast(`${result.name} für €${this.fmt(result.price)} verkauft!`, '🏠');
+                const applied = Taxes.applyCapitalGain(result.capitalGain);
+                let net = result.price;
+                if (applied.delta > 0) {
+                    net -= applied.delta;
+                    GameState.addTransaction('tax', 'realestate', 'Kapitalertragsteuer (Immobilie)', 'RE', 0, 0, 0, applied.delta);
+                } else if (applied.delta < 0) {
+                    net += -applied.delta;
+                    GameState.addTransaction('taxrefund', 'realestate', 'Steuererstattung (Immobilie)', 'RE', 0, 0, 0, -applied.delta);
+                }
+                GameState.addCash(net);
+                GameState.addTransaction('sell', 'realestate', result.name, 'RE', 1, result.price, 0, result.price);
+                this.showToast(`${result.name} für €${this.fmt(net)} verkauft${applied.delta !== 0 ? ' (inkl. Steuer)' : ''}!`, '🏠');
             }
         } else if (ctx.type === 'company') {
             result = Companies.sellCompany(ctx.id);
@@ -1863,6 +2105,7 @@ const UI = {
     },
 
     spinRoulette() {
+        if (!this.canAct()) return;
         const amount = parseFloat(document.getElementById('roulette-bet-amount').value) || 0;
         const result = Casino.spinRoulette(this.rouletteBet || { type: 'red' }, amount);
         if (!result) { this.showToast('Ungültiger Einsatz oder zu wenig Guthaben!', '⚠️'); this.updateCasino(); return; }
@@ -1872,6 +2115,7 @@ const UI = {
     },
 
     spinSlot() {
+        if (!this.canAct()) return;
         if (this.slotBusy || !Casino.SLOTS.canSpin()) return;
         if (GameState.cash < Casino.SLOT_TICKET) {
             this.showToast('Nicht genug Guthaben für ein Ticket!', '⚠️');
@@ -1944,6 +2188,7 @@ const UI = {
     },
 
     flipCoin() {
+        if (!this.canAct()) return;
         const amount = parseFloat(document.getElementById('coin-bet-amount').value) || 0;
         const side = this.coinSide || 'kopf';
         const result = Casino.flipCoin(side, amount);

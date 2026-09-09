@@ -651,3 +651,520 @@ input[type="number"]::-webkit-inner-spin-button {
         white-space: nowrap;
     }
 }
+/* =========================================================
+   Game-Relaunch II – Profi-App-Look für Smartphone & Desktop
+   Farbige Tiefe, Glanz, Animationen + Unterwelt/Gefängnis
+   ========================================================= */
+
+/* --- Tiefe Hintergrundwelt (statt flaches Grau) ----------- */
+body {
+    background:
+        radial-gradient(1000px 620px at 85% -10%, rgba(21, 93, 240, 0.10), transparent 60%),
+        radial-gradient(900px 560px at -10% 108%, rgba(124, 58, 237, 0.10), transparent 60%),
+        linear-gradient(180deg, #eef2f9 0%, #e8edf7 100%);
+}
+.app {
+    background: transparent;
+}
+
+/* --- Header: App-Leiste mit Farbnadel + Glas --------------- */
+.header {
+    position: relative;
+    background: rgba(255, 255, 255, 0.78);
+    -webkit-backdrop-filter: blur(16px) saturate(1.6);
+    backdrop-filter: blur(16px) saturate(1.6);
+    box-shadow: 0 4px 18px rgba(16, 24, 40, 0.06);
+}
+.header::after {
+    content: "";
+    position: absolute;
+    left: 0;
+    right: 0;
+    bottom: -1px;
+    height: 3px;
+    background: linear-gradient(90deg, #155df0 0%, #4f46e5 45%, #7c3aed 80%, rgba(124, 58, 237, 0) 100%);
+    opacity: 0.85;
+}
+.logo::after {
+    animation: livePulse 2.2s ease-in-out infinite;
+}
+@keyframes livePulse {
+    0%, 100% { box-shadow: 0 0 0 0 rgba(11, 158, 79, 0.45); }
+    50%      { box-shadow: 0 0 0 5px rgba(11, 158, 79, 0.0); }
+}
+.game-speed.live {
+    animation: subtleBreathe 2.4s ease-in-out infinite;
+}
+@keyframes subtleBreathe {
+    0%, 100% { opacity: 1; }
+    50%      { opacity: 0.72; }
+}
+
+/* --- Dashboard-Hero: Wallet-Karte wie in einer Profi-App --- */
+.dashboard-hero {
+    background:
+        radial-gradient(560px 240px at 88% -20%, rgba(255, 255, 255, 0.22), transparent 55%),
+        linear-gradient(120deg, #16204b 0%, #1e3fa8 42%, #3b61f0 72%, #7c3aed 115%);
+    border: none;
+    color: #fff;
+    box-shadow: 0 18px 40px rgba(30, 63, 168, 0.38), inset 0 1px 0 rgba(255, 255, 255, 0.30);
+}
+.dashboard-hero::before {
+    background: radial-gradient(circle, rgba(255, 255, 255, 0.16), transparent 62%);
+    top: -120px;
+    right: -60px;
+    width: 340px;
+    height: 340px;
+}
+.dashboard-hero::after {
+    content: "INVESTSIM";
+    position: absolute;
+    right: 18px;
+    bottom: 10px;
+    font-size: 0.62rem;
+    font-weight: 800;
+    letter-spacing: 0.28em;
+    color: rgba(255, 255, 255, 0.34);
+    pointer-events: none;
+}
+.dashboard-hero .hero-label {
+    color: rgba(255, 255, 255, 0.72);
+}
+.dashboard-hero .hero-amount {
+    background: none;
+    -webkit-text-fill-color: #fff;
+    color: #fff;
+    text-shadow: 0 2px 12px rgba(0, 0, 0, 0.25);
+}
+.dashboard-hero .hero-change {
+    display: inline-block;
+    margin-top: 6px;
+    padding: 3px 10px;
+    border-radius: 999px;
+    background: rgba(255, 255, 255, 0.16);
+    font-weight: 600;
+    color: #fff;
+    -webkit-backdrop-filter: blur(4px);
+    backdrop-filter: blur(4px);
+}
+.dashboard-hero .hero-stat {
+    background: rgba(255, 255, 255, 0.10);
+    border: 1px solid rgba(255, 255, 255, 0.16);
+    border-radius: 14px;
+    padding: 10px 14px;
+    -webkit-backdrop-filter: blur(6px);
+    backdrop-filter: blur(6px);
+}
+.dashboard-hero .mini-label {
+    color: rgba(255, 255, 255, 0.66);
+}
+.dashboard-hero .hero-stat-value {
+    color: #fff;
+    font-weight: 700;
+}
+
+/* --- Mini-Stat: kleine Farbsignale für echte Hierarchie ----- */
+.mini-stat {
+    border: 1px solid var(--border);
+    background: var(--bg-secondary);
+    box-shadow: 0 1px 2px rgba(16, 24, 40, 0.04), 0 8px 22px rgba(16, 24, 40, 0.05);
+    transition: transform 0.18s ease, box-shadow 0.18s ease;
+}
+.mini-stat:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 10px 26px rgba(16, 24, 40, 0.09);
+}
+.mini-value {
+    font-weight: 700;
+}
+
+/* --- Karten: kräftigere Rundung, weicheres Material --------- */
+.card {
+    border-radius: 18px;
+    box-shadow: 0 1px 2px rgba(16, 24, 40, 0.04), 0 8px 24px rgba(16, 24, 40, 0.05);
+}
+
+/* --- Navigation: echte Tab-Bar mit Anker-Pille -------------- */
+.nav-btn.active {
+    background: linear-gradient(180deg, #3c7bff, #155df0);
+    box-shadow: 0 8px 18px rgba(21, 93, 240, 0.42), inset 0 1px 0 rgba(255, 255, 255, 0.28);
+    transform: translateY(-1px);
+}
+.nav-btn:active {
+    transform: scale(0.9);
+}
+.nav-btn .nav-icon {
+    transition: transform 0.15s ease;
+}
+.nav-btn.active .nav-icon {
+    transform: scale(1.12);
+}
+
+/* --- Buttons: Drainage-Feedback (wie bei guten Mobile-Games) */
+.btn {
+    transition: transform 0.12s ease, box-shadow 0.15s ease, background 0.15s ease;
+}
+.btn:active:not(:disabled) {
+    transform: scale(0.96);
+}
+.btn:disabled {
+    opacity: 0.55;
+    cursor: not-allowed;
+}
+
+/* --- Seitenwechsel sanft einblenden -------------------------- */
+.page {
+    animation: pageIn 0.28s cubic-bezier(0.4, 0, 0.2, 1);
+}
+@keyframes pageIn {
+    from { opacity: 0; transform: translateY(8px); }
+    to   { opacity: 1; transform: translateY(0); }
+}
+
+/* --- Modals: professioneller Eintritt ------------------------ */
+.modal-content {
+    animation: modalIn 0.22s cubic-bezier(0.2, 0.9, 0.3, 1.2);
+}
+@keyframes modalIn {
+    from { opacity: 0; transform: scale(0.92) translateY(10px); }
+    to   { opacity: 1; transform: scale(1) translateY(0); }
+}
+
+/* --- Toast: gleitet rein ------------------------------------- */
+.news-toast {
+    animation: toastIn 0.34s cubic-bezier(0.2, 0.9, 0.3, 1.15);
+}
+@keyframes toastIn {
+    from { opacity: 0; transform: translateY(-16px) scale(0.95); }
+    to   { opacity: 1; transform: translateY(0) scale(1); }
+}
+
+/* =========================================================
+   UNTERWELT (rein fiktiv)
+   ========================================================= */
+.section-heading {
+    margin: 22px 0 12px;
+    font-size: 0.82rem;
+    letter-spacing: 0.1em;
+    color: var(--text-muted);
+    font-weight: 700;
+}
+.page-subnote {
+    font-weight: 500;
+    font-size: 0.78rem;
+    color: var(--text-muted);
+    letter-spacing: 0.01em;
+}
+.ug-money {
+    color: #b8860b;
+    font-weight: 800;
+}
+.underground-stats {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 12px;
+    margin-bottom: 14px;
+}
+@media (max-width: 768px) {
+    .underground-stats { grid-template-columns: repeat(2, 1fr); }
+}
+
+/* Fahndungsbalken */
+.heat-bar-card {
+    background: linear-gradient(180deg, #161b2e, #1d2340);
+    border-radius: 18px;
+    padding: 16px 18px;
+    margin-bottom: 16px;
+    color: #fff;
+    box-shadow: 0 12px 30px rgba(10, 14, 34, 0.35);
+}
+.heat-label {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    font-weight: 700;
+    font-size: 0.85rem;
+    letter-spacing: 0.04em;
+    margin-bottom: 10px;
+}
+.heat-label span:last-child {
+    color: rgba(255, 255, 255, 0.55);
+    font-weight: 600;
+}
+.heat-wrap {
+    height: 14px;
+    border-radius: 999px;
+    background: rgba(255, 255, 255, 0.12);
+    overflow: hidden;
+    box-shadow: inset 0 1px 3px rgba(0, 0, 0, 0.35);
+}
+.heat-bar {
+    height: 100%;
+    width: 0%;
+    border-radius: 999px;
+    background: linear-gradient(90deg, #2fb96a, #f4b740 60%, #e02e3a);
+    transition: width 0.4s ease;
+}
+.heat-bar-card.heat-wrap { }
+.heat-hint {
+    margin: 10px 0 0;
+    color: rgba(255, 255, 255, 0.55);
+    font-size: 0.78rem;
+    line-height: 1.5;
+}
+.heat-wrap.heat-warn { animation: heatWarn 1.4s ease-in-out infinite; }
+.heat-wrap.heat-danger { animation: heatDanger 0.9s ease-in-out infinite; }
+@keyframes heatWarn {
+    0%, 100% { box-shadow: inset 0 1px 3px rgba(0,0,0,.35), 0 0 0 0 rgba(244,183,64,.0); }
+    50% { box-shadow: inset 0 1px 3px rgba(0,0,0,.35), 0 0 14px 2px rgba(244,183,64,.45); }
+}
+@keyframes heatDanger {
+    0%, 100% { box-shadow: inset 0 1px 3px rgba(0,0,0,.35), 0 0 0 0 rgba(224,46,58,.0); }
+    50% { box-shadow: inset 0 1px 3px rgba(0,0,0,.35), 0 0 16px 3px rgba(224,46,58,.55); }
+}
+
+/* Waschen */
+.ug-wash-card {
+    margin-bottom: 16px;
+}
+.ug-wash-desc {
+    color: var(--text-secondary);
+    font-size: 0.84rem;
+    margin: 6px 0 12px;
+}
+.wash-row {
+    display: flex;
+    gap: 10px;
+}
+.wash-row .trade-input {
+    flex: 1;
+    min-height: 44px;
+}
+.btn-warning {
+    background: linear-gradient(180deg, #f7b733, #f09609);
+    color: #fff;
+    box-shadow: 0 8px 18px rgba(240, 150, 9, 0.35), inset 0 1px 0 rgba(255, 255, 255, 0.3);
+}
+.btn-warning:hover:not(:disabled) {
+    background: linear-gradient(180deg, #f0a722, #d98506);
+    transform: translateY(-1px);
+}
+.wash-preview {
+    margin-top: 10px;
+    font-size: 0.85rem;
+    color: var(--text-secondary);
+}
+
+/* Operationen-Karten */
+.underground-op-list {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+    gap: 14px;
+}
+.ug-card {
+    background: var(--bg-secondary);
+    border: 1px solid var(--border);
+    border-radius: 18px;
+    padding: 16px;
+    box-shadow: 0 1px 2px rgba(16, 24, 40, 0.04), 0 8px 22px rgba(16, 24, 40, 0.06);
+    transition: transform 0.16s ease, box-shadow 0.16s ease;
+}
+.ug-card:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 12px 30px rgba(16, 24, 40, 0.11);
+}
+.ug-card.ug-active {
+    border-color: rgba(224, 46, 58, 0.45);
+    background: linear-gradient(180deg, #fff, rgba(224, 46, 58, 0.045));
+}
+.ug-card-head {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+}
+.ug-icon {
+    width: 46px;
+    height: 46px;
+    border-radius: 14px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.35rem;
+    flex-shrink: 0;
+    box-shadow: inset 0 0 0 1px rgba(0, 0, 0, 0.06);
+}
+.ug-name {
+    font-weight: 700;
+    font-size: 0.98rem;
+}
+.ug-sub {
+    font-size: 0.78rem;
+    color: var(--text-muted);
+    margin-top: 2px;
+}
+.ug-card-head .btn {
+    margin-left: auto;
+}
+.ug-desc {
+    font-size: 0.84rem;
+    color: var(--text-secondary);
+    margin: 10px 0;
+    line-height: 1.45;
+}
+.ug-stats {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 2px 14px;
+    margin-bottom: 12px;
+}
+.ug-stats .stat {
+    border-bottom: 1px solid var(--border);
+    padding: 6px 0;
+}
+.ug-stats .stat span:last-child {
+    font-weight: 700;
+}
+
+/* Haft-Karte auf der Seite */
+.ug-prison-card {
+    margin-bottom: 16px;
+}
+.ug-prison-inner {
+    background: linear-gradient(90deg, #d62430, #7a1220);
+    color: #fff;
+    font-weight: 600;
+    padding: 14px 18px;
+    border-radius: 14px;
+    box-shadow: 0 10px 26px rgba(214, 36, 48, 0.35);
+}
+
+/* =========================================================
+   GEFÄNGNIS
+   ========================================================= */
+.prison-banner {
+    position: sticky;
+    top: 62px;
+    z-index: 260;
+    background: repeating-linear-gradient(45deg, #d62430 0, #d62430 14px, #161b2e 14px, #161b2e 28px);
+    color: #fff;
+    text-align: center;
+    font-size: 0.85rem;
+    padding: 9px 14px;
+    box-shadow: 0 8px 24px rgba(214, 36, 48, 0.35);
+    letter-spacing: 0.02em;
+    animation: heatDanger 1.6s ease-in-out infinite;
+}
+@media (max-width: 768px) {
+    .prison-banner { top: 52px; }
+}
+
+.prison-modal-head {
+    background: linear-gradient(135deg, #161b2e, #3a1020);
+    color: #fff;
+    padding: 22px 20px 16px;
+    border-radius: 20px 20px 0 0;
+    text-align: center;
+}
+.modal-close-x {
+    position: absolute;
+    top: 12px;
+    right: 12px;
+    width: 34px;
+    height: 34px;
+    border: none;
+    border-radius: 999px;
+    background: rgba(255, 255, 255, 0.14);
+    color: #fff;
+    font-size: 0.95rem;
+    line-height: 1;
+    cursor: pointer;
+    -webkit-backdrop-filter: blur(4px);
+    backdrop-filter: blur(4px);
+    transition: background 0.15s ease, transform 0.12s ease;
+}
+.modal-close-x:hover { background: rgba(255, 255, 255, 0.24); }
+.modal-close-x:active { transform: scale(0.9); }
+.prison-modal-head h3 {
+    color: #fff;
+    letter-spacing: 0.04em;
+    margin-top: 6px;
+}
+.prison-badge {
+    font-size: 2.4rem;
+    animation: floatShake 1.6s ease-in-out infinite;
+}
+@keyframes floatShake {
+    0%, 100% { transform: translateY(0) rotate(0); }
+    25% { transform: translateY(-4px) rotate(-6deg); }
+    75% { transform: translateY(-2px) rotate(6deg); }
+}
+.prison-stripes {
+    height: 14px;
+    margin: 16px 0 4px;
+    border-radius: 8px;
+    background: repeating-linear-gradient(45deg, #e02e3a 0, #e02e3a 12px, #0d1424 12px, #0d1424 24px);
+}
+.prison-grid {
+    display: grid;
+    gap: 8px;
+    margin-top: 10px;
+}
+.prison-grid .stat {
+    border-bottom: 1px solid var(--border);
+    padding: 8px 0;
+}
+.prison-grid .stat span:last-child {
+    font-weight: 700;
+}
+.prison-note {
+    font-size: 0.84rem;
+    color: var(--text-secondary);
+    line-height: 1.5;
+    margin: 14px 0;
+}
+
+/* --- News-Kategorie Verbrechen ------------------------------ */
+.news-category-crime {
+    background: rgba(224, 46, 58, 0.12);
+    color: #c81f2c;
+}
+
+/* --- Mobile: Bottom-Navigation wie in professionellen Games -- */
+@media (max-width: 768px) {
+    .sidebar {
+        background: rgba(255, 255, 255, 0.92);
+        -webkit-backdrop-filter: blur(16px) saturate(1.5);
+        backdrop-filter: blur(16px) saturate(1.5);
+        border-top: 1px solid var(--border);
+        box-shadow: 0 -8px 26px rgba(16, 24, 40, 0.10);
+    }
+    .nav-btn {
+        max-width: 64px;
+        border-radius: 14px;
+        margin: 4px 2px;
+        padding: 8px 2px;
+    }
+    .nav-btn.active {
+        background: transparent;
+        box-shadow: none;
+        transform: none;
+    }
+    .nav-btn.active .nav-icon {
+        background: linear-gradient(180deg, #3c7bff, #155df0);
+        border-radius: 12px;
+        color: #fff;
+        box-shadow: 0 5px 14px rgba(21, 93, 240, 0.40), inset 0 1px 0 rgba(255, 255, 255, 0.30);
+        padding: 6px 9px;
+        transform: translateY(-3px);
+    }
+    .nav-btn.active .nav-label {
+        color: var(--blue);
+    }
+    .main-content {
+        padding: 14px;
+        padding-bottom: calc(88px + env(safe-area-inset-bottom));
+    }
+    .heat-label { font-size: 0.78rem; }
+    .wash-row { flex-wrap: wrap; }
+    .wash-row .btn { width: 100%; }
+}

@@ -29,7 +29,32 @@ const GameState = {
         lateFees: 0,
         history: [],
         lastPaymentWeek: 0,
-        dueWeek: 13
+        dueWeek: 13,
+        capitalNet: 0,
+        capitalTaxPaid: 0,
+        rentNet: 0,
+        rentTaxPaid: 0,
+        taxYear: 2025
+    },
+
+    underground: {
+        blackMoney: 0,
+        heat: 0,
+        operations: [],
+        washedTotal: 0,
+        arrests: 0,
+        lastWeek: 1,
+        heatDecayWeek: 0
+    },
+
+    prison: {
+        active: false,
+        crime: '',
+        crimeIcon: '🚔',
+        fine: 0,
+        seized: 0,
+        weeks: 0,
+        untilWeek: 0
     },
 
     transactions: [],
@@ -67,7 +92,27 @@ const GameState = {
         this.taxes = {
             unpaid: 0, capitalTax: 0, soli: 0, grunderwerbsteuer: 0,
             grundsteuer: 0, rentalTax: 0, lateFees: 0, history: [],
-            lastPaymentWeek: 0, dueWeek: 13
+            lastPaymentWeek: 0, dueWeek: 13,
+            capitalNet: 0, capitalTaxPaid: 0,
+            rentNet: 0, rentTaxPaid: 0, taxYear: 2025
+        };
+        this.underground = {
+            blackMoney: 0,
+            heat: 0,
+            operations: [],
+            washedTotal: 0,
+            arrests: 0,
+            lastWeek: 1,
+            heatDecayWeek: 0
+        };
+        this.prison = {
+            active: false,
+            crime: '',
+            crimeIcon: '🚔',
+            fine: 0,
+            seized: 0,
+            weeks: 0,
+            untilWeek: 0
         };
         this.transactions = [];
         this.news = [];
@@ -206,5 +251,13 @@ const GameState = {
 
     getTotalTaxOwed() {
         return this.taxes.unpaid + this.taxes.lateFees;
+    },
+
+    isInPrison() {
+        return !!(this.prison && this.prison.active && this.week < this.prison.untilWeek);
+    },
+
+    prisonWeeksLeft() {
+        return this.isInPrison() ? this.prison.untilWeek - this.week : 0;
     }
 };

@@ -76,6 +76,11 @@
             </div>
         </header>
 
+        <!-- Gefängnis-Banner (bei Haft immer sichtbar) -->
+        <div id="prison-banner" class="prison-banner hidden">
+            <span id="prison-banner-text"></span>
+        </div>
+
         <!-- Sidebar Navigation -->
         <nav class="sidebar">
             <button class="nav-btn active" data-page="dashboard">
@@ -117,6 +122,10 @@
             <button class="nav-btn" data-page="casino">
                 <span class="nav-icon">🎰</span>
                 <span class="nav-label">Casino</span>
+            </button>
+            <button class="nav-btn" data-page="underground">
+                <span class="nav-icon">🕶️</span>
+                <span class="nav-label">Unterwelt</span>
             </button>
             <button class="nav-btn" data-page="leaderboard">
                 <span class="nav-icon">🏆</span>
@@ -416,7 +425,7 @@
                 </div>
                 <div class="tax-overview">
                     <div class="card tax-summary-card">
-                        <h3>Steuerübersicht</h3>
+                        <h3>Steuerübersicht <span class="page-subnote" id="tax-year">Wirtschaftsjahr 2025</span></h3>
                         <div class="tax-grid">
                             <div class="tax-item">
                                 <span class="tax-label">Kapitalertragsteuer (einbehalten)</span>
@@ -441,6 +450,18 @@
                             <div class="tax-item">
                                 <span class="tax-label">Verspätungszuschlag</span>
                                 <span class="tax-value warning" id="tax-late-fee">€0,00</span>
+                            </div>
+                            <div class="tax-item">
+                                <span class="tax-label">Sparerpauschbetrag (verbraucht)</span>
+                                <span class="tax-value" id="tax-pausch">€0,00 / €1.000,00</span>
+                            </div>
+                            <div class="tax-item">
+                                <span class="tax-label">Verrechneter Kapitalertrag (Jahr)</span>
+                                <span class="tax-value" id="tax-capital-net">€0,00</span>
+                            </div>
+                            <div class="tax-item">
+                                <span class="tax-label">Mieteinnahmen (Jahr, versteuert)</span>
+                                <span class="tax-value" id="tax-rent-net">€0,00</span>
                             </div>
                         </div>
                         <div class="tax-total">
@@ -470,8 +491,10 @@
                 <div class="card tax-info-card">
                     <h3>Steuerinformationen (Deutschland)</h3>
                     <div class="tax-info-content">
-                        <p><strong>Kapitalertragsteuer:</strong> 25% + Solidaritätszuschlag (5,5% davon) = 26,375% auf realisierte Gewinne aus Aktien, ETFs und Kryptowährungen. Wird <strong>automatisch beim Verkauf einbehalten</strong> — wie bei einem echten Broker-Depot.</p>
-                        <p><strong>Mieteinnahmen:</strong> werden monatlich automatisch mit progressivem Steuersatz von der Miete abgezogen (bis 45%).</p>
+                        <p><strong>Kapitalertragsteuer:</strong> 25% + Solidaritätszuschlag (5,5% davon) = 26,375% auf realisierte Gewinne aus Aktien, ETFs, Krypto & Immobilienverkäufen. Wird <strong>automatisch beim Verkauf einbehalten</strong> — wie bei einem echten Broker-Depot.</p>
+                        <p><strong>Sparerpauschbetrag:</strong> Die ersten <strong>1.000 € Kapitalerträge pro Jahr sind steuerfrei</strong> (Freibetrag). Er wird automatisch bei Verkäufen berücksichtigt und im neuen Jahr erneuert.</p>
+                        <p><strong>Verlustverrechnung:</strong> Realisierte Verluste verrechnen sich automatisch mit Gewinnen. Liegt dein Jahresergebnis im Minus, fällt keine Steuer an – bereits einbehaltene Steuer <strong>wird sogar erstattet</strong>.</p>
+                        <p><strong>Mieteinnahmen:</strong> werden nach kumuliertem Jahres-Netto progressiv versteuert (bis 45%) – mehr Miete, höherer Steuersatz, wie beim echten Finanzamt.</p>
                         <p><strong>Grundsteuer:</strong> Läuft kontinuierlich als offene Steuerschuld für Immobilienbesitz (ca. 0,3-1% des Immobilienwerts pro Jahr) und ist im Steuerbüro zu zahlen.</p>
                         <p><strong>Grunderwerbsteuer:</strong> 3,5% - 6,5% beim Kauf von Immobilien, je nach Bundesland.</p>
                         <p><strong>⚠️ Verspätungszuschlag:</strong> Bei nicht fristgerechter Zahlung der Steuerschuld: 1% pro Monat (min. €25), maximal 10% der Steuerschuld.</p>
@@ -643,6 +666,55 @@
                 </div>
             </div>
 
+            <!-- Unterwelt (illegal, rein fiktiv) -->
+            <div id="page-underground" class="page">
+                <div class="page-header">
+                    <h2>🕶️ Unterwelt <span class="page-subnote">rein fiktiv! – kein echtes Geld, keine echten Verbrechen</span></h2>
+                </div>
+
+                <div id="ug-prison-card" class="ug-prison-card hidden">
+                    <div class="ug-prison-inner">🔒 <strong>Du sitzt in Haft!</strong> Noch <span id="ug-prison-left">0</span> Woche(n). Grund: <span id="ug-prison-crime">—</span></div>
+                </div>
+
+                <div class="underground-stats">
+                    <div class="card mini-stat">
+                        <span class="mini-label">Schwarzgeld (bar)</span>
+                        <span class="mini-value ug-money" id="ug-black-money">€0</span>
+                    </div>
+                    <div class="card mini-stat">
+                        <span class="mini-label">Fahndungslevel</span>
+                        <span class="mini-value" id="ug-heat">0 / 10</span>
+                    </div>
+                    <div class="card mini-stat">
+                        <span class="mini-label">Aktive Operationen</span>
+                        <span class="mini-value" id="ug-ops">0</span>
+                    </div>
+                    <div class="card mini-stat">
+                        <span class="mini-label">Verhaftungen</span>
+                        <span class="mini-value" id="ug-arrests">0</span>
+                    </div>
+                </div>
+
+                <div class="heat-bar-card">
+                    <div class="heat-label"><span>🚨 Fahndungslevel</span><span id="ug-washed">Gewaschen: €0</span></div>
+                    <div id="ug-heat-wrap" class="heat-wrap"><div id="ug-heat-bar" class="heat-bar"></div></div>
+                    <p class="heat-hint">Je höher das Fahndungslevel, desto eher fliegst du auf. Es sinkt, wenn keine Operationen laufen – und steigt beim Geldwaschen.</p>
+                </div>
+
+                <div class="card ug-wash-card">
+                    <h3>🧼 Schwarzgeld waschen</h3>
+                    <p class="ug-wash-desc">Wandle Schwarzgeld in legales Guthaben um. Waschgebühr <strong>15%</strong> – jede gewaschene Summe erhöht die Fahndung.</p>
+                    <div class="wash-row">
+                        <input type="number" id="underground-wash-amount" min="0" step="1" class="trade-input" placeholder="Betrag in €">
+                        <button id="underground-wash-btn" class="btn btn-warning">Waschen</button>
+                    </div>
+                    <div id="underground-wash-preview" class="wash-preview">Gib einen Betrag ein.</div>
+                </div>
+
+                <h3 class="section-heading">OPERATIONEN</h3>
+                <div id="underground-op-list" class="underground-op-list"></div>
+            </div>
+
             <!-- Reichsten Menschen -->
             <div id="page-leaderboard" class="page">
                 <div class="page-header">
@@ -735,6 +807,29 @@
         </div>
     </div>
 
+    <!-- Gefängnis-Modal -->
+    <div id="prison-modal" class="modal hidden">
+        <div class="modal-content modal-small">
+            <div class="prison-modal-head">
+                <div class="prison-badge">🚔</div>
+                <h3>Du bist verhaftet worden!</h3>
+            </div>
+            <button id="prison-modal-close" class="modal-close-x" title="Schließen">✕</button>
+            <div class="modal-body">
+                <div class="prison-stripes"></div>
+                <div class="prison-grid">
+                    <div class="stat"><span>Verbrechen</span><span id="prison-crime">—</span></div>
+                    <div class="stat"><span>Haftstrafe</span><span id="prison-sentence">—</span></div>
+                    <div class="stat"><span>Noch verbleibend</span><span id="prison-left">—</span></div>
+                    <div class="stat"><span>Geldstrafe</span><span class="text-red" id="prison-fine">—</span></div>
+                    <div class="stat"><span>Beschlagnahmtes Schwarzgeld</span><span class="text-red" id="prison-seized">—</span></div>
+                </div>
+                <p class="prison-note">Während der Haft kannst du nicht handeln. Die Zeit läuft trotzdem weiter – warte deine Strafe ab, um wieder Freiheit zu erlangen.</p>
+                <button id="prison-ok-btn" class="btn btn-danger btn-block">Im Knast abwarten…</button>
+            </div>
+        </div>
+    </div>
+
     <!-- Scripte laden -->
     <script src="js/storage.js"></script>
     <script src="js/gameState.js"></script>
@@ -746,6 +841,7 @@
     <script src="js/luxury.js"></script>
     <script src="js/leaderboard.js"></script>
     <script src="js/casino.js"></script>
+    <script src="js/underground.js"></script>
     <script src="js/taxes.js"></script>
     <script src="js/events.js"></script>
     <script src="js/charts.js"></script>
