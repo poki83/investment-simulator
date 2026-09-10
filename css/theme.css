@@ -603,13 +603,106 @@ input[type="number"]::-webkit-inner-spin-button {
     border: none;
     border-radius: 20px;
     box-shadow: var(--shadow-lg);
+    text-align: center;
+    position: relative;
+    overflow: hidden;
+}
+.tutorial-box::before {
+    content: "";
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 5px;
+    background: linear-gradient(90deg, #155df0, #7c3aed 55%, #f59e0b);
 }
 .tutorial-box h2 {
     font-weight: 800;
     letter-spacing: -0.02em;
+    margin-top: 6px;
+}
+.tutorial-icon {
+    width: 76px;
+    height: 76px;
+    margin: 6px auto 2px;
+    border-radius: 999px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 2.4rem;
+    background: radial-gradient(circle at 30% 25%, #ffffff, #e3ecff 70%);
+    box-shadow: 0 10px 26px rgba(21, 93, 240, 0.28), inset 0 0 0 1px rgba(21, 93, 240, 0.12);
+    animation: tutIcon 0.4s cubic-bezier(0.2, 0.9, 0.3, 1.2);
+}
+@keyframes tutIcon {
+    from { transform: scale(0.6) rotate(-12deg); opacity: 0; }
+    to   { transform: scale(1) rotate(0); opacity: 1; }
+}
+.tutorial-box #tutorial-text {
+    text-align: left;
+    line-height: 1.6;
+    margin: 14px 0 18px;
+    font-size: 0.95rem;
+    animation: pageIn 0.3s ease;
 }
 .tutorial-progress {
     background: #e7ebf2;
+    height: 8px;
+    border-radius: 999px;
+    overflow: hidden;
+}
+.tutorial-progress-bar {
+    background: linear-gradient(90deg, #155df0, #7c3aed);
+    border-radius: 999px;
+    transition: width 0.35s cubic-bezier(0.2, 0.9, 0.3, 1);
+}
+.tutorial-dots {
+    display: flex;
+    justify-content: center;
+    gap: 6px;
+    margin: 12px 0 4px;
+    flex-wrap: wrap;
+}
+.tutorial-dot {
+    width: 9px;
+    height: 9px;
+    border-radius: 999px;
+    background: #d4daf0;
+    transition: all 0.2s ease;
+}
+.tutorial-dot.active {
+    background: linear-gradient(180deg, #3c7bff, #155df0);
+    width: 26px;
+}
+.tutorial-dot.done {
+    background: #9ecbff;
+}
+.tutorial-footer {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 10px;
+    margin-top: 14px;
+    flex-wrap: wrap;
+}
+.tutorial-count {
+    font-size: 0.78rem;
+    font-weight: 700;
+    color: var(--text-muted);
+    letter-spacing: 0.04em;
+}
+.tutorial-buttons {
+    display: flex;
+    gap: 8px;
+    flex-wrap: wrap;
+    justify-content: flex-end;
+}
+.tutorial-buttons .btn {
+    min-width: 104px;
+}
+#tutorial-prev:disabled {
+    opacity: 0.4;
+    cursor: not-allowed;
 }
 
 /* --- Empty State ------------------------------------------- */

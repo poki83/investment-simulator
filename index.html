@@ -23,14 +23,20 @@
     <!-- Tutorial Overlay -->
     <div id="tutorial-overlay" class="tutorial-overlay">
         <div class="tutorial-box">
+            <div class="tutorial-icon" id="tutorial-icon">🚀</div>
             <h2 id="tutorial-title">Willkommen bei InvestSim!</h2>
             <p id="tutorial-text"></p>
             <div class="tutorial-progress">
                 <div id="tutorial-progress-bar" class="tutorial-progress-bar"></div>
             </div>
-            <div class="tutorial-buttons">
-                <button id="tutorial-skip" class="btn btn-secondary">Tutorial überspringen</button>
-                <button id="tutorial-next" class="btn btn-primary">Weiter</button>
+            <div class="tutorial-dots" id="tutorial-dots"></div>
+            <div class="tutorial-footer">
+                <span class="tutorial-count" id="tutorial-count">Schritt 1 von 12</span>
+                <div class="tutorial-buttons">
+                    <button id="tutorial-prev" class="btn btn-secondary">Zurück</button>
+                    <button id="tutorial-skip" class="btn btn-secondary">Überspringen</button>
+                    <button id="tutorial-next" class="btn btn-primary">Weiter ▶</button>
+                </div>
             </div>
         </div>
     </div>
@@ -758,6 +764,9 @@
                 </div>
                 <div class="setting-group">
                     <button id="settings-reset" class="btn btn-danger btn-block">Spiel zurücksetzen</button>
+                </div>
+                <div class="setting-group">
+                    <button id="settings-tutorial" class="btn btn-secondary btn-block">Tutorial neu starten</button>
                 </div>
             </div>
         </div>

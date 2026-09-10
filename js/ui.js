@@ -6,17 +6,18 @@ const UI = {
     portfolioFilter: 'all',
 
     tutorialSteps: [
-        { title: 'Willkommen bei InvestSim!', text: 'Du startest mit <strong>€10.000</strong> Startguthaben. Dein Ziel ist es, Vermögen aufzubauen, indem du in verschiedene Anlageformen investierst.<br><br>Wie ein echter Investor musst du Entscheidungen treffen, Risiken abwägen und Steuern bezahlen.' },
-        { title: 'Dashboard', text: 'Auf dem Dashboard siehst du dein <strong>Gesamtportfolio</strong>, dein verfügbares Guthaben und deine Gesamtgewinne. Der Chart zeigt die Performance deines Portfolios über die Zeit.' },
-        { title: 'Aktienmarkt', text: 'Im Aktienmarkt findest du <strong>20 verschiedene Aktien</strong> - von deutschen Unternehmen wie SAP und BMW bis zu US-Tech-Werten wie Apple und NVIDIA.<br><br>Klicke auf eine Aktie, um Details zu sehen und sie zu kaufen oder verkaufen.' },
-        { title: 'ETFs & Krypto', text: 'ETFs sind <strong>Exchange Traded Funds</strong> - risikoärmer als Einzelaktien.<br><br>Kryptowährungen sind extrem volatil - hohe Gewinne, aber auch hohe Verluste!<br><br>Beides mit Klick auf die jeweilige Karte im Menü.' },
-        { title: 'Immobilien', text: 'Kaufe <strong>Immobilien</strong> in verschiedenen deutschen Städten. Du kannst sie renovieren, um den Wert und die Mieteinnahmen zu erhöhen.<br><br>Achtung: Beim Kauf fällt Grunderwerbsteuer an (je nach Bundesland 3,5-6,5%)!' },
-        { title: 'Unternehmen', text: 'Im Bereich <strong>Unternehmen</strong> kannst du deine eigene Firma gründen - Bank, Bekleidungsmarke, Tech-Startup, Restaurantkette und mehr!<br><br>Unternehmen generieren monatliche Gewinne, wenn sie profitabel laufen. Du kannst sie später auch wieder verkaufen.' },
-        { title: 'Shops & Garage', text: 'In den <strong>Shops</strong> kannst du in verschiedenen Läden kaufen: Auto-Haus, Yacht-Club, Jet-Port und Uhren-Boutique.<br><br>In deiner <strong>Garage</strong> siehst du alle gekauften Güter. Du kannst sie dort jederzeit verkaufen - allerdings nur zum <strong>Gebrauchtpreis</strong> (ca. 60% des Werts).<br><br>⚠️ Autos, Yachten und Flugzeuge verlieren an Wert! Uhren können im Wert steigen.' },
-        { title: 'Reichtumsliste', text: 'Die <strong>Reichtumsliste</strong> zeigt die reichsten Menschen in Deutschland. Versuche, es in die Top 3 zu schaffen!<br><br>Dein Rang wird automatisch aus deinem gesamten Vermögen berechnet.' },
-        { title: 'Steuern', text: 'In Deutschland musst du <strong>Steuern</strong> zahlen:<br><br>• Abgeltungssteuer (26,375%) wird automatisch bei Verkaufsgewinnen einbehalten<br>• Mieteinnahmen werden monatlich automatisch versteuert<br>• Grunderwerbsteuer beim Immobilienkauf<br>• Grundsteuer läuft als offene Steuerschuld<br><br>⚠️ Bezahle deine offene Steuerschuld fristgerecht! Verspätungszuschlag: 1% pro Monat.' },
-        { title: 'Echtzeit', text: 'Das Spiel läuft <strong>in Echtzeit</strong>: Jede Echtzeit-Sekunde = 1 Spieltag, Kurse und Vermögen aktualisieren sich live. Ein Punkt grün = <strong>LIVE</strong>.<br><br>Mit der <strong>Pause-Taste</strong> kannst du bei Bedarf anhalten (z. B. zum Investieren), mit <strong>Play</strong> läuft alles wieder in Echtzeit weiter. Speichern mit 💾-Button.' },
-        { title: 'Nachrichten', text: '<strong>Nachrichten</strong> beeinflussen die Kurse! Halte Augen und Ohren offen für Marktereignisse, Zinsänderungen und Unternehmensmeldungen.<br><br>Viel Erfolg beim Investieren! 📈' }
+        { icon: '🚀', title: 'Willkommen bei InvestSim!', text: 'Du startest mit <strong>€10.000</strong> Startguthaben. Dein Ziel: Aus diesem kleinen Budget ein echtes Vermögen aufzubauen – wie ein echter Investor mit echten Entscheidungen, Risiken und <strong>Steuern</strong>.<br><br>💡 <strong>Tipp:</strong> Das Spiel läuft in Echtzeit weiter, während du dich umschaust. Du kannst mit ⏸ pausieren.' },
+        { icon: '📊', title: 'Dashboard', text: 'Hier siehst du deine <strong>Gesamtperformance</strong>: verfügbares Guthaben, Portfoliowert und Gewinne. Der <strong>Chart</strong> zeigt den Verlauf deines Vermögens.<br><br>💡 <strong>Tipp:</strong> Je grüner dein Verlauf, desto besser – aber auch Verluste lehren dich, worin du besser nicht investierst.' },
+        { icon: '📈', title: 'Aktienmarkt', text: 'Der <strong>Aktienmarkt</strong> bietet <strong>20 Aktien</strong> – von deutschen Klassikern wie SAP und BMW bis zu US-Tech-Werten wie Apple und NVIDIA.<br><br>Klicke auf eine Aktie, um den Kursverlauf zu sehen und über den <strong>Buy/Sell-Slider</strong> zu kaufen oder verkaufen.<br><br>💡 <strong>Tipp:</strong> Kaufe günstig ein und verkaufe nicht sofort beim ersten Kursrutsch – Kurse schwanken täglich.' },
+        { icon: '🌊', title: 'ETFs & Krypto', text: '<strong>ETFs</strong> streuen dein Risiko über viele Werte – ideal für Anfänger, die Ruhe bewahren wollen.<br><br><strong>Kryptowährungen</strong> (Bitcoin, Ethereum, …) sind gnadenlos volatil: 💎 hohe Gewinne, aber auch harte Verluste.<br><br>💡 <strong>Tipp:</strong> Eine Mischung aus ETFs (stabil) und einem kleinen Krypto-Anteil (Chance) ist eine solide Strategie.' },
+        { icon: '🏠', title: 'Immobilien', text: 'Kaufe <strong>Immobilien</strong> in verschiedenen deutschen Städten – jede Stadt hat ihre eigenen <strong>Preise und Mieten</strong>.<br><br>Du kannst Objekte <strong>renovieren</strong> und so Wert &amp; Miete steigern.<br><br>💡 <strong>Tipp:</strong> Achte auf die <strong>Grunderwerbsteuer</strong>: 3,5% bis 6,5% je nach Bundesland – die zahlt beim Kauf sofort mit. Mieteinnahmen werden monatlich versteuert.' },
+        { icon: '🏢', title: 'Unternehmen', text: 'Gründe dein eigenes <strong>Unternehmen</strong> – von der Bank über eine Bekleidungsmarke bis zum Tech-Startup und zur Restaurantkette.<br><br>Unternehmen generieren <strong>monatliche Gewinne</strong>, wenn sie laufen – und du kannst sie später wieder verkaufen.<br><br>💡 <strong>Tipp:</strong> Größere Unternehmen kosten mehr, zahlen aber auch stabiler aus.' },
+        { icon: '🛍️', title: 'Shops & Garage', text: 'In den <strong>Shops</strong> kaufst du Lifestyle-Güter: Auto-Haus, Yacht-Club, Jet-Port und Uhren-Boutique.<br><br>In der <strong>Garage</strong> kannst du sie jederzeit wieder verkaufen – aber nur zum <strong>Gebrauchtpreis</strong> (ca. 60%).<br><br>⚠️ <strong>Wichtig:</strong> Autos, Yachten und Jets verlieren an Wert. Uhren können sogar im Wert steigen!' },
+        { icon: '🎰', title: 'Casino, aber clever', text: 'Im <strong>Casino</strong> kannst du mit deinem Geld spielen: Roulette (auch Zahlen, 35:1), <strong>Blackjack 21</strong>, Spielautomat und Münzwurf.<br><br>⚠️ <strong>Tipp:</strong> Der Hausvorteil ist immer auf Seiten des Casinos. Spiele nur mit Geld, das du verschmerzen kannst – echte Vermögen entstehen an den Märkten, nicht am Spieltisch.' },
+        { icon: '🏆', title: 'Reichtumsliste', text: 'Die <strong>Reichtumsliste</strong> zeigt die reichsten Menschen Deutschlands.<br><br>Dein Rang berechnet sich automatisch aus deinem <strong>gesamten Vermögen</strong> (Guthaben + Portfoliowert).<br><br>💡 <strong>Ziel:</strong> Schaff es in die Top 3 – dann bist du offiziell ein InvestSim-Vermögen.' },
+        { icon: '🧾', title: 'Steuern leicht erklärt', text: 'In Deutschland zahlt man <strong>Steuern</strong> – auch hier im Spiel:<br><br>• <strong>Kapitalertragsteuer (26,375%)</strong> wird automatisch bei Verkaufsgewinnen einbehalten wie im echten Depot<br>• <strong>Sparerpauschbetrag:</strong> die ersten <strong>1.000 € Gewinn pro Jahr sind steuerfrei</strong><br>• <strong>Verluste verrechnen</strong> sich mit Gewinnen – zu viel bezahlte Steuer wird sogar erstattet<br>• <strong>Mieteinnahmen</strong> &amp; <strong>Grunderwerbsteuer</strong> laufen automatisch<br><br>⚠️ Bezahle offene Steuerschulden <strong>fristgerecht</strong> – sonst gibt es 1% Verspätungszuschlag pro Monat.' },
+        { icon: '⏱️', title: 'Echtzeit & Speichern', text: 'Das Spiel läuft <strong>in Echtzeit</strong>: 1 echte Sekunde = 1 Spieltag. Der grüne Punkt heißt <strong>LIVE</strong>.<br><br>• ⏸ <strong>Pause</strong> zum entspannten Investieren<br>• ▶ <strong>Play</strong> lässt die Zeit weiterlaufen<br>• 💾 <strong>Speichern</strong> jederzeit möglich – unterwegs wird automatisch gespeichert' },
+        { icon: '📰', title: 'Nachrichten & Start', text: '<strong>Marktnachrichten</strong> beeinflussen die Kurse live – Zinsänderungen, Unternehmensmeldungen, Crashs.<br><br>Halte die Ohren offen, dann investierst du zur richtigen Zeit am richtigen Ort.<br><br>🚀 <strong>Viel Erfolg! Du bist bereit.</strong>' }
     ],
 
     init() {
@@ -121,6 +122,8 @@ const UI = {
                 location.reload();
             }
         });
+        const tutorialBtn = document.getElementById('settings-tutorial');
+        if (tutorialBtn) tutorialBtn.addEventListener('click', () => this.restartTutorial());
     },
 
     bindCheatCode() {
@@ -213,6 +216,7 @@ const UI = {
         const overlay = document.getElementById('tutorial-overlay');
         const skipBtn = document.getElementById('tutorial-skip');
         const nextBtn = document.getElementById('tutorial-next');
+        const prevBtn = document.getElementById('tutorial-prev');
 
         if (GameState.tutorialDone) {
             overlay.classList.add('hidden');
@@ -224,31 +228,57 @@ const UI = {
         nextBtn.addEventListener('click', () => {
             this.tutorialStep++;
             if (this.tutorialStep >= this.tutorialSteps.length) {
-                overlay.classList.add('hidden');
-                GameState.tutorialDone = true;
-                GameState.paused = true;
-                RealEstate.syncState();
-                GameState.save();
+                this.finishTutorial();
                 return;
             }
             this.showTutorialStep(this.tutorialStep);
         });
 
-        skipBtn.addEventListener('click', () => {
-            overlay.classList.add('hidden');
-            GameState.tutorialDone = true;
-            GameState.paused = true;
-            RealEstate.syncState();
-            GameState.save();
+        prevBtn.addEventListener('click', () => {
+            if (this.tutorialStep <= 0) return;
+            this.tutorialStep--;
+            this.showTutorialStep(this.tutorialStep);
         });
+
+        skipBtn.addEventListener('click', () => {
+            this.finishTutorial();
+        });
+    },
+
+    finishTutorial() {
+        document.getElementById('tutorial-overlay').classList.add('hidden');
+        GameState.tutorialDone = true;
+        GameState.paused = true;
+        RealEstate.syncState();
+        GameState.save();
+    },
+
+    restartTutorial() {
+        GameState.tutorialDone = false;
+        this.tutorialStep = 0;
+        GameState.paused = true;
+        document.getElementById('tutorial-overlay').classList.remove('hidden');
+        this.showTutorialStep(0);
+        GameState.save();
+        this.showToast('Tutorial neu gestartet! 🚀', '🚀');
     },
 
     showTutorialStep(step) {
         const s = this.tutorialSteps[step];
+        document.getElementById('tutorial-icon').textContent = s.icon;
         document.getElementById('tutorial-title').textContent = s.title;
         document.getElementById('tutorial-text').innerHTML = s.text;
         const progress = ((step + 1) / this.tutorialSteps.length) * 100;
         document.getElementById('tutorial-progress-bar').style.width = progress + '%';
+        document.getElementById('tutorial-count').textContent =
+            `Schritt ${step + 1} von ${this.tutorialSteps.length}`;
+        const dots = document.getElementById('tutorial-dots');
+        dots.innerHTML = this.tutorialSteps.map((t, i) =>
+            `<span class="tutorial-dot ${i === step ? 'active' : ''}${i < step ? ' done' : ''}" title="${t.title}"></span>`
+        ).join('');
+        document.getElementById('tutorial-prev').disabled = step === 0;
+        const nextBtn = document.getElementById('tutorial-next');
+        nextBtn.textContent = step === this.tutorialSteps.length - 1 ? 'Loslegen! 🚀' : 'Weiter ▶';
     },
 
     updateAll() {
