@@ -1,5 +1,5 @@
 /* InvestSim – Service Worker: App-Cache & Offline */
-const VERSION = 'investsim-v3';
+const VERSION = 'investsim-v4';
 
 const CORE = [
   './',
