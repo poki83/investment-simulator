@@ -19,7 +19,7 @@ const Game = {
         Luxury.init();
         Leaderboard.init();
         Casino.init();
-        Oracle.ensureState();
+        Learn.ensureState();
         Events.init();
 
         if (loaded) {
@@ -60,7 +60,7 @@ const Game = {
             const prevWeek = GameState.week;
             GameState.advanceDay();
             if (GameState.week !== prevWeek) {
-                Oracle.weekEnded();
+                Learn.newWeek();
             }
             if (GameState.isWeekday()) {
                 StockMarket.update();
@@ -110,10 +110,7 @@ const Game = {
         GameState.advanceDay();
 
         if (GameState.week !== prevWeek) {
-            const oracleEvent = Oracle.weekEnded();
-            if (oracleEvent) {
-                UI.showOracleToast ? UI.showOracleToast(oracleEvent) : null;
-            }
+            Learn.newWeek();
         }
 
         const nowMinute = Math.floor(Date.now() / 60000);

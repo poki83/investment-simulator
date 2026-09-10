@@ -25,7 +25,6 @@ const Taxes = {
             t.capitalTaxPaid = 0;
             t.rentNet = 0;
             t.rentTaxPaid = 0;
-            t.oracleFreibetrag = 0;
             t.taxYear = GameState.year;
         }
     },
@@ -39,7 +38,7 @@ const Taxes = {
 
     /* Jahresziel-Steuer auf den Netto-Kapitalertrag (nach Sparerpauschbetrag). */
     capitalTarget(net) {
-        const pausch = this.PAUSCHBETRAG + (GameState.taxes.oracleFreibetrag || 0);
+        const pausch = this.PAUSCHBETRAG;
         const taxable = Math.max(0, net - pausch);
         const t = this.calculateCapitalGainsTax(taxable);
         return { target: t.total, taxable: this.round2(taxable) };
@@ -200,7 +199,7 @@ const Taxes = {
     getSummary() {
         this.rollTaxYear();
         const t = GameState.taxes;
-        const pausch = this.PAUSCHBETRAG + (t.oracleFreibetrag || 0);
+        const pausch = this.PAUSCHBETRAG;
         const freibetragUsed = Math.min(pausch, Math.max(0, this.round2(t.capitalNet)));
         return {
             unpaid: Math.round(t.unpaid * 100) / 100,

@@ -128,9 +128,9 @@
                 <span class="nav-icon">🏆</span>
                 <span class="nav-label">Reichtum</span>
             </button>
-            <button class="nav-btn" data-page="oracle">
-                <span class="nav-icon">🔮</span>
-                <span class="nav-label">Orakel</span>
+            <button class="nav-btn" data-page="learn">
+                <span class="nav-icon">🎓</span>
+                <span class="nav-label">Marktschule</span>
             </button>
             <button class="nav-btn" data-page="taxes">
                 <span class="nav-icon">📋</span>
@@ -146,6 +146,11 @@
         <main class="main-content">
             <!-- Dashboard Seite -->
             <div id="page-dashboard" class="page active">
+                <a class="learn-banner" href="#" onclick="event.preventDefault(); return UI.navigateTo('learn')">
+                    <span class="learn-banner-ic">🎓</span>
+                    <span class="learn-banner-text"><b>Marktschule</b> · Lerne Börse spielend – Lektionen, Quiz &amp; Wissens-Ränge</span>
+                    <span class="learn-banner-go">›</span>
+                </a>
                 <div class="dashboard-hero card">
                     <div class="hero-main">
                         <div class="hero-label">Gesamtvermögen</div>
@@ -727,73 +732,66 @@
                 </div>
             </div>
 
-            <!-- Markt-Orakel Q -->
-            <div id="page-oracle" class="page">
-                <div class="page-header">
-                    <h2>🔮 Markt-Orakel Q</h2>
-                    <div class="filter-bar">
-                        <span class="casino-cash-box">Signal: <strong id="oracle-status">Bereit</strong></span>
-                    </div>
-                </div>
-
-                <div class="card oracle-holo">
-                    <div class="oracle-orb" id="oracle-orb">Q</div>
-                    <div class="oracle-holo-text">
-                        <p class="oracle-greeting">„Ich durchdringe jeden Kurs, jedes Gerücht, jede Welle des Marktes."</p>
-                        <p class="oracle-brief" id="oracle-brief">Einmal pro Woche stellt Q dir eine Kurs-Prognose. Läuft der Markt in deine Richtung, löst Q wie von Geisterhand einen 7-Tage-Boost aus. Liegst du daneben, zahlt der Markt heim.</p>
-                    </div>
-                </div>
-
-                <div class="card oracle-question-card" id="oracle-question-card">
-                    <h3 id="oracle-question-title">Q denkt nach …</h3>
-                    <p class="oracle-question-text" id="oracle-question-text"></p>
-                    <div class="oracle-price-line" id="oracle-price-line"></div>
-                    <div class="oracle-actions" id="oracle-actions"></div>
-                    <p class="oracle-locked" id="oracle-locked" style="display:none"></p>
-                </div>
-
-                <div class="card oracle-effect" id="oracle-effect" style="display:none"></div>
-
-                <div class="oracle-stats">
-                    <div class="card mini-stat">
-                        <span class="mini-label">Prognosen</span>
-                        <span class="mini-value" id="oracle-total">0</span>
-                    </div>
-                    <div class="card mini-stat">
-                        <span class="mini-label">Richtig</span>
-                        <span class="mini-value" id="oracle-correct">0</span>
-                    </div>
-                    <div class="card mini-stat">
-                        <span class="mini-label">Quote</span>
-                        <span class="mini-value" id="oracle-quote">–</span>
-                    </div>
-                    <div class="card mini-stat">
-                        <span class="mini-label">Serie</span>
-                        <span class="mini-value" id="oracle-streak">0</span>
-                    </div>
-                    <div class="card mini-stat">
-                        <span class="mini-label">Beste Serie</span>
-                        <span class="mini-value" id="oracle-best">0</span>
-                    </div>
-                </div>
-
-                <div class="card oracle-prestige">
-                    <div class="oracle-prestige-head">
-                        <span class="oracle-prestige-emoji" id="oracle-title-emoji">❓</span>
-                        <div>
-                            <div class="oracle-prestige-title" id="oracle-title">Unbekanntes Signal</div>
-                            <div class="oracle-prestige-sub" id="oracle-title-progress">Richtige Prognosen: 0</div>
+            <!-- Marktschule (Börsenwissen) -->
+            <div id="page-learn" class="page">
+                <div id="learn-overview">
+                    <div class="page-header">
+                        <h2>🎓 Marktschule</h2>
+                        <div class="filter-bar">
+                            <span class="casino-cash-box">Wissen: <strong id="learn-xp">0</strong> XP</span>
                         </div>
                     </div>
-                    <div class="oracle-prestige-bar"><div id="oracle-prestige-fill"></div></div>
-                </div>
 
-                <div class="card oracle-history">
-                    <h3>📜 Prognose-Chronik</h3>
-                    <div id="oracle-history-list" class="oracle-history-list">
-                        <div class="oracle-empty">Noch keine Prognosen abgegeben – Q wartet auf dich.</div>
+                    <div class="card learn-rank">
+                        <div class="learn-rank-head">
+                            <span class="learn-rank-emoji" id="learn-rank-emoji">🌱</span>
+                            <div>
+                                <div class="learn-rank-title" id="learn-rank-title">Finanz-Neuling</div>
+                                <div class="learn-rank-sub" id="learn-rank-sub"></div>
+                            </div>
+                        </div>
+                        <div class="progress learn-rank-bar"><div id="learn-rank-fill"></div></div>
+                    </div>
+
+                    <div class="card learn-weekly">
+                        <h3 id="learn-weekly-title">Frage der Woche</h3>
+                        <p class="learn-weekly-text" id="learn-weekly-text"></p>
+                        <div class="learn-options" id="learn-weekly-options"></div>
+                        <p class="learn-weekly-done" id="learn-weekly-done" style="display:none"></p>
+                    </div>
+
+                    <div class="learn-stats">
+                        <div class="card mini-stat">
+                            <span class="mini-label">Richtig</span>
+                            <span class="mini-value" id="learn-correct">0</span>
+                        </div>
+                        <div class="card mini-stat">
+                            <span class="mini-label">Falsch</span>
+                            <span class="mini-value" id="learn-wrong">0</span>
+                        </div>
+                        <div class="card mini-stat">
+                            <span class="mini-label">Serie</span>
+                            <span class="mini-value" id="learn-streak">0</span>
+                        </div>
+                        <div class="card mini-stat">
+                            <span class="mini-label">Lektionen</span>
+                            <span class="mini-value" id="learn-lessons">0 / 6</span>
+                        </div>
+                        <div class="card mini-stat">
+                            <span class="mini-label">Fragen</span>
+                            <span class="mini-value" id="learn-questions">0 / 18</span>
+                        </div>
+                    </div>
+
+                    <div class="learn-modules-grid" id="learn-modules-grid"></div>
+
+                    <div class="card learn-glossary-card">
+                        <h3>📖 Glossar – Börsenbegriffe einfach erklärt</h3>
+                        <div class="learn-glossary" id="learn-glossary"></div>
                     </div>
                 </div>
+
+                <div id="learn-question-view" style="display:none"></div>
             </div>
 
             <!-- Reichsten Menschen -->
@@ -849,6 +847,10 @@
                 <div class="setting-group">
                     <button id="settings-tutorial" class="btn btn-secondary btn-block">Tutorial neu starten</button>
                 </div>
+                <div class="setting-group">
+                    <a href="pitch/" class="btn btn-secondary btn-block" style="text-align:center;text-decoration:none;">🎤 Projekt-Pitch ansehen</a>
+                    <small style="color:var(--text-muted);font-size:0.75rem;margin-top:4px;display:block;">InvestSim ist ein Schulprojekt – die Vorstellung der App findest du hier.</small>
+                </div>
             </div>
         </div>
     </div>
@@ -902,7 +904,7 @@
     <script src="js/luxury.js"></script>
     <script src="js/leaderboard.js"></script>
     <script src="js/casino.js"></script>
-    <script src="js/oracle.js"></script>
+    <script src="js/learn.js"></script>
     <script src="js/taxes.js"></script>
     <script src="js/events.js"></script>
     <script src="js/charts.js"></script>

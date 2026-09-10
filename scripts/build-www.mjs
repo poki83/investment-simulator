@@ -7,7 +7,7 @@ rmSync(www, { recursive: true, force: true });
 mkdirSync(www, { recursive: true });
 
 const FILES = ['index.html', 'manifest.json', 'sw.js'];
-const DIRS = ['css', 'js', 'icons'];
+const DIRS = ['css', 'js', 'icons', 'pitch'];
 
 for (const f of FILES) {
     const src = join(root, f);
@@ -19,4 +19,4 @@ for (const d of DIRS) {
     if (!existsSync(src)) throw new Error('Fehlt: ' + d);
     cpSync(src, join(www, d), { recursive: true });
 }
-console.log('www/ wurde erzeugt (index.html, css, js, icons, manifest, sw.js)');
+console.log('www/ wurde erzeugt (index.html, css, js, icons, manifest, sw.js, pitch)');

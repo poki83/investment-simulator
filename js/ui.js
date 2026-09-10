@@ -3,6 +3,7 @@ const UI = {
     detailOpen: null,
     tradeAction: 'buy',
     tutorialStep: 0,
+    learnOpenModule: null,
     portfolioFilter: 'all',
 
     tutorialSteps: [
@@ -33,7 +34,7 @@ const UI = {
         this.bindSellModal();
         this.bindPortfolio();
         this.bindCasino();
-        this.bindOracle();
+        this.bindLearn();
         this.updateAll();
     },
 
@@ -299,7 +300,7 @@ const UI = {
         this.updateTaxes();
         this.updateNewsList();
         this.updateCasino();
-        if (this.currentPage === 'oracle') this.renderOracle();
+        this.updateLearn();
         this.updateDate();
         this.updateSpeedDisplay();
         if (this.detailOpen && ['stock', 'etf', 'crypto'].indexOf(this.detailOpen.type) !== -1) {
@@ -320,7 +321,7 @@ const UI = {
             case 'garage': this.updateGarage(); break;
             case 'casino': this.updateCasino(); break;
             case 'leaderboard': this.updateLeaderboard(); break;
-            case 'oracle': this.renderOracle(); break;
+            case 'learn': this.renderLearn(); break;
             case 'taxes': this.updateTaxes(); break;
             case 'news': this.updateNewsList(); break;
         }
@@ -1929,6 +1930,14 @@ const UI = {
         GameState.save();
     },
 
+    updateLearn() {
+        const isLessonView = document.getElementById('learn-question-view') &&
+            document.getElementById('learn-question-view').style.display !== 'none';
+        if (this.currentPage === 'learn' && !isLessonView) {
+            this.renderLearn();
+        }
+    },
+
     updateCasino() {
         const stats = GameState.casinoStats || { net: 0, wagered: 0, wins: 0, losses: 0, streak: 0, maxStreak: 0 };
         document.getElementById('casino-cash').textContent = '€' + this.fmt(GameState.cash);
@@ -2063,153 +2072,203 @@ const UI = {
         setTimeout(() => el.classList.remove('cash-flash'), 700);
     },
 
-    /* --- Markt-Orakel Q ------------------------------------- */
-    bindOracle() {
+    /* --- Marktschule / Börsenwissen ------------------------ */
+    bindLearn() {
         document.addEventListener('click', (e) => {
-            const btn = e.target.closest('[data-oracle-predict]');
-            if (!btn) return;
-            if (!this.canAct()) return;
-            const ok = Oracle.answer(btn.dataset.oraclePredict);
-            if (ok) {
-                this.renderOracle();
-                GameState.save();
-                this.showToast('🔮 Q hat deine Prognose aufgenommen.', '🔮');
+            const weekBtn = e.target.closest('[data-learn-weekly]');
+            if (weekBtn) {
+                const res = Learn.answerWeekly(parseInt(weekBtn.dataset.learnWeekly, 10));
+                this.afterLearnAnswer(res, weekBtn);
+                return;
+            }
+            const ansBtn = e.target.closest('[data-learn-answer]');
+            if (ansBtn) {
+                const qIdx = parseInt(ansBtn.dataset.learnAnswer, 10);
+                const mId = ansBtn.dataset.learnModule;
+                const pick = parseInt(ansBtn.dataset.learnPick, 10);
+                const res = Learn.answerLesson(mId, qIdx, pick);
+                this.afterLearnAnswer(res, ansBtn);
+                return;
+            }
+            const openBtn = e.target.closest('[data-learn-open]');
+            if (openBtn) {
+                this.learnOpenModule = openBtn.dataset.learnOpen;
+                this.renderLearnQuestions();
+                document.getElementById('page-learn').scrollTop = 0;
+                return;
+            }
+            const backBtn = e.target.closest('[data-learn-back]');
+            if (backBtn) {
+                this.learnOpenModule = null;
+                this.renderLearn();
             }
         });
     },
 
-    renderOracle() {
-        const o = Oracle.ensureState();
-        const q = o.question;
-
-        const statusEl = document.getElementById('oracle-status');
-        if (!statusEl) return;
-
-        /* Status */
-        if (o.locked) {
-            statusEl.textContent = '📨 Antwort registriert';
-            statusEl.style.color = '#ffd166';
-        } else if (q) {
-            statusEl.textContent = '● Offene Frage';
-            statusEl.style.color = '#2fb96a';
+    afterLearnAnswer(res, btn) {
+        if (!res) return;
+        const correct = res.correct;
+        if (correct) {
+            btn.classList.add('learn-option-correct');
+            this.showToast(`✔ Richtig! +${res.xp} WissensPunkte`, '🎓');
         } else {
-            statusEl.textContent = '● Bereit';
-            statusEl.style.color = '#2fb96a';
+            btn.classList.add('learn-option-wrong');
+            this.showToast(`✘ Leider falsch. ${res.explanation}`, '📖');
         }
-
-        /* Fragekarte */
-        const titleEl = document.getElementById('oracle-question-title');
-        if (q) {
-            const now = Oracle.currentPrice(q);
-            titleEl.textContent = `${q.name} (${q.symbol})`;
-            document.getElementById('oracle-question-text').innerHTML = Oracle.questionText(q);
-            document.getElementById('oracle-price-line').innerHTML =
-                `<span class="oracle-price-tag">Bei Frage: €${this.fmtPrice(q.price)}</span>` +
-                `<span class="oracle-price-tag ${now >= q.price ? 'positive' : 'negative'}">Aktuell: €${this.fmtPrice(now)} ${now >= q.price ? '▲' : '▼'}</span>`;
-            const actions = document.getElementById('oracle-actions');
-            if (o.locked) {
-                actions.style.display = 'none';
-                const lockedEl = document.getElementById('oracle-locked');
-                lockedEl.style.display = '';
-                const predLabel = o.predict === 'up' ? '📈 wird steigen' : o.predict === 'down' ? '📉 wird fallen' : '🚫 nicht wetten';
-                lockedEl.innerHTML = `Deine Prognose ist versiegelt: <strong>${predLabel}</strong>.<br><small>Die Auflösung erfolgt automatisch am Wochenende.</small>`;
-            } else {
-                actions.style.display = '';
-                document.getElementById('oracle-locked').style.display = 'none';
-                actions.innerHTML = `
-                    <button class="btn btn-success" data-oracle-predict="up">📈 Steigt</button>
-                    <button class="btn btn-danger" data-oracle-predict="down">📉 Fällt</button>
-                    <button class="btn btn-secondary" data-oracle-predict="pass">🚫 Passen</button>`;
+        const isLesson = btn.dataset.learnAnswer !== undefined && btn.dataset.learnModule !== undefined;
+        if (isLesson) {
+            const progress = {
+                idx: parseInt(btn.dataset.learnAnswer, 10),
+                correct,
+                pick: parseInt(btn.dataset.learnPick, 10)
+            };
+            const container = document.getElementById('learn-question-view');
+            if (container) {
+                this.renderLearnQuestions(progress);
+                const solved = document.querySelectorAll('.learn-question-solved');
+                if (solved.length < 3) {
+                    const cards = container.querySelectorAll('.card.learn-question');
+                    if (cards[progress.idx]) cards[progress.idx].scrollIntoView({ behavior: 'smooth', block: 'center' });
+                }
             }
         } else {
-            titleEl.textContent = 'Q scannt die Märkte …';
-            document.getElementById('oracle-question-text').innerHTML = 'Die nächste Kurs-Prognose erscheint automatisch mit dem Wochenende.';
-            document.getElementById('oracle-price-line').innerHTML = '';
-            document.getElementById('oracle-actions').style.display = 'none';
-            document.getElementById('oracle-locked').style.display = 'none';
+            this.renderLearn();
         }
-
-        /* Aktiver Boost / Strafe */
-        const effEl = document.getElementById('oracle-effect');
-        if (o.buff || o.penalty) {
-            effEl.style.display = '';
-            let html = '<div class="oracle-effect-tag">';
-            if (o.buff) {
-                const b = o.buff;
-                const txt = b.type === 'steuer'
-                    ? `🧾 Orakel-Steuerbonus: +${Oracle.STEUER_BOOST} € Sparerpauschbetrag`
-                    : `🚀 ${b.type === 'krypto' ? 'Krypto-Rally' : b.type === 'etf' ? 'ETF-Boom' : 'Aktien-Rally'}: +${(Oracle.RATES.boost[b.type] * 100)} % auf dieses Segment`;
-                html += `<div class="oracle-buff">${txt} <small>(wirkt bis Ende Woche ${b.untilWeek})</small></div>`;
-            }
-            if (o.penalty) {
-                const p = o.penalty;
-                const txt = `⚡ ${p.type === 'krypto' ? 'Krypto' : p.type === 'etf' ? 'ETF' : 'Aktien'}-Korrektur: −${(Oracle.RATES.penalty * 100)} % in dieser Woche`;
-                html += `<div class="oracle-penalty">${txt} <small>(bis Ende Woche ${p.untilWeek})</small></div>`;
-            }
-            effEl.innerHTML = html + '</div>';
-        } else {
-            effEl.style.display = 'none';
-        }
-
-        /* Statistiken */
-        const total = o.correct + o.wrong;
-        document.getElementById('oracle-total').textContent = total;
-        document.getElementById('oracle-correct').textContent = o.correct;
-        document.getElementById('oracle-quote').textContent = total > 0
-            ? Math.round((o.correct / total) * 100) + ' %'
-            : '–';
-        document.getElementById('oracle-streak').textContent = o.streak > 1 ? '🔥 ' + o.streak : o.streak;
-        document.getElementById('oracle-best').textContent = o.bestStreak;
-
-        /* Prestige */
-        const title = Oracle.title();
-        document.getElementById('oracle-title-emoji').textContent = title.emoji;
-        document.getElementById('oracle-title').textContent = `${title.emoji} ${title.title}`;
-        const idx = Oracle.TITLES.findIndex(t => t.title === title.title);
-        const next = idx > 0 ? Oracle.TITLES[idx - 1] : null;
-        const subEl = document.getElementById('oracle-title-progress');
-        if (next) {
-            const need = next.min;
-            subEl.textContent = `Richtige Prognosen: ${o.correct} · Nächster Rang: ${next.emoji} ${next.title} (ab ${need})`;
-            document.getElementById('oracle-prestige-fill').style.width = Math.min(100, Math.round((o.correct / need) * 100)) + '%';
-        } else {
-            subEl.textContent = `Richtige Prognosen: ${o.correct} · Höchster Rang erreicht!`;
-            document.getElementById('oracle-prestige-fill').style.width = '100%';
-        }
-
-        /* Chronik */
-        const listEl = document.getElementById('oracle-history-list');
-        if (!o.history.length) {
-            listEl.innerHTML = '<div class="oracle-empty">Noch keine Prognosen abgegeben – Q wartet auf dich.</div>';
-        } else {
-            listEl.innerHTML = o.history.map(h => {
-                const icon = h.outcome === 'correct' ? '✔' : h.outcome === 'wrong' ? '✘' : h.outcome === 'pass' ? '—' : '⊙';
-                const cls = h.outcome === 'correct' ? 'oracle-row-ok' : h.outcome === 'wrong' ? 'oracle-row-no' : 'oracle-row-mid';
-                const pred = h.prediction === 'up' ? '📈 steigt' : h.prediction === 'down' ? '📉 fällt' : h.prediction === 'pass' ? 'gepasst' : 'unbeantwortet';
-                return `<div class="oracle-row ${cls}">
-                    <span class="oracle-row-week">W${h.week}</span>
-                    <span class="oracle-row-asset">${h.name} <small>${h.symbol}</small></span>
-                    <span class="oracle-row-swing ${h.endPrice >= h.price ? 'positive' : 'negative'}">${h.endPrice >= h.price ? '+' : ''}${((h.endPrice - h.price) / h.price * 100).toFixed(2)} %</span>
-                    <span class="oracle-row-pred">${pred}</span>
-                    <span class="oracle-row-outcome ${cls}">${icon} ${Oracle.outcomeLabel(h.outcome)}</span>
-                </div>`;
-            }).join('');
-        }
+        GameState.save();
     },
 
-    showOracleToast(event) {
-        if (!event || !event.q) return;
-        const q = event.q;
-        const move = ((q.moved !== undefined ? q.moved : 0)).toFixed(2) + '%';
-        if (event.type === 'correct') {
-            this.showToast(`🔮 Q: Richtig! ${q.name} ${q.side === 'up' ? 'stieg' : 'fiel'} (${move}) – Boost aktiv!`, '🔮');
-        } else if (event.type === 'wrong') {
-            this.showToast(`🔮 Q: Falsch getippt – ${q.seg === 'krypto' ? 'Krypto' : q.seg === 'etf' ? 'ETF' : 'Aktien'}-Korrektur trifft dich.`, '⚡');
-        } else if (event.type === 'pass') {
-            this.showToast(`🔮 Q: Du hast gepasst – der Markt zieht seine Bahn.`, '🔮');
+    renderLearn() {
+        const l = Learn.ensureState();
+        const rank = Learn.rank();
+
+        const overview = document.getElementById('learn-overview');
+        if (overview) overview.style.display = '';
+        const questionView = document.getElementById('learn-question-view');
+        if (questionView) { questionView.style.display = 'none'; questionView.innerHTML = ''; }
+
+        const xpEl = document.getElementById('learn-xp');
+        if (!xpEl) return;
+
+        xpEl.textContent = l.xp;
+        document.getElementById('learn-rank-emoji').textContent = rank.emoji;
+        document.getElementById('learn-rank-title').textContent = rank.title;
+        const idx = Learn.RANKS.findIndex(r => r.title === rank.title);
+        const next = idx < Learn.RANKS.length - 1 ? Learn.RANKS[idx + 1] : null;
+        const subEl = document.getElementById('learn-rank-sub');
+        if (next) {
+            subEl.textContent = `Nächster Rang: ${next.emoji} ${next.title} (ab ${next.min} XP)`;
+            document.getElementById('learn-rank-fill').style.width = Math.min(100, Math.round((l.xp / next.min) * 100)) + '%';
         } else {
-            this.showToast(`🔮 Q: Frage unbeantwortet – keine Wirkung.`, '🔮');
+            subEl.textContent = 'Höchster Wissens-Rang erreicht!';
+            document.getElementById('learn-rank-fill').style.width = '100%';
         }
+
+        /* Frage der Woche */
+        const wq = l.weekly;
+        const wkCard = document.getElementById('learn-weekly');
+        const wkTitle = document.getElementById('learn-weekly-title');
+        const wkText = document.getElementById('learn-weekly-text');
+        const wkOptions = document.getElementById('learn-weekly-options');
+        const wkDone = document.getElementById('learn-weekly-done');
+
+        if (wq && wq.question && !l.weeklyAnswered) {
+            wkTitle.textContent = `Frage der Woche ${GameState.week}`;
+            wkText.textContent = wq.question;
+            wkOptions.style.display = '';
+            wkDone.style.display = 'none';
+            wkOptions.innerHTML = wq.options.map((opt, i) =>
+                `<button class="btn btn-secondary learn-option" data-learn-weekly="${i}">${opt}</button>`
+            ).join('');
+        } else {
+            wkTitle.textContent = 'Frage der Woche – beantwortet ✔';
+            wkText.innerHTML = wq && wq.question ? `Deine Antwort war: <strong>${l.weeklyPick !== null ? wq.options[l.weeklyPick] : '–'}</strong> ${l.weeklyCorrect ? '· <span class="positive">richtig!</span>' : '· <span class="negative">falsch</span>'}` : 'Nächste Woche gibt es eine neue Frage.';
+            wkOptions.style.display = 'none';
+            wkDone.style.display = '';
+        }
+
+        /* Statistik */
+        document.getElementById('learn-correct').textContent = l.correct;
+        document.getElementById('learn-wrong').textContent = l.wrong;
+        document.getElementById('learn-streak').textContent = l.streak > 1 ? '🔥 ' + l.streak : l.streak;
+        document.getElementById('learn-lessons').textContent = l.lessonCompleted.length + ' / ' + Learn.MODULES.length;
+        document.getElementById('learn-questions').textContent = l.questionsAnswered + ' / ' + Learn.MODULES.reduce((s, m) => s + m.questions.length, 0);
+
+        /* Lektionen-Grid */
+        const grid = document.getElementById('learn-modules-grid');
+        if (grid) grid.innerHTML = Learn.MODULES.map(m => {
+            const answered = (l.answered[m.id] || []).filter(Boolean).length;
+            const total = m.questions.length;
+            const pct = Math.round((answered / total) * 100);
+            return `<div class="card learn-card">
+                <div class="learn-card-top">
+                    <span class="learn-card-emoji">${m.emoji}</span>
+                    <div class="learn-card-info">
+                        <span class="learn-card-cat">${m.cat}</span>
+                        <span class="learn-card-title">${m.title}</span>
+                    </div>
+                    <span class="learn-card-progress">${answered}/${total}</span>
+                </div>
+                <p class="learn-card-summary">${m.summary}</p>
+                <div class="progress learn-progress"><div style="width:${pct}%"></div></div>
+                ${answered === total
+                    ? `<span class="learn-badge-done">✔ Abgeschlossen</span>`
+                    : `<button class="btn btn-primary btn-block" data-learn-open="${m.id}">${answered > 0 ? 'Weiterlernen' : 'Lektion starten'} ›</button>`}
+            </div>`;
+        }).join('');
+
+        /* Glossar */
+        const gloss = document.getElementById('learn-glossary');
+        if (gloss) gloss.innerHTML = Learn.GLOSSARY.map(g =>
+            `<details class="learn-gloss-item"><summary><span class="learn-gloss-emoji">${g.emoji}</span> ${g.term}</summary><p>${g.text}</p></details>`
+        ).join('');
+    },
+
+    renderLearnQuestions(progress) {
+        const l = Learn.ensureState();
+        const m = Learn.MODULES.find(x => x.id === this.learnOpenModule);
+        if (!m) { this.learnOpenModule = null; this.renderLearn(); return; }
+        const qs = m.questions;
+        const answered = l.answered[m.id] || [];
+        const container = document.getElementById('learn-question-view');
+        if (!container) return;
+
+        const overview = document.getElementById('learn-overview');
+        if (overview) overview.style.display = 'none';
+        container.style.display = '';
+
+        container.innerHTML = `
+            <div class="page-header">
+                <h2>${m.emoji} ${m.title}</h2>
+                <button class="btn btn-secondary" data-learn-back>← Zurück</button>
+            </div>
+            <div class="card learn-lesson-theory">
+                <h3>Lernen</h3>
+                ${m.theory.split('\n').filter(p => p.trim()).map(p => `<p>${p}</p>`).join('')}
+                <div class="learn-knowledge">
+                    <strong>💡 Wusstest du schon?</strong>
+                    <p>${m.knowledge}</p>
+                </div>
+            </div>
+
+            ${qs.map((question, qi) => {
+                const solved = answered[qi];
+                return `<div class="card learn-question ${solved ? 'learn-question-solved' : ''}">
+                    <div class="learn-q-head">Frage ${qi + 1} / ${qs.length}${solved ? ' <span class="positive">✔ beantwortet</span>' : ''}</div>
+                    <div class="learn-q-text">${question.q}</div>
+                    <div class="learn-options">${question.options.map((opt, oi) => {
+                        let cls = 'learn-option';
+                        if (solved) {
+                            if (oi === question.correct) cls += ' learn-option-correct';
+                            else if (progress && progress.idx === qi && oi === progress.pick) cls += ' learn-option-wrong';
+                        } else if (progress && progress.idx === qi && oi === progress.pick) {
+                            cls += progress.correct ? ' learn-option-correct' : ' learn-option-wrong';
+                        }
+                        return `<button class="${cls}" ${solved ? 'disabled' : ''} data-learn-answer="${qi}" data-learn-module="${m.id}" data-learn-pick="${oi}">${opt}</button>`;
+                    }).join('')}</div>
+                    ${progress && progress.idx === qi && !progress.correct ? `<div class="learn-explanation">📖 ${question.explanation}</div>` : ''}
+                </div>`;
+            }).join('')}
+        `;
     },
 
     spinRoulette() {

@@ -1,5 +1,5 @@
 /* InvestSim – Service Worker: App-Cache & Offline */
-const VERSION = 'investsim-v2';
+const VERSION = 'investsim-v3';
 
 const CORE = [
   './',
@@ -21,6 +21,7 @@ const CORE = [
   './js/taxes.js',
   './js/charts.js',
   './js/casino.js',
+  './js/learn.js',
   './js/leaderboard.js',
   './js/storage.js',
   './js/main.js',
