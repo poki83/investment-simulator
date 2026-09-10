@@ -19,7 +19,6 @@ const Game = {
         Luxury.init();
         Leaderboard.init();
         Casino.init();
-        Underground.init();
         Events.init();
 
         if (loaded) {
@@ -72,8 +71,6 @@ const Game = {
                 this.lastProcessedMonth = GameState.month;
             }
             Taxes.processWeeklyTaxes();
-            Underground.processWeek();
-            Underground.checkRelease();
         }
         RealEstate.syncState();
         GameState.save();
@@ -133,14 +130,6 @@ const Game = {
         }
 
         Taxes.processWeeklyTaxes();
-
-        Underground.processWeek();
-        if (GameState.isInPrison()) {
-            if (Underground.checkRelease()) {
-                UI.showToast('Entlassen! ⚖️ Endlich wieder draußen.', '⚖️');
-                UI.prisonModalSeen = false;
-            }
-        }
 
         this.checkTaxNotification();
 

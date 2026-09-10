@@ -839,296 +839,6 @@ body {
     to   { opacity: 1; transform: translateY(0) scale(1); }
 }
 
-/* =========================================================
-   UNTERWELT (rein fiktiv)
-   ========================================================= */
-.section-heading {
-    margin: 22px 0 12px;
-    font-size: 0.82rem;
-    letter-spacing: 0.1em;
-    color: var(--text-muted);
-    font-weight: 700;
-}
-.page-subnote {
-    font-weight: 500;
-    font-size: 0.78rem;
-    color: var(--text-muted);
-    letter-spacing: 0.01em;
-}
-.ug-money {
-    color: #b8860b;
-    font-weight: 800;
-}
-.underground-stats {
-    display: grid;
-    grid-template-columns: repeat(4, 1fr);
-    gap: 12px;
-    margin-bottom: 14px;
-}
-@media (max-width: 768px) {
-    .underground-stats { grid-template-columns: repeat(2, 1fr); }
-}
-
-/* Fahndungsbalken */
-.heat-bar-card {
-    background: linear-gradient(180deg, #161b2e, #1d2340);
-    border-radius: 18px;
-    padding: 16px 18px;
-    margin-bottom: 16px;
-    color: #fff;
-    box-shadow: 0 12px 30px rgba(10, 14, 34, 0.35);
-}
-.heat-label {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    font-weight: 700;
-    font-size: 0.85rem;
-    letter-spacing: 0.04em;
-    margin-bottom: 10px;
-}
-.heat-label span:last-child {
-    color: rgba(255, 255, 255, 0.55);
-    font-weight: 600;
-}
-.heat-wrap {
-    height: 14px;
-    border-radius: 999px;
-    background: rgba(255, 255, 255, 0.12);
-    overflow: hidden;
-    box-shadow: inset 0 1px 3px rgba(0, 0, 0, 0.35);
-}
-.heat-bar {
-    height: 100%;
-    width: 0%;
-    border-radius: 999px;
-    background: linear-gradient(90deg, #2fb96a, #f4b740 60%, #e02e3a);
-    transition: width 0.4s ease;
-}
-.heat-bar-card.heat-wrap { }
-.heat-hint {
-    margin: 10px 0 0;
-    color: rgba(255, 255, 255, 0.55);
-    font-size: 0.78rem;
-    line-height: 1.5;
-}
-.heat-wrap.heat-warn { animation: heatWarn 1.4s ease-in-out infinite; }
-.heat-wrap.heat-danger { animation: heatDanger 0.9s ease-in-out infinite; }
-@keyframes heatWarn {
-    0%, 100% { box-shadow: inset 0 1px 3px rgba(0,0,0,.35), 0 0 0 0 rgba(244,183,64,.0); }
-    50% { box-shadow: inset 0 1px 3px rgba(0,0,0,.35), 0 0 14px 2px rgba(244,183,64,.45); }
-}
-@keyframes heatDanger {
-    0%, 100% { box-shadow: inset 0 1px 3px rgba(0,0,0,.35), 0 0 0 0 rgba(224,46,58,.0); }
-    50% { box-shadow: inset 0 1px 3px rgba(0,0,0,.35), 0 0 16px 3px rgba(224,46,58,.55); }
-}
-
-/* Waschen */
-.ug-wash-card {
-    margin-bottom: 16px;
-}
-.ug-wash-desc {
-    color: var(--text-secondary);
-    font-size: 0.84rem;
-    margin: 6px 0 12px;
-}
-.wash-row {
-    display: flex;
-    gap: 10px;
-}
-.wash-row .trade-input {
-    flex: 1;
-    min-height: 44px;
-}
-.btn-warning {
-    background: linear-gradient(180deg, #f7b733, #f09609);
-    color: #fff;
-    box-shadow: 0 8px 18px rgba(240, 150, 9, 0.35), inset 0 1px 0 rgba(255, 255, 255, 0.3);
-}
-.btn-warning:hover:not(:disabled) {
-    background: linear-gradient(180deg, #f0a722, #d98506);
-    transform: translateY(-1px);
-}
-.wash-preview {
-    margin-top: 10px;
-    font-size: 0.85rem;
-    color: var(--text-secondary);
-}
-
-/* Operationen-Karten */
-.underground-op-list {
-    display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
-    gap: 14px;
-}
-.ug-card {
-    background: var(--bg-secondary);
-    border: 1px solid var(--border);
-    border-radius: 18px;
-    padding: 16px;
-    box-shadow: 0 1px 2px rgba(16, 24, 40, 0.04), 0 8px 22px rgba(16, 24, 40, 0.06);
-    transition: transform 0.16s ease, box-shadow 0.16s ease;
-}
-.ug-card:hover {
-    transform: translateY(-2px);
-    box-shadow: 0 12px 30px rgba(16, 24, 40, 0.11);
-}
-.ug-card.ug-active {
-    border-color: rgba(224, 46, 58, 0.45);
-    background: linear-gradient(180deg, #fff, rgba(224, 46, 58, 0.045));
-}
-.ug-card-head {
-    display: flex;
-    align-items: center;
-    gap: 12px;
-}
-.ug-icon {
-    width: 46px;
-    height: 46px;
-    border-radius: 14px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    font-size: 1.35rem;
-    flex-shrink: 0;
-    box-shadow: inset 0 0 0 1px rgba(0, 0, 0, 0.06);
-}
-.ug-name {
-    font-weight: 700;
-    font-size: 0.98rem;
-}
-.ug-sub {
-    font-size: 0.78rem;
-    color: var(--text-muted);
-    margin-top: 2px;
-}
-.ug-card-head .btn {
-    margin-left: auto;
-}
-.ug-desc {
-    font-size: 0.84rem;
-    color: var(--text-secondary);
-    margin: 10px 0;
-    line-height: 1.45;
-}
-.ug-stats {
-    display: grid;
-    grid-template-columns: 1fr 1fr;
-    gap: 2px 14px;
-    margin-bottom: 12px;
-}
-.ug-stats .stat {
-    border-bottom: 1px solid var(--border);
-    padding: 6px 0;
-}
-.ug-stats .stat span:last-child {
-    font-weight: 700;
-}
-
-/* Haft-Karte auf der Seite */
-.ug-prison-card {
-    margin-bottom: 16px;
-}
-.ug-prison-inner {
-    background: linear-gradient(90deg, #d62430, #7a1220);
-    color: #fff;
-    font-weight: 600;
-    padding: 14px 18px;
-    border-radius: 14px;
-    box-shadow: 0 10px 26px rgba(214, 36, 48, 0.35);
-}
-
-/* =========================================================
-   GEFÄNGNIS
-   ========================================================= */
-.prison-banner {
-    position: sticky;
-    top: 62px;
-    z-index: 260;
-    background: repeating-linear-gradient(45deg, #d62430 0, #d62430 14px, #161b2e 14px, #161b2e 28px);
-    color: #fff;
-    text-align: center;
-    font-size: 0.85rem;
-    padding: 9px 14px;
-    box-shadow: 0 8px 24px rgba(214, 36, 48, 0.35);
-    letter-spacing: 0.02em;
-    animation: heatDanger 1.6s ease-in-out infinite;
-}
-@media (max-width: 768px) {
-    .prison-banner { top: 52px; }
-}
-
-.prison-modal-head {
-    background: linear-gradient(135deg, #161b2e, #3a1020);
-    color: #fff;
-    padding: 22px 20px 16px;
-    border-radius: 20px 20px 0 0;
-    text-align: center;
-}
-.modal-close-x {
-    position: absolute;
-    top: 12px;
-    right: 12px;
-    width: 34px;
-    height: 34px;
-    border: none;
-    border-radius: 999px;
-    background: rgba(255, 255, 255, 0.14);
-    color: #fff;
-    font-size: 0.95rem;
-    line-height: 1;
-    cursor: pointer;
-    -webkit-backdrop-filter: blur(4px);
-    backdrop-filter: blur(4px);
-    transition: background 0.15s ease, transform 0.12s ease;
-}
-.modal-close-x:hover { background: rgba(255, 255, 255, 0.24); }
-.modal-close-x:active { transform: scale(0.9); }
-.prison-modal-head h3 {
-    color: #fff;
-    letter-spacing: 0.04em;
-    margin-top: 6px;
-}
-.prison-badge {
-    font-size: 2.4rem;
-    animation: floatShake 1.6s ease-in-out infinite;
-}
-@keyframes floatShake {
-    0%, 100% { transform: translateY(0) rotate(0); }
-    25% { transform: translateY(-4px) rotate(-6deg); }
-    75% { transform: translateY(-2px) rotate(6deg); }
-}
-.prison-stripes {
-    height: 14px;
-    margin: 16px 0 4px;
-    border-radius: 8px;
-    background: repeating-linear-gradient(45deg, #e02e3a 0, #e02e3a 12px, #0d1424 12px, #0d1424 24px);
-}
-.prison-grid {
-    display: grid;
-    gap: 8px;
-    margin-top: 10px;
-}
-.prison-grid .stat {
-    border-bottom: 1px solid var(--border);
-    padding: 8px 0;
-}
-.prison-grid .stat span:last-child {
-    font-weight: 700;
-}
-.prison-note {
-    font-size: 0.84rem;
-    color: var(--text-secondary);
-    line-height: 1.5;
-    margin: 14px 0;
-}
-
-/* --- News-Kategorie Verbrechen ------------------------------ */
-.news-category-crime {
-    background: rgba(224, 46, 58, 0.12);
-    color: #c81f2c;
-}
-
 /* --- Mobile: Bottom-Navigation wie in professionellen Games -- */
 @media (max-width: 768px) {
     .sidebar {
@@ -1164,7 +874,275 @@ body {
         padding: 14px;
         padding-bottom: calc(88px + env(safe-area-inset-bottom));
     }
-    .heat-label { font-size: 0.78rem; }
-    .wash-row { flex-wrap: wrap; }
-    .wash-row .btn { width: 100%; }
+}
+/* =========================================================
+   CASINO-RELAUNCH
+   ========================================================= */
+
+/* --- Casino-Tabs: größer, mit Glanz ----------------------- */
+.casino-tab {
+    border-radius: 12px;
+    font-weight: 700;
+    padding: 10px 14px;
+    transition: transform 0.12s ease, box-shadow 0.15s ease, background 0.15s ease;
+}
+.casino-tab.active {
+    background: linear-gradient(180deg, #854d0e, #a1620a);
+    box-shadow: 0 6px 16px rgba(161, 98, 10, 0.35), inset 0 1px 0 rgba(255, 255, 255, 0.3);
+}
+.casino-tab:active { transform: scale(0.94); }
+
+/* --- Außenwetten-Chips ----------------------------------- */
+.casino-bet-card { display: flex; flex-direction: column; }
+.casino-bet-options {
+    display: grid;
+    grid-template-columns: 1fr 1fr 1fr;
+    gap: 8px;
+    margin: 4px 0 12px;
+}
+.casino-bet-btn {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 2px;
+    padding: 8px 4px;
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    background: var(--bg-secondary);
+    cursor: pointer;
+    font-family: inherit;
+    transition: transform 0.12s ease, box-shadow 0.15s ease, border-color 0.15s ease;
+}
+.casino-bet-btn:hover { transform: translateY(-1px); border-color: var(--blue); }
+.casino-bet-btn.selected {
+    border-color: var(--blue);
+    background: linear-gradient(180deg, #e3edff, #d3e2ff);
+    box-shadow: 0 4px 12px rgba(21, 93, 240, 0.25);
+}
+.bet-chip-icon { font-size: 1.15rem; }
+.bet-chip-label { font-size: 0.78rem; font-weight: 700; text-align: center; line-height: 1.1; }
+.bet-chip-odds { font-size: 0.7rem; color: var(--text-muted); font-weight: 600; }
+.roulette-active-bet {
+    font-size: 0.85rem;
+    font-weight: 700;
+    color: var(--blue);
+    background: rgba(21, 93, 240, 0.08);
+    border-radius: 10px;
+    padding: 8px 10px;
+    margin-bottom: 8px;
+    text-align: center;
+}
+
+/* Gewinnende Zahl hervorheben */
+.roulette-num.roulette-hit {
+    background: #f59e0b !important;
+    color: #fff !important;
+    box-shadow: 0 0 0 3px #fff, 0 0 18px 4px rgba(245, 158, 11, 0.55);
+    animation: roulettePulse 0.9s ease-in-out 2;
+}
+@keyframes roulettePulse {
+    0%, 100% { transform: scale(1); }
+    50% { transform: scale(1.12); }
+}
+
+/* --- Schnell-Einsatz-Chips -------------------------------- */
+.quick-bets-row {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    flex-wrap: wrap;
+    margin: 8px 0 10px;
+}
+.quick-bet-label {
+    font-size: 0.75rem;
+    font-weight: 700;
+    color: var(--text-muted);
+    margin-right: 2px;
+}
+.quick-bet {
+    border: 1px solid var(--border);
+    background: var(--bg-secondary);
+    color: var(--text);
+    border-radius: 999px;
+    padding: 6px 12px;
+    font-size: 0.78rem;
+    font-weight: 700;
+    cursor: pointer;
+    transition: transform 0.12s ease, background 0.15s ease, color 0.15s ease;
+}
+.quick-bet:hover { background: linear-gradient(180deg, #f7dfb0, #f4c66b); color: #3b2b00; border-color: #e0b34e; }
+.quick-bet:active { transform: scale(0.92); }
+
+/* --- Münz-Animation --------------------------------------- */
+.coin-show {
+    transition: transform 0.15s ease;
+}
+.coin-show.flip-anim {
+    animation: coinFlip 0.8s cubic-bezier(0.3, 0.8, 0.4, 1);
+}
+@keyframes coinFlip {
+    0%   { transform: rotateY(0deg) scale(1); }
+    40%  { transform: rotateY(540deg) scale(1.25); }
+    100% { transform: rotateY(720deg) scale(1); }
+}
+
+/* --- Blackjack -------------------------------------------- */
+.casino-bj-card {
+    background: linear-gradient(180deg, #0e2f1d 0%, #125a2f 55%, #0d3a20 100%);
+    color: #fff;
+    border: 1px solid #1d7a41;
+    box-shadow: 0 18px 40px rgba(12, 60, 32, 0.35);
+    overflow: hidden;
+}
+.casino-bj-card h3 { color: #fff; margin: 0; }
+.casino-bj-card label { color: rgba(255, 255, 255, 0.85); }
+.bj-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    background: rgba(0, 0, 0, 0.25);
+    margin: -16px -16px 0;
+    padding: 14px 16px 10px;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.12);
+}
+.bj-deck {
+    font-size: 0.8rem;
+    color: rgba(255, 255, 255, 0.7);
+    font-weight: 600;
+}
+.bj-screen {
+    padding: 22px 6px 12px;
+}
+.bj-zone {
+    text-align: center;
+    min-height: 96px;
+}
+.bj-label {
+    display: inline-block;
+    font-size: 0.7rem;
+    letter-spacing: 0.22em;
+    font-weight: 800;
+    color: rgba(255, 255, 255, 0.55);
+    margin-bottom: 10px;
+}
+.bj-hand {
+    display: flex;
+    justify-content: center;
+    gap: 6px;
+    flex-wrap: wrap;
+    min-height: 84px;
+    align-items: center;
+}
+.bj-divider {
+    height: 1px;
+    background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.28), transparent);
+    margin: 18px 0;
+}
+.bj-hand-sum {
+    display: inline-flex;
+    align-items: center;
+    min-width: 34px;
+    height: 34px;
+    justify-content: center;
+    border-radius: 999px;
+    background: rgba(255, 255, 255, 0.14);
+    color: #fff;
+    font-weight: 800;
+    font-size: 0.95rem;
+    margin-left: 4px;
+    -webkit-backdrop-filter: blur(4px);
+    backdrop-filter: blur(4px);
+}
+.bj-card {
+    width: 58px;
+    height: 84px;
+    border-radius: 9px;
+    background: linear-gradient(180deg, #fff 0%, #f2f4f8 100%);
+    border: 1px solid rgba(0, 0, 0, 0.12);
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.35);
+    display: inline-flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    font-weight: 800;
+    position: relative;
+    animation: cardIn 0.28s cubic-bezier(0.2, 0.9, 0.3, 1.2);
+}
+.bj-card.red { color: #d6241f; }
+.bj-card.dark { color: #1b2030; }
+.bj-card .bj-rank { font-size: 1.4rem; line-height: 1; }
+.bj-card .bj-suit { font-size: 1.15rem; line-height: 1; margin-top: 2px; }
+.bj-card-back {
+    background:
+        linear-gradient(135deg, rgba(255, 255, 255, 0.12) 25%, transparent 25%) 0 0/20px 20px,
+        linear-gradient(225deg, rgba(255, 255, 255, 0.12) 25%, transparent 25%) 0 0/20px 20px,
+        linear-gradient(135deg, #1c3c94, #12265f);
+    color: rgba(255, 255, 255, 0.7);
+    font-size: 1.3rem;
+}
+@keyframes cardIn {
+    from { opacity: 0; transform: translateY(-14px) scale(0.85); }
+    to   { opacity: 1; transform: translateY(0) scale(1); }
+}
+.bj-placeholder {
+    color: rgba(255, 255, 255, 0.45);
+    font-size: 0.85rem;
+}
+.bj-result-line {
+    display: flex;
+    gap: 6px;
+    justify-content: center;
+    margin-bottom: 10px;
+    min-height: 0;
+}
+.bj-controls {
+    background: rgba(0, 0, 0, 0.25);
+    margin: 0 -16px -16px;
+    padding: 16px;
+}
+.bj-bet-row {
+    display: flex;
+    gap: 10px;
+    align-items: center;
+    flex-wrap: wrap;
+}
+.bj-bet-row .trade-input,
+.bj-controls .trade-input {
+    flex: 1;
+    min-width: 140px;
+    background: rgba(0, 0, 0, 0.3);
+    border-color: rgba(255, 255, 255, 0.25);
+    color: #fff;
+}
+.bj-controls .trade-input::placeholder { color: rgba(255, 255, 255, 0.5); }
+.bj-bet-row .quick-bets-row { flex: 1; margin: 0; justify-content: flex-end; }
+.bj-controls .quick-bet {
+    background: rgba(255, 255, 255, 0.1);
+    border-color: rgba(255, 255, 255, 0.25);
+    color: #fff;
+}
+.bj-controls .quick-bet:hover { background: #f4c66b; color: #3b2b00; border-color: #f4c66b; }
+.bj-actions { display: grid; gap: 8px; margin-top: 12px; }
+.btn-success {
+    background: linear-gradient(180deg, #2fb96a, #1e9a54);
+    color: #fff;
+    box-shadow: 0 8px 18px rgba(30, 154, 84, 0.35), inset 0 1px 0 rgba(255, 255, 255, 0.3);
+}
+.btn-success:hover:not(:disabled) { transform: translateY(-1px); }
+.bj-help {
+    color: rgba(255, 255, 255, 0.6);
+    font-size: 0.78rem;
+    line-height: 1.5;
+    margin: 12px 0 0;
+}
+
+/* --- Slot-Paytable Treffer -------------------------------- */
+.slot-pay-row.pay-hit {
+    background: rgba(245, 158, 11, 0.18) !important;
+    border: 1px solid #f59e0b !important;
+    animation: payFlash 1s ease-in-out 2;
+}
+@keyframes payFlash {
+    0%, 100% { opacity: 1; }
+    50% { opacity: 0.5; }
 }

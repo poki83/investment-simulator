@@ -58,6 +58,141 @@ const Casino = {
         }
     },
 
+    /* --- Roulette: Außenwetten (Auswahl) --------------------- */
+    ROULETTE_BETS: [
+        { type: 'red', label: 'Rot', payout: 1, icon: '🔴' },
+        { type: 'black', label: 'Schwarz', payout: 1, icon: '⚫' },
+        { type: 'odd', label: 'Ungerade', payout: 1, icon: '1️⃣3️⃣' },
+        { type: 'even', label: 'Gerade', payout: 1, icon: '2️⃣4️⃣' },
+        { type: 'low', label: '1–18', payout: 1, icon: '🔽' },
+        { type: 'high', label: '19–36', payout: 1, icon: '🔼' },
+        { type: 'dozen1', label: '1. Dtz. 1–12', payout: 2, icon: '1️⃣2️⃣' },
+        { type: 'dozen2', label: '2. Dtz. 13–24', payout: 2, icon: '1️⃣3️⃣–2️⃣4️⃣' },
+        { type: 'dozen3', label: '3. Dtz. 25–36', payout: 2, icon: '2️⃣5️⃣' },
+        { type: 'col1', label: 'Kolonne 1', payout: 2, icon: '▮' },
+        { type: 'col2', label: 'Kolonne 2', payout: 2, icon: '▯' },
+        { type: 'col3', label: 'Kolonne 3', payout: 2, icon: '▯' }
+    ],
+
+    BLACKJACK_MIN_BET: 10,
+
+    BLACKJACK: {
+        state: null, /* { bet, deck, player:[], dealer:[], status, result, payout, profit } */
+
+        newDeck() {
+            const suits = ['♠', '♥', '♦', '♣'];
+            const ranks = ['A', '2', '3', '4', '5', '6', '7', '8', '9', '10', 'J', 'Q', 'K'];
+            const deck = [];
+            for (const s of suits) {
+                for (const r of ranks) deck.push({ rank: r, suit: s });
+            }
+            return this.shuffle(deck);
+        },
+        shuffle(deck) {
+            for (let i = deck.length - 1; i > 0; i--) {
+                const j = Math.floor(Math.random() * (i + 1));
+                const tmp = deck[i];
+                deck[i] = deck[j];
+                deck[j] = tmp;
+            }
+            return deck;
+        },
+        cardValue(rank) {
+            if (rank === 'A') return 11;
+            if (rank === 'K' || rank === 'Q' || rank === 'J') return 10;
+            return parseInt(rank, 10);
+        },
+        handValue(hand) {
+            let total = 0;
+            let aces = 0;
+            for (const c of hand) {
+                total += this.cardValue(c.rank);
+                if (c.rank === 'A') aces++;
+            }
+            while (total > 21 && aces > 0) {
+                total -= 10;
+                aces--;
+            }
+            return total;
+        },
+        isBlackjack(hand) {
+            return hand.length === 2 && this.handValue(hand) === 21;
+        },
+        isBusted(hand) {
+            return this.handValue(hand) > 21;
+        },
+        dealerShouldHit(hand) {
+            return this.handValue(hand) < 17;
+        },
+
+        /* Ergebnisfindung (rein, ohne Nebenwirkungen) */
+        resolve(player, dealer, bet) {
+            const pv = this.handValue(player);
+            const dv = this.handValue(dealer);
+            const pBJ = this.isBlackjack(player);
+            const dBJ = this.isBlackjack(dealer);
+            if (pBJ && dBJ) return { result: 'push', payout: bet };
+            if (pBJ) return { result: 'blackjack', payout: bet * 2.5 };
+            if (dBJ) return { result: 'lose', payout: 0 };
+            if (pv > 21) return { result: 'lose', payout: 0 };
+            if (dv > 21) return { result: 'win', payout: bet * 2 };
+            if (pv === dv) return { result: 'push', payout: bet };
+            return pv > dv ? { result: 'win', payout: bet * 2 } : { result: 'lose', payout: 0 };
+        },
+
+        startDeal(bet) {
+            bet = Math.floor(Number(bet));
+            if (!bet || bet < Casino.BLACKJACK_MIN_BET || bet > GameState.cash) return null;
+            GameState.removeCash(bet);
+            GameState.casinoStats.wagered += bet;
+            const deck = this.newDeck();
+            this.state = {
+                bet,
+                deck,
+                player: [deck.pop(), deck.pop()],
+                dealer: [deck.pop(), deck.pop()],
+                status: 'player',
+                result: null,
+                payout: null,
+                profit: null
+            };
+            if (this.isBlackjack(this.state.player)) return this.stand();
+            return this.state;
+        },
+
+        hit() {
+            const st = this.state;
+            if (!st || st.status !== 'player') return null;
+            st.player.push(st.deck.pop());
+            if (this.isBusted(st.player)) return this.stand();
+            return st;
+        },
+
+        stand() {
+            const st = this.state;
+            if (!st || st.status === 'done') return null;
+            if (st.status === 'player') st.status = 'dealer';
+            while (this.dealerShouldHit(st.dealer)) st.dealer.push(st.deck.pop());
+            const r = this.resolve(st.player, st.dealer, st.bet);
+            st.status = 'done';
+            st.result = r.result;
+            st.payout = r.payout;
+            st.profit = r.payout - st.bet;
+            if (r.result === 'push') {
+                GameState.addCash(r.payout); /* Einsatz zurück, net unverändert */
+            } else if (r.payout > 0) {
+                Casino.addWin(r.payout);
+            } else {
+                Casino.addLoss(st.bet);
+            }
+            return st;
+        },
+
+        cashout() {
+            this.state = null;
+        }
+    },
+
     init() {
         if (!GameState.casinoStats) {
             GameState.casinoStats = { net: 0, wagered: 0, wins: 0, losses: 0 };
@@ -94,20 +229,22 @@ const Casino = {
         let win = false;
         let payout = 0;
 
-        if (bet.type === 'number') {
-            if (bet.num === num) { win = true; payout = 35; }
-        } else if (bet.type === 'red') {
-            if (color === 'red') { win = true; payout = 1; }
-        } else if (bet.type === 'black') {
-            if (color === 'black') { win = true; payout = 1; }
-        } else if (bet.type === 'odd') {
-            if (num !== 0 && num % 2 === 1) { win = true; payout = 1; }
-        } else if (bet.type === 'even') {
-            if (num !== 0 && num % 2 === 0) { win = true; payout = 1; }
-        } else if (bet.type === 'low') {
-            if (num >= 1 && num <= 18) { win = true; payout = 1; }
-        } else if (bet.type === 'high') {
-            if (num >= 19 && num <= 36) { win = true; payout = 1; }
+        switch (bet.type) {
+            case 'number':
+                if (bet.num === num) { win = true; payout = 35; }
+                break;
+            case 'red': if (color === 'red') { win = true; payout = 1; } break;
+            case 'black': if (color === 'black') { win = true; payout = 1; } break;
+            case 'odd': if (num !== 0 && num % 2 === 1) { win = true; payout = 1; } break;
+            case 'even': if (num !== 0 && num % 2 === 0) { win = true; payout = 1; } break;
+            case 'low': if (num >= 1 && num <= 18) { win = true; payout = 1; } break;
+            case 'high': if (num >= 19 && num <= 36) { win = true; payout = 1; } break;
+            case 'dozen1': if (num >= 1 && num <= 12) { win = true; payout = 2; } break;
+            case 'dozen2': if (num >= 13 && num <= 24) { win = true; payout = 2; } break;
+            case 'dozen3': if (num >= 25 && num <= 36) { win = true; payout = 2; } break;
+            case 'col1': if (num >= 1 && num <= 36 && num % 3 === 1) { win = true; payout = 2; } break;
+            case 'col2': if (num >= 1 && num <= 36 && num % 3 === 2) { win = true; payout = 2; } break;
+            case 'col3': if (num >= 1 && num <= 36 && num % 3 === 0) { win = true; payout = 2; } break;
         }
 
         const winAmount = win ? amount * (payout + 1) : 0;

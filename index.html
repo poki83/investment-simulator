@@ -76,11 +76,6 @@
             </div>
         </header>
 
-        <!-- Gefängnis-Banner (bei Haft immer sichtbar) -->
-        <div id="prison-banner" class="prison-banner hidden">
-            <span id="prison-banner-text"></span>
-        </div>
-
         <!-- Sidebar Navigation -->
         <nav class="sidebar">
             <button class="nav-btn active" data-page="dashboard">
@@ -122,10 +117,6 @@
             <button class="nav-btn" data-page="casino">
                 <span class="nav-icon">🎰</span>
                 <span class="nav-label">Casino</span>
-            </button>
-            <button class="nav-btn" data-page="underground">
-                <span class="nav-icon">🕶️</span>
-                <span class="nav-label">Unterwelt</span>
             </button>
             <button class="nav-btn" data-page="leaderboard">
                 <span class="nav-icon">🏆</span>
@@ -606,6 +597,7 @@
 
                 <div id="casino-tabs" class="casino-tabs">
                     <button class="casino-tab active" data-game="roulette" onclick="UI.switchCasinoGame('roulette')">🎡 Roulette</button>
+                    <button class="casino-tab" data-game="blackjack" onclick="UI.switchCasinoGame('blackjack')">🃏 Blackjack 21</button>
                     <button class="casino-tab" data-game="slot" onclick="UI.switchCasinoGame('slot')">🎰 Spielautomat</button>
                     <button class="casino-tab" data-game="coin" onclick="UI.switchCasinoGame('coin')">🪙 Münzwurf</button>
                 </div>
@@ -616,19 +608,63 @@
                         <div class="card casino-board-card">
                             <h3>Roulette</h3>
                             <div id="roulette-number-grid" class="roulette-grid"></div>
+                            <div class="quick-bets-row">
+                                <span class="quick-bet-label">Schnell: </span>
+                                <button class="quick-bet" data-target="roulette-bet-amount" data-amount="25">€25</button>
+                                <button class="quick-bet" data-target="roulette-bet-amount" data-amount="100">€100</button>
+                                <button class="quick-bet" data-target="roulette-bet-amount" data-amount="250">€250</button>
+                                <button class="quick-bet" data-target="roulette-bet-amount" data-amount="1000">€1.000</button>
+                                <button class="quick-bet" data-target="roulette-bet-amount" data-amount="max">All-In</button>
+                            </div>
                             <div id="roulette-result" class="casino-result"></div>
                         </div>
                         <div class="card casino-bet-card">
                             <h3>Dein Einsatz</h3>
-                            <div class="casino-bet-options" id="roulette-bet-options">
-                                <button class="casino-bet-btn" data-bet="red">🔴 Rot (1:1)</button>
-                                <button class="casino-bet-btn" data-bet="black">⚫ Schwarz (1:1)</button>
-                                <button class="casino-bet-btn" data-bet="odd">Ungerade (1:1)</button>
-                                <button class="casino-bet-btn" data-bet="even">Gerade (1:1)</button>
-                            </div>
+                            <div id="roulette-active-bet" class="roulette-active-bet">🔴 Rot · Auszahlung 1:1</div>
+                            <div class="casino-bet-options" id="roulette-bet-options"></div>
                             <label>Einsatz (€):</label>
                             <input type="number" id="roulette-bet-amount" class="trade-input" min="1" value="50" step="10">
                             <button id="roulette-spin-btn" class="btn btn-primary btn-block">🎡 Drehen (Einsatz €50)</button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Blackjack 21 -->
+                <div id="casino-blackjack" class="casino-game hidden">
+                    <div class="card casino-bj-card">
+                        <div class="bj-header">
+                            <h3>🃏 Blackjack 21</h3>
+                            <span class="bj-deck">🎴 Kartenstapel: <strong id="bj-deck-count">52</strong></span>
+                        </div>
+                        <div class="bj-screen">
+                            <div class="bj-zone bj-dealer">
+                                <span class="bj-label">DEALER</span>
+                                <div id="bj-dealer-hand" class="bj-hand"></div>
+                            </div>
+                            <div class="bj-divider"></div>
+                            <div class="bj-zone bj-player">
+                                <span class="bj-label">DU</span>
+                                <div id="bj-player-hand" class="bj-hand"></div>
+                            </div>
+                        </div>
+                        <div id="bj-result" class="casino-result"></div>
+                        <div class="bj-controls">
+                            <label>Einsatz (€, min. 10):</label>
+                            <div class="bj-bet-row">
+                                <input type="number" id="bj-bet-amount" class="trade-input" min="10" value="50" step="10">
+                                <div class="quick-bets-row inline">
+                                    <button class="quick-bet" data-target="bj-bet-amount" data-amount="25">€25</button>
+                                    <button class="quick-bet" data-target="bj-bet-amount" data-amount="100">€100</button>
+                                    <button class="quick-bet" data-target="bj-bet-amount" data-amount="250">€250</button>
+                                    <button class="quick-bet" data-target="bj-bet-amount" data-amount="max">All-In</button>
+                                </div>
+                            </div>
+                            <div class="bj-actions">
+                                <button id="bj-deal-btn" class="btn btn-primary btn-block">🃏 Karten teilen (Einsatz €50)</button>
+                                <button id="bj-hit-btn" class="btn btn-success btn-block hidden">➕ Karte ziehen (Hit)</button>
+                                <button id="bj-stand-btn" class="btn btn-secondary btn-block hidden">✋ Stehen bleiben (Stand)</button>
+                            </div>
+                            <p class="bj-help">Ziel: Mit deinen Karten näher an <strong>21</strong> als der Dealer, ohne drüber zu rauschen. Ass = 1 oder 11. Blackjack (21 mit 2 Karten) zahlt <strong>1,5-fach</strong>, normales Gewinn 1:1.</p>
                         </div>
                     </div>
                 </div>
@@ -661,58 +697,16 @@
                         <div id="coin-result" class="casino-result"></div>
                         <label>Einsatz (€):</label>
                         <input type="number" id="coin-bet-amount" class="trade-input" min="1" value="25" step="5">
+                        <div class="quick-bets-row coin-quick">
+                            <button class="quick-bet" data-target="coin-bet-amount" data-amount="10">€10</button>
+                            <button class="quick-bet" data-target="coin-bet-amount" data-amount="50">€50</button>
+                            <button class="quick-bet" data-target="coin-bet-amount" data-amount="100">€100</button>
+                            <button class="quick-bet" data-target="coin-bet-amount" data-amount="250">€250</button>
+                            <button class="quick-bet" data-target="coin-bet-amount" data-amount="max">All-In</button>
+                        </div>
                         <button id="coin-flip-btn" class="btn btn-primary btn-block">🪙 Werfen (Einsatz €25)</button>
                     </div>
                 </div>
-            </div>
-
-            <!-- Unterwelt (illegal, rein fiktiv) -->
-            <div id="page-underground" class="page">
-                <div class="page-header">
-                    <h2>🕶️ Unterwelt <span class="page-subnote">rein fiktiv! – kein echtes Geld, keine echten Verbrechen</span></h2>
-                </div>
-
-                <div id="ug-prison-card" class="ug-prison-card hidden">
-                    <div class="ug-prison-inner">🔒 <strong>Du sitzt in Haft!</strong> Noch <span id="ug-prison-left">0</span> Woche(n). Grund: <span id="ug-prison-crime">—</span></div>
-                </div>
-
-                <div class="underground-stats">
-                    <div class="card mini-stat">
-                        <span class="mini-label">Schwarzgeld (bar)</span>
-                        <span class="mini-value ug-money" id="ug-black-money">€0</span>
-                    </div>
-                    <div class="card mini-stat">
-                        <span class="mini-label">Fahndungslevel</span>
-                        <span class="mini-value" id="ug-heat">0 / 10</span>
-                    </div>
-                    <div class="card mini-stat">
-                        <span class="mini-label">Aktive Operationen</span>
-                        <span class="mini-value" id="ug-ops">0</span>
-                    </div>
-                    <div class="card mini-stat">
-                        <span class="mini-label">Verhaftungen</span>
-                        <span class="mini-value" id="ug-arrests">0</span>
-                    </div>
-                </div>
-
-                <div class="heat-bar-card">
-                    <div class="heat-label"><span>🚨 Fahndungslevel</span><span id="ug-washed">Gewaschen: €0</span></div>
-                    <div id="ug-heat-wrap" class="heat-wrap"><div id="ug-heat-bar" class="heat-bar"></div></div>
-                    <p class="heat-hint">Je höher das Fahndungslevel, desto eher fliegst du auf. Es sinkt, wenn keine Operationen laufen – und steigt beim Geldwaschen.</p>
-                </div>
-
-                <div class="card ug-wash-card">
-                    <h3>🧼 Schwarzgeld waschen</h3>
-                    <p class="ug-wash-desc">Wandle Schwarzgeld in legales Guthaben um. Waschgebühr <strong>15%</strong> – jede gewaschene Summe erhöht die Fahndung.</p>
-                    <div class="wash-row">
-                        <input type="number" id="underground-wash-amount" min="0" step="1" class="trade-input" placeholder="Betrag in €">
-                        <button id="underground-wash-btn" class="btn btn-warning">Waschen</button>
-                    </div>
-                    <div id="underground-wash-preview" class="wash-preview">Gib einen Betrag ein.</div>
-                </div>
-
-                <h3 class="section-heading">OPERATIONEN</h3>
-                <div id="underground-op-list" class="underground-op-list"></div>
             </div>
 
             <!-- Reichsten Menschen -->
@@ -807,29 +801,6 @@
         </div>
     </div>
 
-    <!-- Gefängnis-Modal -->
-    <div id="prison-modal" class="modal hidden">
-        <div class="modal-content modal-small">
-            <div class="prison-modal-head">
-                <div class="prison-badge">🚔</div>
-                <h3>Du bist verhaftet worden!</h3>
-            </div>
-            <button id="prison-modal-close" class="modal-close-x" title="Schließen">✕</button>
-            <div class="modal-body">
-                <div class="prison-stripes"></div>
-                <div class="prison-grid">
-                    <div class="stat"><span>Verbrechen</span><span id="prison-crime">—</span></div>
-                    <div class="stat"><span>Haftstrafe</span><span id="prison-sentence">—</span></div>
-                    <div class="stat"><span>Noch verbleibend</span><span id="prison-left">—</span></div>
-                    <div class="stat"><span>Geldstrafe</span><span class="text-red" id="prison-fine">—</span></div>
-                    <div class="stat"><span>Beschlagnahmtes Schwarzgeld</span><span class="text-red" id="prison-seized">—</span></div>
-                </div>
-                <p class="prison-note">Während der Haft kannst du nicht handeln. Die Zeit läuft trotzdem weiter – warte deine Strafe ab, um wieder Freiheit zu erlangen.</p>
-                <button id="prison-ok-btn" class="btn btn-danger btn-block">Im Knast abwarten…</button>
-            </div>
-        </div>
-    </div>
-
     <!-- Scripte laden -->
     <script src="js/storage.js"></script>
     <script src="js/gameState.js"></script>
@@ -841,7 +812,6 @@
     <script src="js/luxury.js"></script>
     <script src="js/leaderboard.js"></script>
     <script src="js/casino.js"></script>
-    <script src="js/underground.js"></script>
     <script src="js/taxes.js"></script>
     <script src="js/events.js"></script>
     <script src="js/charts.js"></script>

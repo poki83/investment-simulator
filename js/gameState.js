@@ -37,26 +37,6 @@ const GameState = {
         taxYear: 2025
     },
 
-    underground: {
-        blackMoney: 0,
-        heat: 0,
-        operations: [],
-        washedTotal: 0,
-        arrests: 0,
-        lastWeek: 1,
-        heatDecayWeek: 0
-    },
-
-    prison: {
-        active: false,
-        crime: '',
-        crimeIcon: '🚔',
-        fine: 0,
-        seized: 0,
-        weeks: 0,
-        untilWeek: 0
-    },
-
     transactions: [],
     news: [],
     portfolioHistory: [],
@@ -95,24 +75,6 @@ const GameState = {
             lastPaymentWeek: 0, dueWeek: 13,
             capitalNet: 0, capitalTaxPaid: 0,
             rentNet: 0, rentTaxPaid: 0, taxYear: 2025
-        };
-        this.underground = {
-            blackMoney: 0,
-            heat: 0,
-            operations: [],
-            washedTotal: 0,
-            arrests: 0,
-            lastWeek: 1,
-            heatDecayWeek: 0
-        };
-        this.prison = {
-            active: false,
-            crime: '',
-            crimeIcon: '🚔',
-            fine: 0,
-            seized: 0,
-            weeks: 0,
-            untilWeek: 0
         };
         this.transactions = [];
         this.news = [];
@@ -253,11 +215,4 @@ const GameState = {
         return this.taxes.unpaid + this.taxes.lateFees;
     },
 
-    isInPrison() {
-        return !!(this.prison && this.prison.active && this.week < this.prison.untilWeek);
-    },
-
-    prisonWeeksLeft() {
-        return this.isInPrison() ? this.prison.untilWeek - this.week : 0;
-    }
-};
+    };

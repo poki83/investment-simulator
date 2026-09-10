@@ -4,8 +4,6 @@ const UI = {
     tradeAction: 'buy',
     tutorialStep: 0,
     portfolioFilter: 'all',
-    prisonModalSeen: false,
-    undergroundView: 'all',
 
     tutorialSteps: [
         { title: 'Willkommen bei InvestSim!', text: 'Du startest mit <strong>€10.000</strong> Startguthaben. Dein Ziel ist es, Vermögen aufzubauen, indem du in verschiedene Anlageformen investierst.<br><br>Wie ein echter Investor musst du Entscheidungen treffen, Risiken abwägen und Steuern bezahlen.' },
@@ -34,7 +32,6 @@ const UI = {
         this.bindSellModal();
         this.bindPortfolio();
         this.bindCasino();
-        this.bindUnderground();
         this.updateAll();
     },
 
@@ -86,199 +83,8 @@ const UI = {
         this.updateLiveClock();
     },
 
-    /* --- Haft / Aktionen sperren ------------------------------ */
     canAct() {
-        if (GameState.isInPrison()) {
-            this.showToast('🔒 Du sitzt in Haft! Noch ' + GameState.prisonWeeksLeft() + ' Woche(n) Gefängnis.', '🔒');
-            this.openPrisonModal();
-            return false;
-        }
         return true;
-    },
-
-    updatePrisonBanner() {
-        const el = document.getElementById('prison-banner');
-        if (!el) return;
-        const left = GameState.prisonWeeksLeft();
-        const p = GameState.prison;
-        if (GameState.isInPrison() && p) {
-            el.classList.remove('hidden');
-            el.querySelector('#prison-banner-text').innerHTML =
-                `${p.crimeIcon} <strong>HAFT:</strong> noch ${left} Woche(n) · Grund: ${p.crime}`;
-        } else {
-            el.classList.add('hidden');
-        }
-    },
-
-    checkPrisonModal() {
-        if (GameState.isInPrison() && !this.prisonModalSeen) {
-            this.openPrisonModal();
-        }
-    },
-
-    openPrisonModal() {
-        const p = GameState.prison;
-        if (!p || !p.active) return;
-        this.prisonModalSeen = true;
-        const el = document.getElementById('prison-modal');
-        document.getElementById('prison-crime').textContent = `${p.crimeIcon} ${p.crime}`;
-        document.getElementById('prison-sentence').textContent = p.weeks + ' Wochen';
-        document.getElementById('prison-left').textContent = Math.max(0, p.untilWeek - GameState.week) + ' Woche(n)';
-        document.getElementById('prison-fine').textContent = '€' + this.fmt(p.fine);
-        document.getElementById('prison-seized').textContent = '€' + this.fmt(p.seized);
-        el.classList.remove('hidden');
-    },
-
-    closePrisonModal() {
-        document.getElementById('prison-modal').classList.add('hidden');
-    },
-
-    /* --- Unterwelt Seite -------------------------------------- */
-    bindUnderground() {
-        const startBtn = document.getElementById('underground-start-btn');
-        if (startBtn) startBtn.addEventListener('click', () => {
-            const opId = document.getElementById('underground-op-select').value;
-            Underground.start(opId);
-            this.updateAll();
-        });
-        const washBtn = document.getElementById('underground-wash-btn');
-        if (washBtn) washBtn.addEventListener('click', () => this.washBlackMoney());
-        const amountInput = document.getElementById('underground-wash-amount');
-        if (amountInput) amountInput.addEventListener('input', () => this.updateWashPreview());
-        const chk = document.getElementById('prison-modal-close');
-        if (chk) chk.addEventListener('click', () => this.closePrisonModal());
-        const btnClean = document.getElementById('prison-ok-btn');
-        if (btnClean) btnClean.addEventListener('click', () => this.closePrisonModal());
-    },
-
-    updateWashPreview() {
-        const amount = Math.max(0, parseFloat(document.getElementById('underground-wash-amount').value) || 0);
-        const max = Math.floor(GameState.underground.blackMoney || 0);
-        const clamped = Math.min(amount, max);
-        const fee = Math.round(clamped * Underground.WASH_FEE);
-        const heat = Math.min(Underground.MAX_HEAT, (GameState.underground.heat || 0) + Math.max(1, Math.floor(clamped / Underground.HEAT_PER_EURO)));
-        const el = document.getElementById('underground-wash-preview');
-        if (el) {
-            el.innerHTML = clamped > 0
-                ? `→ Du erhältst <strong>€${this.fmt(clamped - fee)}</strong> · Waschgebühr €${this.fmt(fee)} · Fahndung steigt auf ${heat}/10`
-                : 'Gib einen Betrag ein.';
-        }
-    },
-
-    startOperation(opId) {
-        if (!this.canAct()) return;
-        const result = Underground.start(opId);
-        if (result.ok) {
-            this.showToast('Operation gestartet! 💸 Wöchentliches Schwarzgeld aktiv.', '💸');
-        } else if (result.error === 'aktiv') {
-            this.showToast('Diese Operation läuft bereits!', 'ℹ️');
-        } else if (result.error === 'guthaben') {
-            this.showToast('Nicht genug Guthaben!', '⚠️');
-        } else if (result.error === 'gefängnis') {
-            this.canAct();
-        }
-        this.updateAll();
-    },
-
-    stopOperation(opId) {
-        if (!this.canAct()) return;
-        const result = Underground.stop(opId);
-        if (result) {
-            this.showToast('Operation beendet. Restbestände: €' + this.fmt(result.resale) + ' Schwarzgeld.', '✂️');
-        }
-        this.updateAll();
-    },
-
-    washBlackMoney() {
-        if (!this.canAct()) return;
-        const amount = parseFloat(document.getElementById('underground-wash-amount').value) || 0;
-        const result = Underground.wash(amount);
-        if (result) {
-            this.showToast(`€${this.fmt(result.netto)} gewaschen (Gebühr €${this.fmt(result.fee)}). Fahndungslevel: ${result.heat}/10`, '🧼');
-            document.getElementById('underground-wash-amount').value = '';
-        } else {
-            this.showToast('Nichts zu waschen!', 'ℹ️');
-        }
-        this.updateAll();
-    },
-
-    updateUnderground() {
-        const safe = (el, val) => { const e = document.getElementById(el); if (e) e.textContent = val; };
-        const u = GameState.underground || { blackMoney: 0, heat: 0, operations: [], arrests: 0 };
-
-        safe('ug-black-money', '€' + this.fmt(u.blackMoney || 0));
-        safe('ug-heat', (u.heat || 0) + ' / 10');
-        safe('ug-ops', (u.operations || []).length);
-        safe('ug-arrests', u.arrests || 0);
-        safe('ug-washed', '€' + this.fmt(u.washedTotal || 0));
-
-        const heatEl = document.getElementById('ug-heat-bar');
-        if (heatEl) heatEl.style.width = Math.min(100, (u.heat || 0) * 10) + '%';
-        const heatWrap = document.getElementById('ug-heat-wrap');
-        if (heatWrap) heatWrap.className = 'heat-wrap' + ((u.heat || 0) >= 7 ? ' heat-danger' : (u.heat || 0) >= 4 ? ' heat-warn' : '');
-
-        if (GameState.isInPrison()) {
-            const b = document.getElementById('ug-prison-card');
-            if (b) { b.classList.remove('hidden'); }
-            const leftEl = document.getElementById('ug-prison-left');
-            if (leftEl) leftEl.textContent = GameState.prisonWeeksLeft();
-            const crimeEl = document.getElementById('ug-prison-crime');
-            if (crimeEl) crimeEl.textContent = GameState.prison.crime;
-            return;
-        }
-        const b2 = document.getElementById('ug-prison-card');
-        if (b2) b2.classList.add('hidden');
-
-        /* Operationen-Liste */
-        const cont = document.getElementById('underground-op-list');
-        if (!cont) return;
-        let html = '';
-        const active = u.operations || [];
-        for (const def of Underground.activities) {
-            const op = active.find(o => o.opId === def.id);
-            if (op) {
-                const weeks = Math.max(0, GameState.week - op.startWeek);
-                const risk = Underground.displayRisk(op);
-                html += `<div class="ug-card ug-active">
-                    <div class="ug-card-head">
-                        <span class="ug-icon" style="background:rgba(224,46,58,.12)">${def.icon}</span>
-                        <div>
-                            <div class="ug-name">${def.name}</div>
-                            <div class="ug-sub">${op.invested > 0 ? 'Investiert: €' + this.fmt(op.invested) : ''} · Woche ${weeks + 1} aktiv</div>
-                        </div>
-                        <button class="btn btn-secondary btn-sm" onclick="UI.stopOperation('${def.id}')">Auflösen</button>
-                    </div>
-                    <div class="ug-stats">
-                        <div class="stat"><span>Schwarzgeld gesamt</span><span class="ug-money">€${this.fmt(op.profit)}</span></div>
-                        <div class="stat"><span>Erwischt-Risiko/Woche</span><span class="text-red">${risk.toFixed(1)}%</span></div>
-                    </div>
-                </div>`;
-            }
-        }
-        for (const def of Underground.activities) {
-            if (active.find(o => o.opId === def.id)) continue;
-            const affordable = def.invest <= GameState.cash;
-            html += `<div class="ug-card">
-                <div class="ug-card-head">
-                    <span class="ug-icon" style="background:rgba(124,58,237,.12)">${def.icon}</span>
-                    <div>
-                        <div class="ug-name">${def.name}</div>
-                        <div class="ug-sub">${def.danger} Risiko · ${def.jail} Wo. Haft bei Erwischt</div>
-                    </div>
-                </div>
-                <p class="ug-desc">${def.desc}</p>
-                <div class="ug-stats">
-                    <div class="stat"><span>Einstieg</span><span>€${this.fmt(def.invest)}</span></div>
-                    <div class="stat"><span>Schwarzgeld/Woche</span><span>€${this.fmt(def.min)}–€${this.fmt(def.max)}</span></div>
-                    <div class="stat"><span>Basis-Risiko</span><span class="text-red">${(def.risk * 100).toFixed(1)}%</span></div>
-                    <div class="stat"><span>Haft</span><span class="text-red">${def.jail} Wo.</span></div>
-                </div>
-                <button class="btn ${affordable ? 'btn-danger' : 'btn-secondary'} btn-block" onclick="UI.startOperation('${def.id}')" ${affordable ? '' : 'disabled'}>
-                    ${affordable ? 'Operation starten (€' + this.fmt(def.invest) + ')' : 'Zu wenig Guthaben'}
-                </button>
-            </div>`;
-        }
-        cont.innerHTML = html;
     },
 
     updateLiveClock() {
@@ -462,9 +268,6 @@ const UI = {
         this.updateTaxes();
         this.updateNewsList();
         this.updateCasino();
-        this.updateUnderground();
-        this.updatePrisonBanner();
-        this.checkPrisonModal();
         this.updateDate();
         this.updateSpeedDisplay();
         if (this.detailOpen && ['stock', 'etf', 'crypto'].indexOf(this.detailOpen.type) !== -1) {
@@ -484,7 +287,6 @@ const UI = {
             case 'luxury': this.updateLuxury(); break;
             case 'garage': this.updateGarage(); break;
             case 'casino': this.updateCasino(); break;
-            case 'underground': this.updateUnderground(); break;
             case 'leaderboard': this.updateLeaderboard(); break;
             case 'taxes': this.updateTaxes(); break;
             case 'news': this.updateNewsList(); break;
@@ -2006,7 +1808,21 @@ const UI = {
             html += `<button class="roulette-num ${color}" onclick="UI.selectRouletteBet('number',${n})">${n}</button>`;
         }
         grid.innerHTML = html;
-        this.selectRouletteBet('red');
+        this.renderOutsideBets();
+        this.selectRouletteBet(this.rouletteBet ? this.rouletteBet.type : 'red', this.rouletteBet ? this.rouletteBet.num : undefined);
+    },
+
+    /* Außenwetten als Chips (Dutzende, Kolonnen, Farben, etc.) */
+    renderOutsideBets() {
+        const el = document.getElementById('roulette-bet-options');
+        if (!el) return;
+        el.innerHTML = Casino.ROULETTE_BETS.map(b =>
+            `<button class="casino-bet-btn" data-bet="${b.type}" data-payout="${b.payout}" onclick="UI.selectRouletteBet('${b.type}')">
+                <span class="bet-chip-icon">${b.icon}</span>
+                <span class="bet-chip-label">${b.label}</span>
+                <span class="bet-chip-odds">${b.payout}:1</span>
+            </button>`
+        ).join('');
     },
 
     bindCasino() {
@@ -2014,12 +1830,13 @@ const UI = {
         this.renderSlotPaytable();
         document.getElementById('roulette-bet-amount').addEventListener('input', () => this.updateCasinoButtons());
         document.getElementById('coin-bet-amount').addEventListener('input', () => this.updateCasinoButtons());
+        document.getElementById('bj-bet-amount').addEventListener('input', () => this.updateCasinoButtons());
         document.getElementById('roulette-spin-btn').addEventListener('click', () => this.spinRoulette());
         document.getElementById('slot-spin-btn').addEventListener('click', () => this.spinSlot());
         document.getElementById('coin-flip-btn').addEventListener('click', () => this.flipCoin());
-        document.querySelectorAll('#roulette-bet-options .casino-bet-btn').forEach(btn => {
-            btn.addEventListener('click', () => this.selectRouletteBet(btn.dataset.bet));
-        });
+        document.getElementById('bj-deal-btn').addEventListener('click', () => this.bjDeal());
+        document.getElementById('bj-hit-btn').addEventListener('click', () => this.bjHit());
+        document.getElementById('bj-stand-btn').addEventListener('click', () => this.bjStand());
         document.querySelectorAll('.coin-btn').forEach(btn => {
             btn.addEventListener('click', () => {
                 this.coinSide = btn.dataset.side;
@@ -2027,6 +1844,10 @@ const UI = {
                 btn.classList.add('selected');
                 this.updateCasinoButtons();
             });
+        });
+        /* Schnell-Einsatz-Chips */
+        document.querySelectorAll('.quick-bet').forEach(chip => {
+            chip.addEventListener('click', () => this.setQuickBet(chip.dataset.target, chip.dataset.amount));
         });
         setInterval(() => {
             if (this.slotBusy || Casino.SLOTS.msLeft() > 0) {
@@ -2038,10 +1859,21 @@ const UI = {
         this.updateCasino();
     },
 
+    setQuickBet(targetId, amount) {
+        const input = document.getElementById(targetId);
+        if (!input) return;
+        if (amount === 'max') {
+            input.value = Math.max(Casino.BLACKJACK_MIN_BET, Math.floor(GameState.cash));
+        } else {
+            input.value = amount;
+        }
+        this.updateCasinoButtons();
+    },
+
     renderSlotPaytable() {
         const tiers = Casino.SLOTS.TIERS;
         document.getElementById('slot-paytable').innerHTML = tiers.map(t =>
-            `<div class="slot-pay-row"><span class="slot-pay-symbols">${t.symbols.join(' ')}</span>` +
+            `<div class="slot-pay-row" data-combo="${t.symbols.join('')}"><span class="slot-pay-symbols">${t.symbols.join(' ')}</span>` +
             `<span class="slot-pay-name">${t.name}</span>` +
             `<span class="slot-pay-amount">€${this.fmt(t.pay)}</span></div>`
         ).join('');
@@ -2052,32 +1884,36 @@ const UI = {
         document.getElementById('casino-roulette').classList.toggle('hidden', game !== 'roulette');
         document.getElementById('casino-slot').classList.toggle('hidden', game !== 'slot');
         document.getElementById('casino-coin').classList.toggle('hidden', game !== 'coin');
+        document.getElementById('casino-blackjack').classList.toggle('hidden', game !== 'blackjack');
         if (game === 'roulette' && this.rouletteBet) this.renderRouletteBoard();
         this.updateCasino();
+        GameState.save();
     },
 
     updateCasino() {
-        const stats = GameState.casinoStats || { net: 0, wagered: 0, wins: 0 };
+        const stats = GameState.casinoStats || { net: 0, wagered: 0, wins: 0, losses: 0 };
         document.getElementById('casino-cash').textContent = '€' + this.fmt(GameState.cash);
         const netEl = document.getElementById('casino-net');
         netEl.textContent = (stats.net >= 0 ? '+' : '−') + '€' + this.fmt(Math.abs(stats.net));
         netEl.style.color = stats.net >= 0 ? 'var(--green)' : 'var(--red)';
         document.getElementById('casino-wagered').textContent = '€' + this.fmt(stats.wagered);
         document.getElementById('casino-wins').textContent = stats.wins;
+        this.renderBlackjack();
         this.updateCasinoButtons();
     },
 
     updateCasinoButtons() {
-        const rouletteAmt = parseFloat(document.getElementById('roulette-bet-amount').value) || 0;
-        const coinAmt = parseFloat(document.getElementById('coin-bet-amount').value) || 0;
         const btnR = document.getElementById('roulette-spin-btn');
         const btnS = document.getElementById('slot-spin-btn');
         const btnC = document.getElementById('coin-flip-btn');
-
-        btnR.textContent = `🎡 Drehen (Einsatz €${this.fmt(rouletteAmt)})`;
-        btnC.textContent = `🪙 Werfen (Einsatz €${this.fmt(coinAmt)})`;
-        btnR.disabled = rouletteAmt <= 0 || rouletteAmt > GameState.cash;
-        btnC.disabled = coinAmt <= 0 || coinAmt > GameState.cash;
+        if (btnR && btnC) {
+            const rouletteAmt = parseFloat(document.getElementById('roulette-bet-amount').value) || 0;
+            const coinAmt = parseFloat(document.getElementById('coin-bet-amount').value) || 0;
+            btnR.textContent = `🎡 Drehen (Einsatz €${this.fmt(rouletteAmt)})`;
+            btnC.textContent = `🪙 Werfen (Einsatz €${this.fmt(coinAmt)})`;
+            btnR.disabled = rouletteAmt <= 0 || rouletteAmt > GameState.cash;
+            btnC.disabled = coinAmt <= 0 || coinAmt > GameState.cash;
+        }
 
         const slotLeft = Math.ceil(Casino.SLOTS.msLeft() / 1000);
         const slotLocked = this.slotBusy || slotLeft > 0;
@@ -2085,22 +1921,54 @@ const UI = {
         btnS.textContent = slotLocked
             ? (this.slotBusy ? '🎰 Läuft…' : `🎰 Ticket kaufen & Drehen (€100) · ${slotLeft}s`)
             : '🎰 Ticket kaufen & Drehen (€100)';
+
+        const bjSt = Casino.BLACKJACK.state;
+        const btnDeal = document.getElementById('bj-deal-btn');
+        const btnHit = document.getElementById('bj-hit-btn');
+        const btnStand = document.getElementById('bj-stand-btn');
+        if (btnDeal) {
+            const bjAmt = parseFloat(document.getElementById('bj-bet-amount').value) || 0;
+            const playing = bjSt && bjSt.status !== 'done';
+            btnDeal.hidden = playing;
+            btnHit.hidden = !playing;
+            btnStand.hidden = !playing;
+            btnDeal.disabled = bjAmt < Casino.BLACKJACK_MIN_BET || bjAmt > GameState.cash;
+            btnDeal.textContent = `🃏 Karten teilen (Einsatz €${this.fmt(bjAmt)})`;
+        }
     },
 
     selectRouletteBet(type, num) {
         this.rouletteBet = { type, num };
         document.querySelectorAll('#roulette-bet-options .casino-bet-btn').forEach(b => b.classList.toggle('selected', b.dataset.bet === type));
         document.querySelectorAll('.roulette-num').forEach(b => b.classList.toggle('selected', type === 'number' && parseInt(b.textContent) === num));
+        const label = document.getElementById('roulette-active-bet');
+        if (label) {
+            const entry = Casino.ROULETTE_BETS.find(b => b.type === type);
+            if (entry) {
+                label.textContent = `${entry.icon} ${entry.label} · Auszahlung ${entry.payout}:1`;
+            } else {
+                label.textContent = `🎯 Direkte Zahl ${num} · Auszahlung 35:1`;
+            }
+        }
     },
 
     showRouletteResult(result) {
         const el = document.getElementById('roulette-result');
         if (!result) { el.innerHTML = '<span class="casino-message empty">Zahl deinen Einsatz oder wähle zuerst ein Spiel!</span>'; return; }
+        document.querySelectorAll('.roulette-num').forEach(b => {
+            b.classList.toggle('roulette-hit', parseInt(b.textContent) === result.num);
+        });
         const colorName = result.color === 'red' ? '🔴 Rot' : result.color === 'black' ? '⚫ Schwarz' : '🟢 Grün';
+        let betName = 'Deposit';
+        const entry = this.rouletteBet ? Casino.ROULETTE_BETS.find(b => b.type === this.rouletteBet.type) : null;
+        if (entry) betName = `${entry.icon} ${entry.label}`;
+        else if (this.rouletteBet && this.rouletteBet.type === 'number') betName = `Zahl ${this.rouletteBet.num}`;
         el.innerHTML = `<div class="casino-ball ${result.color}">${result.num}</div>
             <div class="casino-message ${result.win ? 'message-win' : 'message-lose'}">
                 ${result.color === 'green' ? 'Die Kugel fiel auf die 0 (Grün) – Haus gewinnt!' : `Die Kugel fiel auf <strong>${result.num}</strong> (${colorName}).`}
-                <br>${result.win ? `<span class="positive">GEWONNEN! +€${this.fmt(result.profit)}</span>` : `<span class="negative">Leider verloren. −€${this.fmt(Math.abs(result.profit))}</span>`}
+                <br>${result.win
+                    ? `Wette <strong>${betName}</strong> gewinnt! <span class="positive">+€${this.fmt(result.profit)}</span>`
+                    : `<span class="negative">Leider verloren. −€${this.fmt(Math.abs(result.profit))}</span>`}
             </div>`;
     },
 
@@ -2172,6 +2040,9 @@ const UI = {
 
     showSlotResult(result) {
         const el = document.getElementById('slot-result');
+        document.querySelectorAll('.slot-pay-row').forEach(row => {
+            row.classList.toggle('pay-hit', result.winAmount > 0 && row.dataset.combo === result.symbols.join(''));
+        });
         if (result.jackpot) {
             el.innerHTML = `<div class="slot-jackpot">💰💰💰 JACKPOT! 💰💰💰</div>
                 <div class="casino-message message-win">Du hast <strong>€1.000.000</strong> gewonnen!</div>`;
@@ -2194,7 +2065,11 @@ const UI = {
         const result = Casino.flipCoin(side, amount);
         if (!result) { this.showToast('Ungültiger Einsatz oder zu wenig Guthaben!', '⚠️'); this.updateCasino(); return; }
         const face = result.result === 'kopf' ? '👑' : '🪙';
-        document.getElementById('coin-show').textContent = face;
+        const coin = document.getElementById('coin-show');
+        coin.textContent = face;
+        coin.classList.remove('flip-anim');
+        void coin.offsetWidth;
+        coin.classList.add('flip-anim');
         const el = document.getElementById('coin-result');
         el.innerHTML = `<div class="casino-message ${result.win ? 'message-win' : 'message-lose'}">
             Ergebnis: <strong>${result.result.charAt(0).toUpperCase() + result.result.slice(1)}</strong> ${face}
@@ -2202,6 +2077,98 @@ const UI = {
         </div>`;
         this.updateCasino();
         GameState.save();
+    },
+
+    /* --- Blackjack 21 ---------------------------------------- */
+    cardHtml(card) {
+        if (!card) return '';
+        const red = (card.suit === '♥' || card.suit === '♦');
+        return `<span class="bj-card ${red ? 'red' : 'dark'}"><span class="bj-rank">${card.rank}</span><span class="bj-suit">${card.suit}</span></span>`;
+    },
+    cardBack() {
+        return '<span class="bj-card bj-card-back">?</span>';
+    },
+    handSumHtml(hand) {
+        const v = Casino.BLACKJACK.handValue(hand);
+        return `<span class="bj-hand-sum">${v > 21 ? '<span class="negative">' + v + '</span>' : v}</span>`;
+    },
+    renderBlackjack() {
+        const st = Casino.BLACKJACK.state;
+        const dealer = document.getElementById('bj-dealer-hand');
+        const player = document.getElementById('bj-player-hand');
+        const deckEl = document.getElementById('bj-deck-count');
+        if (!dealer || !player) return;
+        const deckCount = st ? st.deck.length : 52;
+        if (deckEl) deckEl.textContent = deckCount;
+
+        if (!st) {
+            dealer.innerHTML = '<span class="bj-placeholder">Warte auf Einsatz…</span>';
+            player.innerHTML = '<span class="bj-placeholder">Karten werden geteilt.</span>';
+            this.renderBlackjackResult(null);
+            return;
+        }
+        const hideHole = st.status === 'player';
+        dealer.innerHTML = this.cardBack() + this.cardHtml(st.dealer[1]) + this.handSumHtml(hideHole ? [st.dealer[1]] : st.dealer);
+        player.innerHTML = st.player.map(c => this.cardHtml(c)).join('') + this.handSumHtml(st.player);
+        this.renderBlackjackResult(st.status === 'done' ? st : null);
+    },
+    renderBlackjackResult(st) {
+        const el = document.getElementById('bj-result');
+        if (!el) return;
+        if (!st) {
+            el.innerHTML = '';
+            return;
+        }
+        const labels = {
+            blackjack: 'BLACKJACK! 🎉 21 auf den ersten beiden Karten!',
+            win: 'Du gewinnst! 🥳',
+            push: 'Unentschieden – Einsatz zurück.',
+            lose: 'Bank gewinnt. 😔'
+        };
+        const payText = st.result === 'push'
+            ? 'Einsatz zurück.'
+            : (st.profit >= 0 ? `+€${this.fmt(st.profit)}` : `−€${this.fmt(Math.abs(st.profit))}`);
+        el.innerHTML = `<div class="bj-result-line">${st.player.map(c => this.cardHtml(c)).join(' ') || ''} vs. ${st.dealer.map(c => this.cardHtml(c)).join(' ') || ''}</div>
+            <div class="casino-message ${st.result === 'lose' ? 'message-lose' : 'message-win'}">
+                <strong>${labels[st.result] || st.result}</strong>
+                <br><span class="${st.profit >= 0 ? 'positive' : 'negative'}">${payText}</span>
+            </div>`;
+    },
+    bjDeal() {
+        if (!this.canAct()) return;
+        const amount = parseFloat(document.getElementById('bj-bet-amount').value) || 0;
+        const st = Casino.BLACKJACK.startDeal(amount);
+        if (!st) { this.showToast('Mindesteinsatz €' + Casino.BLACKJACK_MIN_BET + ' – oder zu wenig Guthaben!', '⚠️'); this.updateCasino(); return; }
+        this.renderBlackjack();
+        if (st.status === 'done') {
+            this.bjFinish();
+        }
+        this.updateCasino();
+        GameState.save();
+    },
+    bjHit() {
+        if (!this.canAct()) return;
+        const st = Casino.BLACKJACK.hit();
+        if (!st) return;
+        this.renderBlackjack();
+        if (st.status === 'done') this.bjFinish();
+        this.updateCasino();
+        GameState.save();
+    },
+    bjStand() {
+        if (!this.canAct()) return;
+        const st = Casino.BLACKJACK.stand();
+        if (!st) return;
+        this.renderBlackjack();
+        this.bjFinish();
+        this.updateCasino();
+        GameState.save();
+    },
+    bjFinish() {
+        const st = Casino.BLACKJACK.state;
+        if (!st) return;
+        this.renderBlackjackResult(st);
+        if (st.result === 'blackjack') this.showToast('BLACKJACK! 🎉 +€' + this.fmt(st.profit), '🎉');
     },
 
     updateLeaderboard() {
