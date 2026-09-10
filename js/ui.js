@@ -1840,6 +1840,11 @@ const UI = {
         grid.innerHTML = html;
         this.renderOutsideBets();
         this.selectRouletteBet(this.rouletteBet ? this.rouletteBet.type : 'red', this.rouletteBet ? this.rouletteBet.num : undefined);
+        if (this.lastRouletteNum !== undefined) {
+            document.querySelectorAll('.roulette-num').forEach(b => {
+                b.classList.toggle('roulette-hit', parseInt(b.textContent) === this.lastRouletteNum);
+            });
+        }
     },
 
     /* Außenwetten als Chips (Dutzende, Kolonnen, Farben, etc.) */
@@ -1893,7 +1898,8 @@ const UI = {
         const input = document.getElementById(targetId);
         if (!input) return;
         if (amount === 'max') {
-            input.value = Math.max(Casino.BLACKJACK_MIN_BET, Math.floor(GameState.cash));
+            const min = targetId === 'bj-bet-amount' ? Casino.BLACKJACK_MIN_BET : 1;
+            input.value = Math.max(min, Math.floor(GameState.cash));
         } else {
             input.value = amount;
         }
@@ -1921,13 +1927,17 @@ const UI = {
     },
 
     updateCasino() {
-        const stats = GameState.casinoStats || { net: 0, wagered: 0, wins: 0, losses: 0 };
+        const stats = GameState.casinoStats || { net: 0, wagered: 0, wins: 0, losses: 0, streak: 0, maxStreak: 0 };
         document.getElementById('casino-cash').textContent = '€' + this.fmt(GameState.cash);
         const netEl = document.getElementById('casino-net');
         netEl.textContent = (stats.net >= 0 ? '+' : '−') + '€' + this.fmt(Math.abs(stats.net));
         netEl.style.color = stats.net >= 0 ? 'var(--green)' : 'var(--red)';
         document.getElementById('casino-wagered').textContent = '€' + this.fmt(stats.wagered);
         document.getElementById('casino-wins').textContent = stats.wins;
+        const lossesEl = document.getElementById('casino-losses');
+        if (lossesEl) lossesEl.textContent = stats.losses;
+        const streakEl = document.getElementById('casino-streak');
+        if (streakEl) streakEl.textContent = stats.streak > 0 ? `🔥 ${stats.streak}` : `${stats.maxStreak}`;
         this.renderBlackjack();
         this.updateCasinoButtons();
     },
@@ -1939,10 +1949,10 @@ const UI = {
         if (btnR && btnC) {
             const rouletteAmt = parseFloat(document.getElementById('roulette-bet-amount').value) || 0;
             const coinAmt = parseFloat(document.getElementById('coin-bet-amount').value) || 0;
-            btnR.textContent = `🎡 Drehen (Einsatz €${this.fmt(rouletteAmt)})`;
-            btnC.textContent = `🪙 Werfen (Einsatz €${this.fmt(coinAmt)})`;
-            btnR.disabled = rouletteAmt <= 0 || rouletteAmt > GameState.cash;
-            btnC.disabled = coinAmt <= 0 || coinAmt > GameState.cash;
+            btnR.textContent = this.rouletteBusy ? '🎡 Die Kugel rollt…' : `🎡 Drehen (Einsatz €${this.fmt(rouletteAmt)})`;
+            btnC.textContent = this.coinBusy ? '🪙 Die Münze fliegt…' : `🪙 Werfen (Einsatz €${this.fmt(coinAmt)})`;
+            btnR.disabled = this.rouletteBusy || rouletteAmt <= 0 || rouletteAmt > GameState.cash;
+            btnC.disabled = this.coinBusy || coinAmt <= 0 || coinAmt > GameState.cash;
         }
 
         const slotLeft = Math.ceil(Casino.SLOTS.msLeft() / 1000);
@@ -1985,31 +1995,96 @@ const UI = {
     showRouletteResult(result) {
         const el = document.getElementById('roulette-result');
         if (!result) { el.innerHTML = '<span class="casino-message empty">Zahl deinen Einsatz oder wähle zuerst ein Spiel!</span>'; return; }
+        this.lastRouletteNum = result.num;
         document.querySelectorAll('.roulette-num').forEach(b => {
             b.classList.toggle('roulette-hit', parseInt(b.textContent) === result.num);
         });
         const colorName = result.color === 'red' ? '🔴 Rot' : result.color === 'black' ? '⚫ Schwarz' : '🟢 Grün';
-        let betName = 'Deposit';
-        const entry = this.rouletteBet ? Casino.ROULETTE_BETS.find(b => b.type === this.rouletteBet.type) : null;
-        if (entry) betName = `${entry.icon} ${entry.label}`;
-        else if (this.rouletteBet && this.rouletteBet.type === 'number') betName = `Zahl ${this.rouletteBet.num}`;
-        el.innerHTML = `<div class="casino-ball ${result.color}">${result.num}</div>
+        const betName = this.rouletteBetName();
+        el.innerHTML = `<div class="casino-ball ${result.color}">
+                <span class="casino-ball-num">${result.num}</span>
+            </div>
             <div class="casino-message ${result.win ? 'message-win' : 'message-lose'}">
                 ${result.color === 'green' ? 'Die Kugel fiel auf die 0 (Grün) – Haus gewinnt!' : `Die Kugel fiel auf <strong>${result.num}</strong> (${colorName}).`}
                 <br>${result.win
                     ? `Wette <strong>${betName}</strong> gewinnt! <span class="positive">+€${this.fmt(result.profit)}</span>`
                     : `<span class="negative">Leider verloren. −€${this.fmt(Math.abs(result.profit))}</span>`}
             </div>`;
+        if (result.win) {
+            this.emitWinBurst(el, result.payout >= 35);
+        }
+    },
+
+    rouletteBetName() {
+        const entry = this.rouletteBet ? Casino.ROULETTE_BETS.find(b => b.type === this.rouletteBet.type) : null;
+        if (entry) return `${entry.icon} ${entry.label}`;
+        if (this.rouletteBet && this.rouletteBet.type === 'number') return `Zahl ${this.rouletteBet.num}`;
+        return 'Rot';
+    },
+
+    /* Emoji-Partikel-Burst bei Gewinnen/Jackpot */
+    emitWinBurst(container, big) {
+        if (!container || !container.getBoundingClientRect) return;
+        const emojis = big
+            ? ['💰', '💵', '✨', '🌟', '🤑', '💎', '🎉', '🥇']
+            : ['✨', '⭐', '🎉', '💸', '🌟'];
+        const count = big ? 34 : 18;
+        const rect = container.getBoundingClientRect();
+        const frag = document.createDocumentFragment();
+        for (let i = 0; i < count; i++) {
+            const s = document.createElement('span');
+            s.className = 'casino-burst';
+            s.textContent = emojis[Math.floor(Math.random() * emojis.length)];
+            const dx = (Math.random() * 2 - 1) * 140 + 'px';
+            const dy = (Math.random() * -120 - 40) + 'px';
+            s.style.left = (Math.random() * 100) + '%';
+            s.style.setProperty('--dx', dx);
+            s.style.setProperty('--dy', dy);
+            s.style.setProperty('--dur', (0.7 + Math.random() * 0.6) + 's');
+            s.style.setProperty('--delay', (Math.random() * 0.25) + 's');
+            s.style.fontSize = (big ? 1.4 + Math.random() * 1.2 : 0.9 + Math.random() * 0.6) + 'rem';
+            frag.appendChild(s);
+        }
+        container.style.position = 'relative';
+        container.appendChild(frag);
+        setTimeout(() => container.querySelectorAll('.casino-burst').forEach(b => b.remove()), 1500);
+    },
+
+    /* Kurzes Aufblitzen des Guthabens */
+    casinoFlash() {
+        const el = document.getElementById('casino-cash');
+        if (!el) return;
+        el.classList.remove('cash-flash');
+        void el.offsetWidth;
+        el.classList.add('cash-flash');
+        setTimeout(() => el.classList.remove('cash-flash'), 700);
     },
 
     spinRoulette() {
         if (!this.canAct()) return;
+        if (this.rouletteBusy) return;
         const amount = parseFloat(document.getElementById('roulette-bet-amount').value) || 0;
-        const result = Casino.spinRoulette(this.rouletteBet || { type: 'red' }, amount);
-        if (!result) { this.showToast('Ungültiger Einsatz oder zu wenig Guthaben!', '⚠️'); this.updateCasino(); return; }
-        this.showRouletteResult(result);
-        this.updateCasino();
-        GameState.save();
+        if (amount <= 0 || amount > GameState.cash) {
+            this.showToast('Ungültiger Einsatz oder zu wenig Guthaben!', '⚠️');
+            this.updateCasino();
+            return;
+        }
+        const grid = document.getElementById('roulette-number-grid');
+        const resultEl = document.getElementById('roulette-result');
+        this.rouletteBusy = true;
+        resultEl.innerHTML = '<div class="casino-ball rolling">🎱</div><div class="casino-message empty">Die Kugel rollt…</div>';
+        grid.classList.add('roulette-spinning');
+        this.updateCasinoButtons();
+
+        setTimeout(() => {
+            const result = Casino.spinRoulette(this.rouletteBet || { type: 'red' }, amount);
+            if (!result) { this.showToast('Ungültiger Einsatz oder zu wenig Guthaben!', '⚠️'); }
+            this.rouletteBusy = false;
+            grid.classList.remove('roulette-spinning');
+            if (result) this.showRouletteResult(result);
+            this.updateCasino();
+            GameState.save();
+        }, 900);
     },
 
     spinSlot() {
@@ -2026,6 +2101,7 @@ const UI = {
 
         this.slotBusy = true;
         document.getElementById('slot-result').innerHTML = '';
+        document.getElementById('slot-reels').classList.remove('slot-win');
         this.updateCasinoButtons();
         this.updateCasino();
 
@@ -2045,6 +2121,13 @@ const UI = {
 
             reels.forEach(reel => reel.classList.remove('slot-stop'));
             reels.forEach(reel => reel.classList.add('spinning'));
+            reels.forEach((reel, i) => {
+                reel.classList.remove('winning-reel');
+                void reel.offsetWidth;
+                if (i === 0) setTimeout(() => reel.classList.add('shine'), 700);
+                if (i === 1) setTimeout(() => reel.classList.add('shine'), 1250);
+                if (i === 2) setTimeout(() => reel.classList.add('shine'), 1750);
+            });
 
             for (let r = 0; r < 3; r++) {
                 const iv = setInterval(() => {
@@ -2062,8 +2145,10 @@ const UI = {
             });
             setTimeout(() => {
                 reels.forEach(reel => reel.classList.remove('spinning'));
-                reels.forEach(reel => reel.classList.add('slot-stop'));
-                setTimeout(resolve, 250);
+                reels.forEach((reel, r) => {
+                    setTimeout(() => reel.classList.add('slot-stop'), r * 90);
+                });
+                setTimeout(resolve, 320);
             }, 1900);
         });
     },
@@ -2074,14 +2159,22 @@ const UI = {
             row.classList.toggle('pay-hit', result.winAmount > 0 && row.dataset.combo === result.symbols.join(''));
         });
         if (result.jackpot) {
+            document.getElementById('slot-reels').classList.add('slot-win');
             el.innerHTML = `<div class="slot-jackpot">💰💰💰 JACKPOT! 💰💰💰</div>
                 <div class="casino-message message-win">Du hast <strong>€1.000.000</strong> gewonnen!</div>`;
+            this.emitWinBurst(el, true);
+            this.casinoFlash();
         } else if (result.winAmount > 0) {
+            document.getElementById('slot-reels').classList.add('slot-win');
             el.innerHTML = `<div class="casino-message message-win">
                 ${result.symbols.join(' ')} · <strong>${result.combo}</strong>
                 <br><span class="positive">+€${this.fmt(result.winAmount)}</span>
             </div>`;
+            if (result.winAmount >= 1000) this.emitWinBurst(el, true);
+            else this.emitWinBurst(el, false);
+            this.casinoFlash();
         } else {
+            document.getElementById('slot-reels').classList.remove('slot-win');
             el.innerHTML = `<div class="casino-message message-lose">
                 ${result.symbols.join(' ')} · <span class="negative">Kein Gewinn. −€${this.fmt(Math.abs(result.profit))}</span>
             </div>`;
@@ -2090,23 +2183,49 @@ const UI = {
 
     flipCoin() {
         if (!this.canAct()) return;
+        if (this.coinBusy) return;
         const amount = parseFloat(document.getElementById('coin-bet-amount').value) || 0;
         const side = this.coinSide || 'kopf';
         const result = Casino.flipCoin(side, amount);
         if (!result) { this.showToast('Ungültiger Einsatz oder zu wenig Guthaben!', '⚠️'); this.updateCasino(); return; }
-        const face = result.result === 'kopf' ? '👑' : '🪙';
-        const coin = document.getElementById('coin-show');
-        coin.textContent = face;
-        coin.classList.remove('flip-anim');
-        void coin.offsetWidth;
-        coin.classList.add('flip-anim');
+        this.coinBusy = true;
+        this.updateCasinoButtons();
+
         const el = document.getElementById('coin-result');
-        el.innerHTML = `<div class="casino-message ${result.win ? 'message-win' : 'message-lose'}">
-            Ergebnis: <strong>${result.result.charAt(0).toUpperCase() + result.result.slice(1)}</strong> ${face}
-            <br>${result.win ? `<span class="positive">GEWONNEN! +€${this.fmt(result.profit)}</span>` : `<span class="negative">Leider verloren. −€${this.fmt(Math.abs(result.profit))}</span>`}
-        </div>`;
-        this.updateCasino();
-        GameState.save();
+        el.innerHTML = '<div class="casino-message empty">Die Münze fliegt…</div>';
+
+        const faces = ['kopf', 'zahl'];
+        let spinCount = 0;
+        const coin = document.getElementById('coin-show');
+        const spinLoop = setInterval(() => {
+            coin.textContent = faces[spinCount % 2] === 'kopf' ? '👑' : '🪙';
+            coin.classList.remove('flip-anim');
+            void coin.offsetWidth;
+            coin.classList.add('flip-anim');
+            spinCount++;
+        }, 260);
+
+        const finishFlip = setTimeout(() => {
+            clearInterval(spinLoop);
+            const face = result.result === 'kopf' ? '👑' : '🪙';
+            coin.textContent = face;
+            coin.classList.remove('flip-anim');
+            void coin.offsetWidth;
+            coin.classList.add('flip-anim', 'coin-finish');
+            setTimeout(() => coin.classList.remove('coin-finish'), 800);
+
+            el.innerHTML = `<div class="casino-message ${result.win ? 'message-win' : 'message-lose'}">
+                Ergebnis: <strong>${result.result.charAt(0).toUpperCase() + result.result.slice(1)}</strong> ${face}
+                <br>${result.win ? `<span class="positive">GEWONNEN! +€${this.fmt(result.profit)}</span>` : `<span class="negative">Leider verloren. −€${this.fmt(Math.abs(result.profit))}</span>`}
+            </div>`;
+            if (result.win) {
+                this.emitWinBurst(el, false);
+                this.casinoFlash();
+            }
+            this.coinBusy = false;
+            this.updateCasino();
+            GameState.save();
+        }, 1350);
     },
 
     /* --- Blackjack 21 ---------------------------------------- */
@@ -2135,12 +2254,31 @@ const UI = {
             dealer.innerHTML = '<span class="bj-placeholder">Warte auf Einsatz…</span>';
             player.innerHTML = '<span class="bj-placeholder">Karten werden geteilt.</span>';
             this.renderBlackjackResult(null);
+            const bjCard = document.querySelector('.casino-bj-card');
+            if (bjCard) bjCard.classList.remove('win', 'lose', 'push');
             return;
         }
-        const hideHole = st.status === 'player';
-        dealer.innerHTML = this.cardBack() + this.cardHtml(st.dealer[1]) + this.handSumHtml(hideHole ? [st.dealer[1]] : st.dealer);
+        const done = st.status === 'done';
+        const resultLine =
+            done
+                ? `<span class="bj-pill ${st.result === 'win' || st.result === 'blackjack' ? 'pill-win' : st.result === 'push' ? 'pill-push' : 'pill-lose'}">
+                        ${st.result === 'blackjack' ? '♠️ BLACKJACK' : st.result === 'win' ? 'GEWONNEN' : st.result === 'push' ? 'PUSH' : 'BANK GEWINNT'}
+                   </span>`
+                : '<span class="bj-pill pill-info">🃏 Dealer zieht bis 17</span>';
+        document.getElementById('bj-zone-dealer').classList.toggle('reveal', done);
+        dealer.innerHTML =
+            (done ? '' : this.cardBack()) +
+            this.cardHtml(st.dealer[1]) +
+            this.handSumHtml(done ? st.dealer : [st.dealer[1]]) +
+            resultLine;
         player.innerHTML = st.player.map(c => this.cardHtml(c)).join('') + this.handSumHtml(st.player);
-        this.renderBlackjackResult(st.status === 'done' ? st : null);
+        const bjCard = document.querySelector('.casino-bj-card');
+        if (bjCard) {
+            bjCard.classList.toggle('win', done && (st.result === 'win' || st.result === 'blackjack'));
+            bjCard.classList.toggle('lose', done && st.result === 'lose');
+            bjCard.classList.toggle('push', done && st.result === 'push');
+        }
+        this.renderBlackjackResult(done ? st : null);
     },
     renderBlackjackResult(st) {
         const el = document.getElementById('bj-result');
@@ -2158,8 +2296,7 @@ const UI = {
         const payText = st.result === 'push'
             ? 'Einsatz zurück.'
             : (st.profit >= 0 ? `+€${this.fmt(st.profit)}` : `−€${this.fmt(Math.abs(st.profit))}`);
-        el.innerHTML = `<div class="bj-result-line">${st.player.map(c => this.cardHtml(c)).join(' ') || ''} vs. ${st.dealer.map(c => this.cardHtml(c)).join(' ') || ''}</div>
-            <div class="casino-message ${st.result === 'lose' ? 'message-lose' : 'message-win'}">
+        el.innerHTML = `<div class="casino-message ${st.result === 'lose' ? 'message-lose' : 'message-win'}">
                 <strong>${labels[st.result] || st.result}</strong>
                 <br><span class="${st.profit >= 0 ? 'positive' : 'negative'}">${payText}</span>
             </div>`;
@@ -2198,7 +2335,14 @@ const UI = {
         const st = Casino.BLACKJACK.state;
         if (!st) return;
         this.renderBlackjackResult(st);
-        if (st.result === 'blackjack') this.showToast('BLACKJACK! 🎉 +€' + this.fmt(st.profit), '🎉');
+        if (st.result === 'blackjack') {
+            this.showToast('BLACKJACK! 🎉 +€' + this.fmt(st.profit), '🎉');
+            this.emitWinBurst(document.getElementById('bj-result'), true);
+            this.casinoFlash();
+        } else if (st.result === 'win') {
+            this.emitWinBurst(document.getElementById('bj-result'), st.profit >= 100);
+            this.casinoFlash();
+        }
     },
 
     updateLeaderboard() {

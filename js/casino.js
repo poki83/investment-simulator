@@ -70,8 +70,8 @@ const Casino = {
         { type: 'dozen2', label: '2. Dtz. 13–24', payout: 2, icon: '1️⃣3️⃣–2️⃣4️⃣' },
         { type: 'dozen3', label: '3. Dtz. 25–36', payout: 2, icon: '2️⃣5️⃣' },
         { type: 'col1', label: 'Kolonne 1', payout: 2, icon: '▮' },
-        { type: 'col2', label: 'Kolonne 2', payout: 2, icon: '▯' },
-        { type: 'col3', label: 'Kolonne 3', payout: 2, icon: '▯' }
+        { type: 'col2', label: 'Kolonne 2', payout: 2, icon: '▮▮' },
+        { type: 'col3', label: 'Kolonne 3', payout: 2, icon: '▮▮▮' }
     ],
 
     BLACKJACK_MIN_BET: 10,
@@ -181,7 +181,7 @@ const Casino = {
             if (r.result === 'push') {
                 GameState.addCash(r.payout); /* Einsatz zurück, net unverändert */
             } else if (r.payout > 0) {
-                Casino.addWin(r.payout);
+                Casino.addWin(r.payout, st.bet);
             } else {
                 Casino.addLoss(st.bet);
             }
@@ -195,19 +195,23 @@ const Casino = {
 
     init() {
         if (!GameState.casinoStats) {
-            GameState.casinoStats = { net: 0, wagered: 0, wins: 0, losses: 0 };
+            GameState.casinoStats = { net: 0, wagered: 0, wins: 0, losses: 0, streak: 0, maxStreak: 0 };
         }
     },
 
-    addWin(amount) {
+    /* amount = ausgezahlt (brutto inkl. Einsatz), stake = gesetzter Einsatz */
+    addWin(amount, stake) {
         GameState.addCash(amount);
-        GameState.casinoStats.net += amount;
+        GameState.casinoStats.net += amount - (Number(stake) || 0);
         GameState.casinoStats.wins++;
+        GameState.casinoStats.streak = (GameState.casinoStats.streak || 0) + 1;
+        GameState.casinoStats.maxStreak = Math.max(GameState.casinoStats.maxStreak || 0, GameState.casinoStats.streak);
     },
 
     addLoss(amount) {
         GameState.casinoStats.net -= amount;
         GameState.casinoStats.losses++;
+        GameState.casinoStats.streak = 0;
     },
 
     redBlack(num) {
@@ -251,7 +255,7 @@ const Casino = {
         const profit = win ? amount * payout : -amount;
 
         if (win) {
-            this.addWin(winAmount);
+            this.addWin(winAmount, amount);
         } else {
             this.addLoss(amount);
         }
@@ -273,7 +277,7 @@ const Casino = {
         const profit = winAmount - amount;
 
         if (winAmount > 0) {
-            this.addWin(winAmount);
+            this.addWin(winAmount, amount);
         } else {
             this.addLoss(amount);
         }
@@ -301,7 +305,7 @@ const Casino = {
         const profit = win ? amount : -amount;
 
         if (win) {
-            this.addWin(winAmount);
+            this.addWin(winAmount, amount);
         } else {
             this.addLoss(amount);
         }

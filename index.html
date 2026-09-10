@@ -599,6 +599,14 @@
                         <span class="mini-label">Gewinntreffer</span>
                         <span class="mini-value" id="casino-wins">0</span>
                     </div>
+                    <div class="card mini-stat">
+                        <span class="mini-label">Verlorene Runden</span>
+                        <span class="mini-value" id="casino-losses">0</span>
+                    </div>
+                    <div class="card mini-stat">
+                        <span class="mini-label">Beste Serie</span>
+                        <span class="mini-value" id="casino-streak">0</span>
+                    </div>
                 </div>
 
                 <div id="casino-tabs" class="casino-tabs">
@@ -643,7 +651,7 @@
                             <span class="bj-deck">🎴 Kartenstapel: <strong id="bj-deck-count">52</strong></span>
                         </div>
                         <div class="bj-screen">
-                            <div class="bj-zone bj-dealer">
+                            <div class="bj-zone bj-dealer" id="bj-zone-dealer">
                                 <span class="bj-label">DEALER</span>
                                 <div id="bj-dealer-hand" class="bj-hand"></div>
                             </div>

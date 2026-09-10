@@ -43,7 +43,7 @@ const GameState = {
     realEstateState: [],
     tutorialDone: false,
     totalInvested: 0,
-    casinoStats: { net: 0, wagered: 0, wins: 0, losses: 0 },
+    casinoStats: { net: 0, wagered: 0, wins: 0, losses: 0, streak: 0, maxStreak: 0 },
 
     init() {
         const saved = Storage.load();
@@ -82,7 +82,7 @@ const GameState = {
         this.realEstateState = [];
         this.tutorialDone = false;
         this.totalInvested = 0;
-        this.casinoStats = { net: 0, wagered: 0, wins: 0, losses: 0 };
+        this.casinoStats = { net: 0, wagered: 0, wins: 0, losses: 0, streak: 0, maxStreak: 0 };
     },
 
     save() {

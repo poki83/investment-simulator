@@ -1078,6 +1078,30 @@ body {
     40%  { transform: rotateY(540deg) scale(1.25); }
     100% { transform: rotateY(720deg) scale(1); }
 }
+.coin-show.coin-finish {
+    animation: coinBounce 0.8s cubic-bezier(0.3, 0.8, 0.4, 1) !important;
+}
+@keyframes coinBounce {
+    0%   { transform: scale(1.25); }
+    30%  { transform: scale(0.9) translateY(8px); }
+    60%  { transform: scale(1.15) translateY(-6px); }
+    100% { transform: scale(1) translateY(0); }
+}
+
+/* --- Geld-Flash ------------------------------------------- */
+.casino-cash-box strong {
+    transition: color 0.2s ease, transform 0.2s ease;
+    display: inline-block;
+}
+.casino-cash-box strong.cash-flash {
+    color: #ffd166;
+    transform: scale(1.12);
+    animation: cashPulse 0.6s ease 2;
+}
+@keyframes cashPulse {
+    0%, 100% { filter: brightness(1); }
+    50% { filter: brightness(1.65); }
+}
 
 /* --- Blackjack -------------------------------------------- */
 .casino-bj-card {
@@ -1238,4 +1262,131 @@ body {
 @keyframes payFlash {
     0%, 100% { opacity: 1; }
     50% { opacity: 0.5; }
+}
+
+/* =========================================================
+   CASINO-ANIMATIONEN (Relaunch 2)
+   ========================================================= */
+
+/* --- Guthaben-Flash --------------------------------------- */
+.casino-cash-box strong {
+    transition: color 0.2s ease, transform 0.2s ease;
+    display: inline-block;
+}
+.casino-cash-box strong.cash-flash {
+    color: #ffd166;
+    transform: scale(1.12);
+    animation: cashPulse 0.6s ease 2;
+}
+@keyframes cashPulse {
+    0%, 100% { filter: brightness(1); }
+    50% { filter: brightness(1.65); }
+}
+
+/* --- Roulette: Kugel- und Zahlen-Animation ---------------- */
+.roulette-grid.roulette-spinning .roulette-num {
+    animation: numShake 0.12s ease-in-out infinite alternate;
+    pointer-events: none;
+}
+@keyframes numShake {
+    from { transform: translateY(-2px); }
+    to   { transform: translateY(2px); }
+}
+.casino-ball {
+    animation: ballDrop 0.45s cubic-bezier(0.2, 0.9, 0.3, 1.15);
+}
+.casino-ball.rolling {
+    animation: ballSpin 0.5s linear infinite;
+}
+@keyframes ballDrop {
+    from { transform: translateY(-26px) scale(0.7); opacity: 0; }
+    to   { transform: translateY(0) scale(1); opacity: 1; }
+}
+@keyframes ballSpin {
+    from { transform: rotate(0deg); }
+    to   { transform: rotate(360deg); }
+}
+
+/* --- Slot: Gewinn-Glow + Glanz-Slide ---------------------- */
+.slot-reel {
+    position: relative;
+}
+.slot-reels.slot-win {
+    animation: slotWinGlow 0.5s ease-in-out 3;
+}
+@keyframes slotWinGlow {
+    0%, 100% { box-shadow: 0 0 0 rgba(245, 158, 11, 0); }
+    50% { box-shadow: 0 0 0 4px #f59e0b, 0 0 34px 8px rgba(245, 158, 11, 0.5); }
+}
+.slot-reel.shine::after {
+    content: "";
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(105deg, transparent 30%, rgba(255, 255, 255, 0.85) 50%, transparent 70%);
+    transform: translateX(-130%);
+    animation: reelShine 0.55s ease forwards;
+    pointer-events: none;
+}
+@keyframes reelShine {
+    to { transform: translateX(130%); }
+}
+
+/* --- Emoji-Burst bei Gewinnen ------------------------------ */
+.casino-result .casino-message {
+    position: relative;
+}
+.casino-burst {
+    position: absolute;
+    top: 30%;
+    pointer-events: none;
+    animation: burstFly var(--dur) cubic-bezier(0.2, 0.7, 0.3, 1) var(--delay) forwards;
+    opacity: 0;
+    text-shadow: 0 2px 6px rgba(0, 0, 0, 0.25);
+}
+@keyframes burstFly {
+    0%   { opacity: 1; transform: translate(0, 0) scale(0.6) rotate(0deg); }
+    70%  { opacity: 1; }
+    100% { opacity: 0; transform: translate(var(--dx), var(--dy)) scale(1.3) rotate(var(--rot, 50deg)); }
+}
+
+/* --- Blackjack: gestaffeltes Austeilen --------------------- */
+.bj-hand .bj-card:nth-child(2) { animation-delay: 0.09s; }
+.bj-hand .bj-card:nth-child(3) { animation-delay: 0.18s; }
+.bj-hand .bj-card:nth-child(4) { animation-delay: 0.27s; }
+.bj-hand .bj-card:nth-child(5) { animation-delay: 0.36s; }
+.bj-zone.reveal .bj-hand .bj-card:nth-child(2) {
+    animation: cardReveal 0.5s cubic-bezier(0.2, 0.9, 0.3, 1.2);
+}
+@keyframes cardReveal {
+    0%   { transform: perspective(500px) rotateY(90deg); opacity: 0.3; }
+    100% { transform: perspective(500px) rotateY(0deg); opacity: 1; }
+}
+.bj-pill {
+    display: inline-block;
+    margin: 10px auto 0;
+    padding: 6px 14px;
+    border-radius: 999px;
+    font-size: 0.78rem;
+    font-weight: 800;
+    letter-spacing: 0.05em;
+    text-transform: uppercase;
+}
+.bj-pill.pill-info { background: rgba(255, 255, 255, 0.12); color: rgba(255, 255, 255, 0.75); }
+.bj-pill.pill-win  { background: linear-gradient(90deg, #ffd76a, #f59e0b); color: #3b2b00; animation: pillPop 0.5s cubic-bezier(0.2, 0.9, 0.3, 1.4); }
+.bj-pill.pill-push { background: rgba(255, 255, 255, 0.85); color: #14532d; }
+.bj-pill.pill-lose { background: rgba(220, 38, 38, 0.85); color: #fff; }
+@keyframes pillPop {
+    0%   { transform: scale(0.5); opacity: 0; }
+    60%  { transform: scale(1.15); }
+    100% { transform: scale(1); opacity: 1; }
+}
+.casino-bj-card {
+    transition: box-shadow 0.3s ease;
+}
+.casino-bj-card.win  { box-shadow: 0 0 0 3px #2fb96a, 0 18px 40px rgba(12, 60, 32, 0.35); animation: bjGlow 1s ease-in-out 2; }
+.casino-bj-card.lose { box-shadow: 0 0 0 3px rgba(220, 38, 38, 0.65), 0 18px 40px rgba(60, 20, 20, 0.3); }
+.casino-bj-card.push { box-shadow: 0 0 0 3px rgba(255, 255, 255, 0.45), 0 18px 40px rgba(12, 60, 32, 0.35); }
+@keyframes bjGlow {
+    0%, 100% { filter: brightness(1); }
+    50% { filter: brightness(1.2); }
 }
