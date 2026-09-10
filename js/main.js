@@ -19,6 +19,7 @@ const Game = {
         Luxury.init();
         Leaderboard.init();
         Casino.init();
+        Oracle.ensureState();
         Events.init();
 
         if (loaded) {
@@ -56,7 +57,11 @@ const Game = {
 
         const days = Math.min(30, elapsedMinutes);
         for (let i = 0; i < days; i++) {
+            const prevWeek = GameState.week;
             GameState.advanceDay();
+            if (GameState.week !== prevWeek) {
+                Oracle.weekEnded();
+            }
             if (GameState.isWeekday()) {
                 StockMarket.update();
                 ETFMarket.update();
@@ -101,7 +106,15 @@ const Game = {
     },
 
     tick() {
+        const prevWeek = GameState.week;
         GameState.advanceDay();
+
+        if (GameState.week !== prevWeek) {
+            const oracleEvent = Oracle.weekEnded();
+            if (oracleEvent) {
+                UI.showOracleToast ? UI.showOracleToast(oracleEvent) : null;
+            }
+        }
 
         const nowMinute = Math.floor(Date.now() / 60000);
         if (nowMinute !== this.lastMarketMinute) {

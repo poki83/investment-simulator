@@ -44,6 +44,7 @@ const GameState = {
     tutorialDone: false,
     totalInvested: 0,
     casinoStats: { net: 0, wagered: 0, wins: 0, losses: 0, streak: 0, maxStreak: 0 },
+    oracle: null,
 
     init() {
         const saved = Storage.load();
@@ -83,6 +84,7 @@ const GameState = {
         this.tutorialDone = false;
         this.totalInvested = 0;
         this.casinoStats = { net: 0, wagered: 0, wins: 0, losses: 0, streak: 0, maxStreak: 0 };
+        this.oracle = null;
     },
 
     save() {

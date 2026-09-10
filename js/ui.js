@@ -33,6 +33,7 @@ const UI = {
         this.bindSellModal();
         this.bindPortfolio();
         this.bindCasino();
+        this.bindOracle();
         this.updateAll();
     },
 
@@ -298,6 +299,7 @@ const UI = {
         this.updateTaxes();
         this.updateNewsList();
         this.updateCasino();
+        if (this.currentPage === 'oracle') this.renderOracle();
         this.updateDate();
         this.updateSpeedDisplay();
         if (this.detailOpen && ['stock', 'etf', 'crypto'].indexOf(this.detailOpen.type) !== -1) {
@@ -318,6 +320,7 @@ const UI = {
             case 'garage': this.updateGarage(); break;
             case 'casino': this.updateCasino(); break;
             case 'leaderboard': this.updateLeaderboard(); break;
+            case 'oracle': this.renderOracle(); break;
             case 'taxes': this.updateTaxes(); break;
             case 'news': this.updateNewsList(); break;
         }
@@ -2058,6 +2061,155 @@ const UI = {
         void el.offsetWidth;
         el.classList.add('cash-flash');
         setTimeout(() => el.classList.remove('cash-flash'), 700);
+    },
+
+    /* --- Markt-Orakel Q ------------------------------------- */
+    bindOracle() {
+        document.addEventListener('click', (e) => {
+            const btn = e.target.closest('[data-oracle-predict]');
+            if (!btn) return;
+            if (!this.canAct()) return;
+            const ok = Oracle.answer(btn.dataset.oraclePredict);
+            if (ok) {
+                this.renderOracle();
+                GameState.save();
+                this.showToast('🔮 Q hat deine Prognose aufgenommen.', '🔮');
+            }
+        });
+    },
+
+    renderOracle() {
+        const o = Oracle.ensureState();
+        const q = o.question;
+
+        const statusEl = document.getElementById('oracle-status');
+        if (!statusEl) return;
+
+        /* Status */
+        if (o.locked) {
+            statusEl.textContent = '📨 Antwort registriert';
+            statusEl.style.color = '#ffd166';
+        } else if (q) {
+            statusEl.textContent = '● Offene Frage';
+            statusEl.style.color = '#2fb96a';
+        } else {
+            statusEl.textContent = '● Bereit';
+            statusEl.style.color = '#2fb96a';
+        }
+
+        /* Fragekarte */
+        const titleEl = document.getElementById('oracle-question-title');
+        if (q) {
+            const now = Oracle.currentPrice(q);
+            titleEl.textContent = `${q.name} (${q.symbol})`;
+            document.getElementById('oracle-question-text').innerHTML = Oracle.questionText(q);
+            document.getElementById('oracle-price-line').innerHTML =
+                `<span class="oracle-price-tag">Bei Frage: €${this.fmtPrice(q.price)}</span>` +
+                `<span class="oracle-price-tag ${now >= q.price ? 'positive' : 'negative'}">Aktuell: €${this.fmtPrice(now)} ${now >= q.price ? '▲' : '▼'}</span>`;
+            const actions = document.getElementById('oracle-actions');
+            if (o.locked) {
+                actions.style.display = 'none';
+                const lockedEl = document.getElementById('oracle-locked');
+                lockedEl.style.display = '';
+                const predLabel = o.predict === 'up' ? '📈 wird steigen' : o.predict === 'down' ? '📉 wird fallen' : '🚫 nicht wetten';
+                lockedEl.innerHTML = `Deine Prognose ist versiegelt: <strong>${predLabel}</strong>.<br><small>Die Auflösung erfolgt automatisch am Wochenende.</small>`;
+            } else {
+                actions.style.display = '';
+                document.getElementById('oracle-locked').style.display = 'none';
+                actions.innerHTML = `
+                    <button class="btn btn-success" data-oracle-predict="up">📈 Steigt</button>
+                    <button class="btn btn-danger" data-oracle-predict="down">📉 Fällt</button>
+                    <button class="btn btn-secondary" data-oracle-predict="pass">🚫 Passen</button>`;
+            }
+        } else {
+            titleEl.textContent = 'Q scannt die Märkte …';
+            document.getElementById('oracle-question-text').innerHTML = 'Die nächste Kurs-Prognose erscheint automatisch mit dem Wochenende.';
+            document.getElementById('oracle-price-line').innerHTML = '';
+            document.getElementById('oracle-actions').style.display = 'none';
+            document.getElementById('oracle-locked').style.display = 'none';
+        }
+
+        /* Aktiver Boost / Strafe */
+        const effEl = document.getElementById('oracle-effect');
+        if (o.buff || o.penalty) {
+            effEl.style.display = '';
+            let html = '<div class="oracle-effect-tag">';
+            if (o.buff) {
+                const b = o.buff;
+                const txt = b.type === 'steuer'
+                    ? `🧾 Orakel-Steuerbonus: +${Oracle.STEUER_BOOST} € Sparerpauschbetrag`
+                    : `🚀 ${b.type === 'krypto' ? 'Krypto-Rally' : b.type === 'etf' ? 'ETF-Boom' : 'Aktien-Rally'}: +${(Oracle.RATES.boost[b.type] * 100)} % auf dieses Segment`;
+                html += `<div class="oracle-buff">${txt} <small>(wirkt bis Ende Woche ${b.untilWeek})</small></div>`;
+            }
+            if (o.penalty) {
+                const p = o.penalty;
+                const txt = `⚡ ${p.type === 'krypto' ? 'Krypto' : p.type === 'etf' ? 'ETF' : 'Aktien'}-Korrektur: −${(Oracle.RATES.penalty * 100)} % in dieser Woche`;
+                html += `<div class="oracle-penalty">${txt} <small>(bis Ende Woche ${p.untilWeek})</small></div>`;
+            }
+            effEl.innerHTML = html + '</div>';
+        } else {
+            effEl.style.display = 'none';
+        }
+
+        /* Statistiken */
+        const total = o.correct + o.wrong;
+        document.getElementById('oracle-total').textContent = total;
+        document.getElementById('oracle-correct').textContent = o.correct;
+        document.getElementById('oracle-quote').textContent = total > 0
+            ? Math.round((o.correct / total) * 100) + ' %'
+            : '–';
+        document.getElementById('oracle-streak').textContent = o.streak > 1 ? '🔥 ' + o.streak : o.streak;
+        document.getElementById('oracle-best').textContent = o.bestStreak;
+
+        /* Prestige */
+        const title = Oracle.title();
+        document.getElementById('oracle-title-emoji').textContent = title.emoji;
+        document.getElementById('oracle-title').textContent = `${title.emoji} ${title.title}`;
+        const idx = Oracle.TITLES.findIndex(t => t.title === title.title);
+        const next = idx > 0 ? Oracle.TITLES[idx - 1] : null;
+        const subEl = document.getElementById('oracle-title-progress');
+        if (next) {
+            const need = next.min;
+            subEl.textContent = `Richtige Prognosen: ${o.correct} · Nächster Rang: ${next.emoji} ${next.title} (ab ${need})`;
+            document.getElementById('oracle-prestige-fill').style.width = Math.min(100, Math.round((o.correct / need) * 100)) + '%';
+        } else {
+            subEl.textContent = `Richtige Prognosen: ${o.correct} · Höchster Rang erreicht!`;
+            document.getElementById('oracle-prestige-fill').style.width = '100%';
+        }
+
+        /* Chronik */
+        const listEl = document.getElementById('oracle-history-list');
+        if (!o.history.length) {
+            listEl.innerHTML = '<div class="oracle-empty">Noch keine Prognosen abgegeben – Q wartet auf dich.</div>';
+        } else {
+            listEl.innerHTML = o.history.map(h => {
+                const icon = h.outcome === 'correct' ? '✔' : h.outcome === 'wrong' ? '✘' : h.outcome === 'pass' ? '—' : '⊙';
+                const cls = h.outcome === 'correct' ? 'oracle-row-ok' : h.outcome === 'wrong' ? 'oracle-row-no' : 'oracle-row-mid';
+                const pred = h.prediction === 'up' ? '📈 steigt' : h.prediction === 'down' ? '📉 fällt' : h.prediction === 'pass' ? 'gepasst' : 'unbeantwortet';
+                return `<div class="oracle-row ${cls}">
+                    <span class="oracle-row-week">W${h.week}</span>
+                    <span class="oracle-row-asset">${h.name} <small>${h.symbol}</small></span>
+                    <span class="oracle-row-swing ${h.endPrice >= h.price ? 'positive' : 'negative'}">${h.endPrice >= h.price ? '+' : ''}${((h.endPrice - h.price) / h.price * 100).toFixed(2)} %</span>
+                    <span class="oracle-row-pred">${pred}</span>
+                    <span class="oracle-row-outcome ${cls}">${icon} ${Oracle.outcomeLabel(h.outcome)}</span>
+                </div>`;
+            }).join('');
+        }
+    },
+
+    showOracleToast(event) {
+        if (!event || !event.q) return;
+        const q = event.q;
+        const move = ((q.moved !== undefined ? q.moved : 0)).toFixed(2) + '%';
+        if (event.type === 'correct') {
+            this.showToast(`🔮 Q: Richtig! ${q.name} ${q.side === 'up' ? 'stieg' : 'fiel'} (${move}) – Boost aktiv!`, '🔮');
+        } else if (event.type === 'wrong') {
+            this.showToast(`🔮 Q: Falsch getippt – ${q.seg === 'krypto' ? 'Krypto' : q.seg === 'etf' ? 'ETF' : 'Aktien'}-Korrektur trifft dich.`, '⚡');
+        } else if (event.type === 'pass') {
+            this.showToast(`🔮 Q: Du hast gepasst – der Markt zieht seine Bahn.`, '🔮');
+        } else {
+            this.showToast(`🔮 Q: Frage unbeantwortet – keine Wirkung.`, '🔮');
+        }
     },
 
     spinRoulette() {

@@ -128,6 +128,10 @@
                 <span class="nav-icon">🏆</span>
                 <span class="nav-label">Reichtum</span>
             </button>
+            <button class="nav-btn" data-page="oracle">
+                <span class="nav-icon">🔮</span>
+                <span class="nav-label">Orakel</span>
+            </button>
             <button class="nav-btn" data-page="taxes">
                 <span class="nav-icon">📋</span>
                 <span class="nav-label">Steuern</span>
@@ -723,6 +727,75 @@
                 </div>
             </div>
 
+            <!-- Markt-Orakel Q -->
+            <div id="page-oracle" class="page">
+                <div class="page-header">
+                    <h2>🔮 Markt-Orakel Q</h2>
+                    <div class="filter-bar">
+                        <span class="casino-cash-box">Signal: <strong id="oracle-status">Bereit</strong></span>
+                    </div>
+                </div>
+
+                <div class="card oracle-holo">
+                    <div class="oracle-orb" id="oracle-orb">Q</div>
+                    <div class="oracle-holo-text">
+                        <p class="oracle-greeting">„Ich durchdringe jeden Kurs, jedes Gerücht, jede Welle des Marktes."</p>
+                        <p class="oracle-brief" id="oracle-brief">Einmal pro Woche stellt Q dir eine Kurs-Prognose. Läuft der Markt in deine Richtung, löst Q wie von Geisterhand einen 7-Tage-Boost aus. Liegst du daneben, zahlt der Markt heim.</p>
+                    </div>
+                </div>
+
+                <div class="card oracle-question-card" id="oracle-question-card">
+                    <h3 id="oracle-question-title">Q denkt nach …</h3>
+                    <p class="oracle-question-text" id="oracle-question-text"></p>
+                    <div class="oracle-price-line" id="oracle-price-line"></div>
+                    <div class="oracle-actions" id="oracle-actions"></div>
+                    <p class="oracle-locked" id="oracle-locked" style="display:none"></p>
+                </div>
+
+                <div class="card oracle-effect" id="oracle-effect" style="display:none"></div>
+
+                <div class="oracle-stats">
+                    <div class="card mini-stat">
+                        <span class="mini-label">Prognosen</span>
+                        <span class="mini-value" id="oracle-total">0</span>
+                    </div>
+                    <div class="card mini-stat">
+                        <span class="mini-label">Richtig</span>
+                        <span class="mini-value" id="oracle-correct">0</span>
+                    </div>
+                    <div class="card mini-stat">
+                        <span class="mini-label">Quote</span>
+                        <span class="mini-value" id="oracle-quote">–</span>
+                    </div>
+                    <div class="card mini-stat">
+                        <span class="mini-label">Serie</span>
+                        <span class="mini-value" id="oracle-streak">0</span>
+                    </div>
+                    <div class="card mini-stat">
+                        <span class="mini-label">Beste Serie</span>
+                        <span class="mini-value" id="oracle-best">0</span>
+                    </div>
+                </div>
+
+                <div class="card oracle-prestige">
+                    <div class="oracle-prestige-head">
+                        <span class="oracle-prestige-emoji" id="oracle-title-emoji">❓</span>
+                        <div>
+                            <div class="oracle-prestige-title" id="oracle-title">Unbekanntes Signal</div>
+                            <div class="oracle-prestige-sub" id="oracle-title-progress">Richtige Prognosen: 0</div>
+                        </div>
+                    </div>
+                    <div class="oracle-prestige-bar"><div id="oracle-prestige-fill"></div></div>
+                </div>
+
+                <div class="card oracle-history">
+                    <h3>📜 Prognose-Chronik</h3>
+                    <div id="oracle-history-list" class="oracle-history-list">
+                        <div class="oracle-empty">Noch keine Prognosen abgegeben – Q wartet auf dich.</div>
+                    </div>
+                </div>
+            </div>
+
             <!-- Reichsten Menschen -->
             <div id="page-leaderboard" class="page">
                 <div class="page-header">
@@ -829,6 +902,7 @@
     <script src="js/luxury.js"></script>
     <script src="js/leaderboard.js"></script>
     <script src="js/casino.js"></script>
+    <script src="js/oracle.js"></script>
     <script src="js/taxes.js"></script>
     <script src="js/events.js"></script>
     <script src="js/charts.js"></script>
