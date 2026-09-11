@@ -167,6 +167,10 @@
   /* ------------------------------ Schluss */
   .closing{font-size:clamp(1.2rem,3vw,1.5rem)}
   .thanks{font-size:clamp(2.4rem,8vw,4.2rem);font-weight:800;letter-spacing:-.03em;margin-bottom:12px}
+  .qrcode{display:flex;flex-direction:column;align-items:center;gap:10px;margin-top:28px}
+  .qrcode img{width:min(200px,40vmin);border-radius:16px;border:6px solid #fff;box-shadow:0 12px 34px rgba(0,0,0,.45)}
+  .qrcode .cap{font-size:.86rem;color:var(--muted)}
+  .qrcode .cap b{color:var(--gold)}
 
   /* ---------- Navigations-Pfeile ---------- */
   .navarrow{
@@ -371,6 +375,10 @@
       <div class="ctas">
         <a class="btn btn-gold" href="..">🚀 App ausprobieren</a>
         <a class="btn btn-ghost" href="#" onclick="event.preventDefault();window.print()">🖨️ Drucken / PDF</a>
+      </div>
+      <div class="qrcode">
+        <img src="../assets/qr-code.png" alt="QR-Code zur InvestSim-App">
+        <span class="cap">📲 Scanne mich – direkt in die App · <b>poki83.github.io/investment-simulator</b></span>
       </div>
       <p class="hint" style="margin-top:26px">Ein Schulprojekt von <b>Pit, Richard &amp; Laris</b> · Klasse 9a · Stadtteilschule Waldörfer</p>
     </div>
